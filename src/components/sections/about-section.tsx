@@ -21,8 +21,8 @@ export function AboutSection() {
             <Card className="overflow-hidden border-2 neon-border">
               <CardContent className="p-0">
                 <Image
-                  src="https://cdn.discordapp.com/attachments/1402190606301794395/1402190969096372387/1.png?ex=6893039a&is=6891b21a&hm=1decdb7202f1276a8f0fee390a69f9567a2182e50ae57130180c9064ff000ae8&"
-                  alt="Burgershot restaurant"
+                  src="https://cdn.discordapp.com/attachments/1402190606301794395/1402222031025471589/1.png?ex=68932088&is=6891cf08&hm=9b43f9ef8dc2c7607925351d458afffd394a7574d5e960b60a2d8491bb545ae5&"
+                  alt="GM_Logo"
                   width={600}
                   height={400}
                   className="object-cover w-full h-auto"
