@@ -15,6 +15,7 @@ const menuItems = {
   burgers: [
     { name: "Steahouse Supreme Burger", price: "$25,000", description: "Our signature classic. A juicy beef patty, special sauce, lettuce, cheese, pickles, onions on a sesame seed bun." },
     { name: "Sunrise Ham Melt Sandwich", price: "$11,000", description: "Double patty, double cheese, bacon, and a fried egg. Not for the faint of heart." },
+    { name: "NEW BURGERS & SANDWICHES", price: "COMING SOON!", description: "Coming Soon!" },
    
   ],
   sides: [
@@ -24,6 +25,7 @@ const menuItems = {
   drinks: [
     { name: "E-Cola", price: "$25,000", description: "The classic taste of virtual refreshment." },
     { name: "Sprunk", price: "$11,000", description: "For when you need that extra green kick." },
+    { name: "NEW SIDES AND DRINKS", price: "COMING SOON!", description: "Coming Soon!" },
   ],
 };
 
