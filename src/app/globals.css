@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 248 39% 58%; /* Deep Purple */
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 51 100% 50%; /* Electric Gold */
+    --accent-foreground: 0 0% 7%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 10% 3.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 7%; /* Almost Black */
+    --foreground: 0 0% 98%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 248 39% 58%; /* Deep Purple */
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 51 100% 50%; /* Electric Gold */
+    --accent-foreground: 0 0% 7%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 51 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  ::selection {
+    @apply bg-primary/50 text-primary-foreground;
+  }
+}
+
+/* Neon glow effect for buttons */
+.neon-button {
+  @apply shadow-[0_0_5px_theme(colors.accent.DEFAULT),0_0_10px_theme(colors.accent.DEFAULT),0_0_20px_theme(colors.accent.DEFAULT)] transition-all duration-300;
+}
+.neon-button:hover {
+  @apply shadow-[0_0_10px_theme(colors.accent.DEFAULT),0_0_20px_theme(colors.accent.DEFAULT),0_0_40px_theme(colors.accent.DEFAULT)];
+}
+
+/* Glowing border effect for cards */
+.neon-border {
+  @apply border-accent/20 shadow-[0_0_15px_-5px_theme(colors.accent.DEFAULT)] transition-all duration-300;
+}
+.neon-border:hover {
+  @apply border-accent/50 shadow-[0_0_25px_-5px_theme(colors.accent.DEFAULT)];
+}
