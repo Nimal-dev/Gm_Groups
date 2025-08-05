@@ -3,8 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 const pillars = [
   {
-    name: "Godwin Memana",
-    title: "Boss",
+    name: "Godwin memana",
+    title: "The Boss",
     description: "The architect of our empire. With a mind for strategy and a vision that cuts through the chaos, The Boss guides our every move.",
     image: {
       src: "https://placehold.co/400x500.png",
@@ -13,20 +13,20 @@ const pillars = [
   },
   {
     name: "Nimal Prince",
-    title: "Manager",
+    title: "The Manager",
     description: "The engine of our operations. The Manager ensures every deal is sealed, every asset is managed, and the gears of our enterprise turn smoothly.",
     image: {
-      src: "https://media.discordapp.net/attachments/1402190606301794395/1402216731157594203/nimal.png?ex=68931b98&is=6891ca18&hm=f80baa958f102c4fc30482bc56a29d22cf27e6159a9067767c81d5251146de74&=&format=webp&quality=lossless&width=533&height=800",
-      hint: "gta character male suit"
+      src: "https://cdn.discordapp.com/attachments/1402190606301794395/1402256964821455060/nimal.png?ex=68934111&is=6891ef91&hm=51dd3245356d411d9c513a2dd3d8ea5fd0f2f91a3be80f7cc5064fd155f46934&",
+      hint: "gta character male business"
     }
   },
   {
-    name: "Ambaan OP",
-    title: "Legal Advisor",
-    description: "The Legal Advisor navigates the treacherous waters of the law, ensuring our business remains untouchable.",
+    name: "Ambaan op",
+    title: "The Legal Advisor",
+    description: "The shadow navigates the treacherous waters of the law, ensuring our business remains untouchable.",
     image: {
       src: "https://media.discordapp.net/attachments/1402190606301794395/1402216730826248315/Ambaan.png?ex=68931b98&is=6891ca18&hm=5150ed6ce7557295bb0f90d292c211edff34f1ee21f906e7991a280a4fea0633&=&format=webp&quality=lossless&width=533&height=800",
-      hint: "gta character male legal advisor"
+      hint: "gta character male lawyer"
     }
   }
 ];

@@ -11,7 +11,7 @@ export function AboutSection() {
               About <span className="text-primary">GM Groups</span>
             </h2>
             <p className="text-lg text-muted-foreground">
-              GM Groups Pvt Ltd stands as the most dominant Roleplay club on the Xlantis server. Our roots run deep in the city's underbelly and its high-flying corporate world. We are more than a crew; we are a family bound by a legacy of strategic business, and unwavering loyalty.
+              GM Groups Pvt Ltd stands as the most dominant Roleplay club on the Xlantis server. Our roots run deep in the city's underbelly and its high-flying corporate world. We are more than a crew; we are a family bound by a legacy of strategic business, calculated crime, and unwavering loyalty.
             </p>
             <p className="text-lg text-muted-foreground">
               Our influence extends to every corner of the city, most notably through our ownership of <span className="font-bold text-primary">Burgershot</span> – the most loved and frequented fast-food spot in Xlantis. It's a testament to our public face, a symbol of our power to control both the streets and the spreadsheets.
@@ -21,7 +21,7 @@ export function AboutSection() {
             <Card className="overflow-hidden border-2 neon-border">
               <CardContent className="p-0">
                 <Image
-                  src="https://cdn.discordapp.com/attachments/1402190606301794395/1402222031025471589/1.png?ex=68932088&is=6891cf08&hm=9b43f9ef8dc2c7607925351d458afffd394a7574d5e960b60a2d8491bb545ae5&"
+                  src="https://cdn.discordapp.com/attachments/1402190606301794395/1402190969096372387/1.png?ex=6893039a&is=6891b21a&hm=1decdb7202f1276a8f0fee390a69f9567a2182e50ae57130180c9064ff000ae8&"
                   alt="GM_Logo"
                   width={600}
                   height={400}

@@ -5,6 +5,7 @@ import { HeroSection } from '@/components/sections/hero-section';
 import { JoinUsSection } from '@/components/sections/join-us-section';
 import { PillarsSection } from '@/components/sections/pillars-section';
 import { Footer } from '@/components/footer';
+import { BurgershotCTA } from '@/components/sections/burgershot-cta';
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
         <AboutSection />
         <PillarsSection />
         <BusinessSection />
+        <BurgershotCTA />
         <JoinUsSection />
       </main>
       <Footer />
