@@ -31,13 +31,15 @@ const menuItems = {
 
 const ambianceImages = [
   { src: "https://cdn.discordapp.com/attachments/1402190606301794395/1402260583696437288/2.png?ex=6893446f&is=6891f2ef&hm=774df0da77b5fdec188a781e14f0a43752d6ead38149ea629aa155998e3281a0&", alt: "Burgershot interior view 1", hint: "diner interior night" },
+  
   { src: "https://cdn.discordapp.com/attachments/1402190606301794395/1402261583383494707/ChatGPT_Image_Aug_5_2025_05_36_01_PM.png?ex=6893455e&is=6891f3de&hm=3d82ee560818871e597f5ebe9b99c53e8ba1cd2ed8d032a024f4d03f2002868e&", alt: "Burgershot interior view 2", hint: "retro diner booth" },
-  { src: "https://placehold.co/600x400.png", alt: "Burgershot interior view 3", hint: "neon sign food" },
+
+  { src: "https://cdn.discordapp.com/attachments/1402190606301794395/1402303900094300262/ChatGPT_Image_Aug_5_2025_08_23_47_PM.png?ex=68936cc7&is=68921b47&hm=9924db660df40d4f716d5657531bb4dbf0de3452b85a9bdee0886d0fb68b9ea7&", alt: "Burgershot interior view 3", hint: "neon sign food" },
 ];
 
 export default function BurgershotPage() {
   const plugin = React.useRef(
-    Autoplay({ delay: 2000, stopOnInteraction: false, stopOnMouseEnter: false })
+    Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })
   );
 
   return (
@@ -51,10 +53,10 @@ export default function BurgershotPage() {
         >
           <div className="absolute inset-0 bg-black/70" />
           <div className="container relative z-10 px-4 mx-auto text-center">
-            <h1 className="text-5xl font-bold tracking-tight text-white uppercase font-headline md:text-7xl">
+            <h1 className="text-5xl font-bold tracking-tight text-white uppercase font-headline md:text-7xl" data-aos="fade-up">
               Welcome to <span className="text-primary">Burgershot</span>
             </h1>
-            <p className="max-w-3xl mx-auto mt-6 text-2xl italic text-accent font-headline">
+            <p className="max-w-3xl mx-auto mt-6 text-2xl italic text-accent font-headline" data-aos="fade-up" data-aos-delay="200">
               &ldquo;The Taste of Freedom and Profit.&rdquo;
             </p>
           </div>
