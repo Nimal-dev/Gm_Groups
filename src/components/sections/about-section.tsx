@@ -11,7 +11,7 @@ export function AboutSection() {
               About <span className="text-primary">GM Groups</span>
             </h2>
             <p className="text-lg text-muted-foreground">
-              GM Groups Pvt Ltd stands as the most dominant Roleplay club on the Xlantis server. Our roots run deep in the city's underbelly and its high-flying corporate world. We are more than a crew; we are a family bound by a legacy of strategic business, calculated crime, and unwavering loyalty.
+              GM Groups Pvt Ltd stands as the most dominant Roleplay club on the Xlantis server. Our roots run deep in the city's underbelly and its high-flying corporate world. We are more than a crew; we are a family bound by a legacy of strategic business, and unwavering loyalty.
             </p>
             <p className="text-lg text-muted-foreground">
               Our influence extends to every corner of the city, most notably through our ownership of <span className="font-bold text-primary">Burgershot</span> – the most loved and frequented fast-food spot in Xlantis. It's a testament to our public face, a symbol of our power to control both the streets and the spreadsheets.
