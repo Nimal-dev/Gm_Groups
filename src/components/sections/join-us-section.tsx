@@ -23,7 +23,7 @@ export function JoinUsSection() {
             Ready to Join The Elite?
           </h2>
           <p className="max-w-2xl mx-auto mt-6 text-xl text-muted-foreground">
-            Loyalty is our currency and power is our language. If you have what it takes to thrive in the high-stakes world of Xlantis, your family is waiting.
+            Loyalty is our currency and respect is our language. If you have what it takes to thrive in the high-stakes world of Xlantis, we are waiting for you!.
           </p>
           <div className="mt-10">
             <Button asChild size="lg" className="flex items-center px-10 py-6 text-lg font-bold text-background bg-accent neon-button hover:bg-accent/90">

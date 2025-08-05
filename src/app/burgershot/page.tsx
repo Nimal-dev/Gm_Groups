@@ -15,6 +15,7 @@ const menuItems = {
   burgers: [
     { name: "Steahouse Supreme Burger", price: "$25,000", description: "Our signature classic. A juicy beef patty, special sauce, lettuce, cheese, pickles, onions on a sesame seed bun." },
     { name: "Sunrise Ham Melt Sandwich", price: "$11,000", description: "Double patty, double cheese, bacon, and a fried egg. Not for the faint of heart." },
+    { name: "NEW BURGERS & SANDWICHES", price: "COMING SOON!", description: "Coming Soon!" },
    
   ],
   sides: [
@@ -24,6 +25,7 @@ const menuItems = {
   drinks: [
     { name: "E-Cola", price: "$25,000", description: "The classic taste of virtual refreshment." },
     { name: "Sprunk", price: "$11,000", description: "For when you need that extra green kick." },
+    { name: "NEW SIDES AND DRINKS", price: "COMING SOON!", description: "Coming Soon!" },
   ],
 };
 
@@ -35,7 +37,7 @@ const ambianceImages = [
 
 export default function BurgershotPage() {
   const plugin = React.useRef(
-    Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true })
+    Autoplay({ delay: 2000, stopOnInteraction: false, stopOnMouseEnter: false })
   );
 
   return (
@@ -101,7 +103,7 @@ export default function BurgershotPage() {
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <Card className="overflow-hidden border-2 neon-border lg:order-last">
                 <Image
-                  src="https://placehold.co/600x400.png"
+                  src="https://cdn.discordapp.com/attachments/1402190606301794395/1402267165331030066/4.png?ex=68934a91&is=6891f911&hm=b3f26020c9e1b8e5a6aeaeae346b055ee844e138d613b180bed49528985b7b95&"
                   alt="Burgershot kitchen"
                   width={600}
                   height={400}
