@@ -3,8 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 const pillars = [
   {
-    name: "The Boss",
-    title: "Strategic Leader & Visionary",
+    name: "Godwin Memana",
+    title: "Boss",
     description: "The architect of our empire. With a mind for strategy and a vision that cuts through the chaos, The Boss guides our every move.",
     image: {
       src: "https://placehold.co/400x500.png",
@@ -12,21 +12,21 @@ const pillars = [
     }
   },
   {
-    name: "The Manager",
-    title: "Operations & Deals",
+    name: "Nimal Prince",
+    title: "Manager",
     description: "The engine of our operations. The Manager ensures every deal is sealed, every asset is managed, and the gears of our enterprise turn smoothly.",
     image: {
-      src: "https://placehold.co/400x500.png",
-      hint: "gta character female business"
+      src: "https://media.discordapp.net/attachments/1402190606301794395/1402216731157594203/nimal.png?ex=68931b98&is=6891ca18&hm=f80baa958f102c4fc30482bc56a29d22cf27e6159a9067767c81d5251146de74&=&format=webp&quality=lossless&width=533&height=800",
+      hint: "gta character male suit"
     }
   },
   {
-    name: "The Legal Advisor",
-    title: "Clean-ups & Cover-ups",
+    name: "Ambaan OP",
+    title: "Legal Advisor",
     description: "The Legal Advisor navigates the treacherous waters of the law, ensuring our business remains untouchable.",
     image: {
-      src: "https://placehold.co/400x500.png",
-      hint: "gta character male lawyer"
+      src: "https://media.discordapp.net/attachments/1402190606301794395/1402216730826248315/Ambaan.png?ex=68931b98&is=6891ca18&hm=5150ed6ce7557295bb0f90d292c211edff34f1ee21f906e7991a280a4fea0633&=&format=webp&quality=lossless&width=533&height=800",
+      hint: "gta character male legal advisor"
     }
   }
 ];
