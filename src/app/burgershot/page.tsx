@@ -13,23 +13,23 @@ import React from "react";
 
 const menuItems = {
   burgers: [
-    { name: "Bleeder Burger", price: "$15", description: "Our signature classic. A juicy beef patty, special sauce, lettuce, cheese, pickles, onions on a sesame seed bun." },
-    { name: "Heart Stopper", price: "$20", description: "Double patty, double cheese, bacon, and a fried egg. Not for the faint of heart." },
-    { name: "Money Shot", price: "$18", description: "A wagyu beef patty, truffle aioli, arugula, and swiss cheese. Pure luxury." },
+    { name: "Steahouse Supreme Burger", price: "$25,000", description: "Our signature classic. A juicy beef patty, special sauce, lettuce, cheese, pickles, onions on a sesame seed bun." },
+    { name: "Sunrise Ham Melt Sandwich", price: "$11,000", description: "Double patty, double cheese, bacon, and a fried egg. Not for the faint of heart." },
+   
   ],
   sides: [
-    { name: "Unhappy Meal Fries", price: "$6", description: "Crispy, salty, and perfect for sharing. Or not." },
-    { name: "Onion Rings of Power", price: "$8", description: "Thick-cut, beer-battered onion rings. One ring to rule them all." },
+    { name: " Fries", price: "$5,000", description: "Crispy, salty, and perfect for sharing. Or not." },
+    
   ],
   drinks: [
-    { name: "E-Cola", price: "$5", description: "The classic taste of virtual refreshment." },
-    { name: "Sprunk", price: "$5", description: "For when you need that extra green kick." },
+    { name: "E-Cola", price: "$25,000", description: "The classic taste of virtual refreshment." },
+    { name: "Sprunk", price: "$11,000", description: "For when you need that extra green kick." },
   ],
 };
 
 const ambianceImages = [
-  { src: "https://placehold.co/600x400.png", alt: "Burgershot interior view 1", hint: "diner interior night" },
-  { src: "https://placehold.co/600x400.png", alt: "Burgershot interior view 2", hint: "retro diner booth" },
+  { src: "https://cdn.discordapp.com/attachments/1402190606301794395/1402260583696437288/2.png?ex=6893446f&is=6891f2ef&hm=774df0da77b5fdec188a781e14f0a43752d6ead38149ea629aa155998e3281a0&", alt: "Burgershot interior view 1", hint: "diner interior night" },
+  { src: "https://cdn.discordapp.com/attachments/1402190606301794395/1402261583383494707/ChatGPT_Image_Aug_5_2025_05_36_01_PM.png?ex=6893455e&is=6891f3de&hm=3d82ee560818871e597f5ebe9b99c53e8ba1cd2ed8d032a024f4d03f2002868e&", alt: "Burgershot interior view 2", hint: "retro diner booth" },
   { src: "https://placehold.co/600x400.png", alt: "Burgershot interior view 3", hint: "neon sign food" },
 ];
 
@@ -44,7 +44,7 @@ export default function BurgershotPage() {
       <main className="flex-grow">
         <section
           className="relative py-40 text-white bg-center bg-cover bg-fixed sm:py-60"
-          style={{ backgroundImage: "url('https://placehold.co/1920x1080.png')" }}
+          style={{ backgroundImage: "url('https://cdn.discordapp.com/attachments/1402190606301794395/1402196301814169631/BS_1.png?ex=68930891&is=6891b711&hm=c292387f17da90d3f31bf96773162176462243db88ca2339276111741034a154&')" }}
           data-ai-hint="fast food restaurant interior"
         >
           <div className="absolute inset-0 bg-black/70" />

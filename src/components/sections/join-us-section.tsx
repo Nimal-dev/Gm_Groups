@@ -13,7 +13,7 @@ export function JoinUsSection() {
     <section 
       id="join" 
       className="relative py-32 text-white bg-center bg-cover bg-fixed sm:py-48"
-      style={{backgroundImage: "url('https://placehold.co/1920x1080.png')"}}
+      style={{backgroundImage: "url('https://cdn.discordapp.com/attachments/1402190606301794395/1402199591612317696/ChatGPT_Image_Aug_5_2025_01_28_17_PM_1.png?ex=68930ba2&is=6891ba22&hm=c26b37f327d0704c5ca223352bfab527ff0bf219043e29aa74c1e9c52f902825&')"}}
       data-ai-hint="luxury cars night city"
     >
       <div className="absolute inset-0 bg-gradient-to-t from-background via-black/80 to-black/70" />
@@ -27,7 +27,7 @@ export function JoinUsSection() {
           </p>
           <div className="mt-10">
             <Button asChild size="lg" className="flex items-center px-10 py-6 text-lg font-bold text-background bg-accent neon-button hover:bg-accent/90">
-              <Link href="https://discord.gg/" target="_blank" rel="noopener noreferrer">
+              <Link href="https://discord.gg/jfgTHBnVYD" target="_blank" rel="noopener noreferrer">
                 <DiscordIcon className="w-6 h-6 mr-2" />
                 Join our Discord
               </Link>
