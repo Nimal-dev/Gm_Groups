@@ -18,7 +18,7 @@ export function BusinessSection() {
             More than just a fast-food joint, Burgershot is a hub of information, a neutral ground for meetings, and a symbol of our public-facing dominance. It's the jewel in our commercial crown.
           </p>
           <blockquote className="mt-8 text-2xl italic font-semibold text-accent font-headline">
-            &ldquo;Where crime meets cuisine.&rdquo;
+            &ldquo;Where city meets cuisine.&rdquo;
           </blockquote>
         </div>
       </div>

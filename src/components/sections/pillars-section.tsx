@@ -23,7 +23,7 @@ const pillars = [
   {
     name: "The Legal Advisor",
     title: "Clean-ups & Cover-ups",
-    description: "The shadow that erases our tracks. The Legal Advisor navigates the treacherous waters of the law, ensuring our business remains untouchable.",
+    description: "The Legal Advisor navigates the treacherous waters of the law, ensuring our business remains untouchable.",
     image: {
       src: "https://placehold.co/400x500.png",
       hint: "gta character male lawyer"
