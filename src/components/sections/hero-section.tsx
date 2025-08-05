@@ -8,7 +8,7 @@ export function HeroSection() {
     <section 
       id="hero" 
       className="relative flex items-center justify-center w-full min-h-screen text-white bg-center bg-cover bg-no-repeat bg-fixed"
-      style={{backgroundImage: "url('https://media.discordapp.net/attachments/1402190606301794395/1402190744231477329/wp_logo.jpg?ex=68930364&is=6891b1e4&hm=aba8dc0b8113428567257b43fdcb1e02cd38c9d5adebd5221bbb3743eb14c1c7&=&format=webp&width=1423&height=800')"}}
+      style={{backgroundImage: "url('https://cdn.discordapp.com/attachments/1402190606301794395/1402190744231477329/wp_logo.jpg?ex=68930364&is=6891b1e4&hm=aba8dc0b8113428567257b43fdcb1e02cd38c9d5adebd5221bbb3743eb14c1c7&')"}}
       data-ai-hint="cinematic city nightscape"
     >
       <div className="absolute inset-0 bg-black/60" />
