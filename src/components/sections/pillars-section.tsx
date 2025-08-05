@@ -26,7 +26,7 @@ const pillars = [
     description: "The Legal Advisor navigates the treacherous waters of the law, ensuring our business remains untouchable.",
     image: {
       src: "https://media.discordapp.net/attachments/1402190606301794395/1402216730826248315/Ambaan.png?ex=68931b98&is=6891ca18&hm=5150ed6ce7557295bb0f90d292c211edff34f1ee21f906e7991a280a4fea0633&=&format=webp&quality=lossless&width=533&height=800",
-      hint: "gta character male lawyer"
+      hint: "gta character male legal advisor"
     }
   }
 ];
