@@ -37,7 +37,7 @@ const ambianceImages = [
 
 export default function BurgershotPage() {
   const plugin = React.useRef(
-    Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true })
+    Autoplay({ delay: 2000, stopOnInteraction: false, stopOnMouseEnter: false })
   );
 
   return (
@@ -103,7 +103,7 @@ export default function BurgershotPage() {
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <Card className="overflow-hidden border-2 neon-border lg:order-last">
                 <Image
-                  src="https://placehold.co/600x400.png"
+                  src="https://cdn.discordapp.com/attachments/1402190606301794395/1402267165331030066/4.png?ex=68934a91&is=6891f911&hm=b3f26020c9e1b8e5a6aeaeae346b055ee844e138d613b180bed49528985b7b95&"
                   alt="Burgershot kitchen"
                   width={600}
                   height={400}

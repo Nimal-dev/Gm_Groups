@@ -37,7 +37,7 @@ export function PillarsSection() {
       <div className="container px-4 mx-auto">
         <div className="mb-16 text-center">
           <h2 className="text-4xl font-bold tracking-tight text-white uppercase font-headline md:text-5xl">
-            Our <span className="text-primary">Pillars</span>
+            Our<span className="text-primary">Pillars</span>
           </h2>
           <p className="max-w-2xl mx-auto mt-4 text-lg text-muted-foreground">
             Three core members form the foundation of our power.
