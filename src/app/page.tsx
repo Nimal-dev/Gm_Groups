@@ -16,7 +16,7 @@ export default function Home() {
         <AboutSection />
         <PillarsSection />
         <BusinessSection />
-        <BurgershotCTA />
+        {/* <BurgershotCTA /> */}
         <JoinUsSection />
       </main>
       <Footer />

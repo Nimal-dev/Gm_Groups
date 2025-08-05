@@ -19,13 +19,13 @@ export function JoinUsSection() {
       <div className="absolute inset-0 bg-gradient-to-t from-background via-black/80 to-black/70" />
       <div className="container relative z-10 px-4 mx-auto">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl font-bold tracking-tight text-white uppercase font-headline md:text-5xl">
+          <h2 className="text-4xl font-bold tracking-tight text-white uppercase font-headline md:text-5xl" data-aos="fade-up">
             Ready to Join The Elite?
           </h2>
-          <p className="max-w-2xl mx-auto mt-6 text-xl text-muted-foreground">
+          <p className="max-w-2xl mx-auto mt-6 text-xl text-muted-foreground" data-aos="fade-up" data-aos-delay="200">
             Loyalty is our currency and respect is our language. If you have what it takes to thrive in the high-stakes world of Xlantis, we are waiting for you!.
           </p>
-          <div className="mt-10">
+          <div className="mt-10" data-aos="fade-up" data-aos-delay="400">
             <Button asChild size="lg" className="flex items-center px-10 py-6 text-lg font-bold text-background bg-accent neon-button hover:bg-accent/90">
               <Link href="https://discord.gg/jfgTHBnVYD" target="_blank" rel="noopener noreferrer">
                 <DiscordIcon className="w-6 h-6 mr-2" />
