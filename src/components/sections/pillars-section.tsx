@@ -3,15 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 const pillars = [
   {
-    name: "Godwin memana",
-    title: "The Boss",
-    description: "The architect of our empire. With a mind for strategy and a vision that cuts through the chaos, The Boss guides our every move.",
-    image: {
-      src: "https://placehold.co/400x500.png",
-      hint: "gta character male suit"
-    }
-  },
-  {
     name: "Nimal Prince",
     title: "The Manager",
     description: "The engine of our operations. The Manager ensures every deal is sealed, every asset is managed, and the gears of our enterprise turn smoothly.",
@@ -20,6 +11,16 @@ const pillars = [
       hint: "gta character male business"
     }
   },
+  {
+    name: "Godwin memana",
+    title: "The Boss",
+    description: "The architect of our empire. With a mind for strategy and a vision that cuts through the chaos, The Boss guides our every move.",
+    image: {
+      src: "https://cdn.discordapp.com/attachments/1402190606301794395/1402391214288015451/GM.png?ex=6893be18&is=68926c98&hm=e6d0838f2999a7e1a8eb31364eeb97108800e5ac77de1c48f409f4f0bf51c6e1&",
+      hint: "gta character male suit"
+    }
+  },
+  
   {
     name: "Ambaan op",
     title: "The Legal Advisor",
