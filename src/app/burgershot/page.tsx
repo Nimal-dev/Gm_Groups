@@ -14,8 +14,8 @@ import React from "react";
 
 const menuItems = {
   burgers: [
-    { name: "Steahouse Supreme Burger", price: "$25,000", description: "Our signature classic. A juicy beef patty, special sauce, lettuce, cheese, pickles, onions on a sesame seed bun." },
-    { name: "Sunrise Ham Melt Sandwich", price: "$11,000", description: "Double patty, double cheese, bacon, and a fried egg. Not for the faint of heart." },
+    { name: "Steahouse Supreme Burger", price: "$25,000", description: "Our signature classic. A mix of juicy chicken, bacon and steak patty, special sauce, lettuce, cheese, pickles, onions, ketchup on a sesame seed bun." },
+    { name: "Sunrise Ham Melt Sandwich", price: "$11,000", description: "Double cheese, ham, and a fried egg. Not for the faint of heart." },
     { name: "NEW BURGERS & SANDWICHES", price: "COMING SOON!", description: "Coming Soon!" },
 
   ],
