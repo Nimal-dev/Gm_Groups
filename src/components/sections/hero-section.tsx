@@ -3,12 +3,14 @@ import Link from "next/link";
 import { ArrowDown } from "lucide-react";
 import { Logo } from "@/components/logo";
 
+import gm_wp from "../../../public/gm_wallpaper.jpg";
+
 export function HeroSection() {
   return (
     <section 
       id="hero" 
       className="relative flex items-center justify-center w-full min-h-screen text-white bg-center bg-cover bg-no-repeat bg-fixed"
-      style={{backgroundImage: "url('https://cdn.discordapp.com/attachments/1402190606301794395/1402190744231477329/wp_logo.jpg?ex=68930364&is=6891b1e4&hm=aba8dc0b8113428567257b43fdcb1e02cd38c9d5adebd5221bbb3743eb14c1c7&')"}}
+      style={{backgroundImage: `url(${gm_wp.src})`}}
       data-ai-hint="cinematic city nightscape"
     >
       <div className="absolute inset-0 bg-black/60" />

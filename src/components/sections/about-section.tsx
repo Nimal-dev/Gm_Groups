@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 
+import gm_logo from "../../../public/gm_logo.png"
+
 export function AboutSection() {
   return (
     <section id="about" className="py-24 bg-background sm:py-32">
@@ -21,7 +23,7 @@ export function AboutSection() {
             <Card className="overflow-hidden border-2 neon-border">
               <CardContent className="p-0">
                 <Image
-                  src="https://cdn.discordapp.com/attachments/1402190606301794395/1402190969096372387/1.png?ex=6893039a&is=6891b21a&hm=1decdb7202f1276a8f0fee390a69f9567a2182e50ae57130180c9064ff000ae8&"
+                  src= {gm_logo}
                   alt="GM_Logo"
                   width={600}
                   height={400}
