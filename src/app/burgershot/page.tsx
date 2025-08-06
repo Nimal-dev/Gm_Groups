@@ -106,7 +106,7 @@ export default function BurgershotPage() {
 
           </div>
         </section>
-
+{/* The abiance section */}
         <section id="about" className="py-24 sm:py-32">
           <div className="container px-4 mx-auto">
             <div className="grid items-center gap-12 lg:grid-cols-2">
@@ -151,7 +151,7 @@ export default function BurgershotPage() {
             </div>
           </div>
         </section>
-
+{/* The Kitchen section */}
         <section id="kitchen" className="py-24 bg-background/50 sm:py-32">
           <div className="container px-4 mx-auto">
             <div className="grid items-center gap-12 lg:grid-cols-2">
@@ -165,7 +165,7 @@ export default function BurgershotPage() {
                   data-ai-hint="restaurant kitchen action"
                 />
               </Card>
-              <div className="lg:order-first">
+              <div className="lg:order-last">
                 <h2 className="text-4xl font-bold tracking-tight text-white uppercase font-headline md:text-5xl">
                   The <span className="text-primary">Engine Room</span>
                 </h2>
