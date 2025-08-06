@@ -26,7 +26,7 @@ export function HeroSection() {
         </div>
         <div className="mt-10" data-aos="fade-up" data-aos-delay="600">
           <Button asChild size="lg" className="px-10 py-6 text-lg font-bold text-background bg-accent neon-button hover:bg-accent/90">
-            <Link href="#join">Join The Family</Link>
+            <Link href="#join">Join The Club</Link>
           </Button>
         </div>
       </div>
