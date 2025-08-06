@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -16,11 +17,11 @@ const menuItems = {
     { name: "Steahouse Supreme Burger", price: "$25,000", description: "Our signature classic. A juicy beef patty, special sauce, lettuce, cheese, pickles, onions on a sesame seed bun." },
     { name: "Sunrise Ham Melt Sandwich", price: "$11,000", description: "Double patty, double cheese, bacon, and a fried egg. Not for the faint of heart." },
     { name: "NEW BURGERS & SANDWICHES", price: "COMING SOON!", description: "Coming Soon!" },
-   
+
   ],
   sides: [
     { name: " Fries", price: "$5,000", description: "Crispy, salty, and perfect for sharing. Or not." },
-    
+
   ],
   drinks: [
     { name: "E-Cola", price: "$25,000", description: "The classic taste of virtual refreshment." },
@@ -31,7 +32,7 @@ const menuItems = {
 
 const ambianceImages = [
   { src: "https://cdn.discordapp.com/attachments/1402190606301794395/1402260583696437288/2.png?ex=6893446f&is=6891f2ef&hm=774df0da77b5fdec188a781e14f0a43752d6ead38149ea629aa155998e3281a0&", alt: "Burgershot interior view 1", hint: "diner interior night" },
-  
+
   { src: "https://cdn.discordapp.com/attachments/1402190606301794395/1402261583383494707/ChatGPT_Image_Aug_5_2025_05_36_01_PM.png?ex=6893455e&is=6891f3de&hm=3d82ee560818871e597f5ebe9b99c53e8ba1cd2ed8d032a024f4d03f2002868e&", alt: "Burgershot interior view 2", hint: "retro diner booth" },
 
   { src: "https://cdn.discordapp.com/attachments/1402190606301794395/1402303900094300262/ChatGPT_Image_Aug_5_2025_08_23_47_PM.png?ex=68936cc7&is=68921b47&hm=9924db660df40d4f716d5657531bb4dbf0de3452b85a9bdee0886d0fb68b9ea7&", alt: "Burgershot interior view 3", hint: "neon sign food" },
@@ -61,6 +62,50 @@ export default function BurgershotPage() {
             </p>
           </div>
         </section>
+{/* INVESTORS SECTION */}
+        {/* <section id="investors" className="py-24 sm:py-32">
+          <div className="container px-4 mx-auto">
+            <div className="grid items-center gap-12 lg:grid-cols-2">
+              <div>
+                <h2 className="text-4xl font-bold tracking-tight text-white uppercase font-headline md:text-5xl">
+                  Meet Our <span className="text-primary">Investors</span>
+                </h2>
+                <p className="mt-6 text-lg text-muted-foreground">
+                  At GM Groups, we take pride in our ventures—and none more than our beloved Burgershot outlet. This dream wouldn’t have been possible without the unwavering support of our sole investor, the Tokyo Family. Their full financial backing brought our vision to life, helping us serve great taste with unmatched passion. This is a joint venture between GM x TOKYO.
+                </p>
+              </div>
+              <Card className="overflow-hidden border-2 neon-border lg:order-last">
+                <Image
+                  src="https://cdn.discordapp.com/attachments/1402190606301794395/1402507691057741844/GMxTKY_site.png?ex=68942a92&is=6892d912&hm=406ef97ee8013d0f89471277f6099bbdbb5c857c43c4c329ddf89fe7378d4675&"
+                  alt="Burgershot kitchen"
+                  width={600}
+                  height={400}
+                  className="object-cover w-full h-auto"
+                  data-ai-hint="restaurant kitchen action"
+                />
+              </Card>
+            </div>
+          </div>
+        </section> */}
+        <section
+          id="business"
+          className="relative py-32 text-white bg-center bg-cover bg-fixed sm:py-48"
+          style={{ backgroundImage: "url('https://cdn.discordapp.com/attachments/1402190606301794395/1402507691057741844/GMxTKY_site.png?ex=68942a92&is=6892d912&hm=406ef97ee8013d0f89471277f6099bbdbb5c857c43c4c329ddf89fe7378d4675&')" }}
+          data-ai-hint="neon diner night"
+        >
+          <div className="absolute inset-0 bg-black/70" />
+          <div className="container relative z-10 px-4 mx-auto">
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-4xl font-bold tracking-tight text-white uppercase font-headline md:text-5xl" data-aos="fade-up">
+                MEET OUR <span className="text-primary">INVESTORS</span>
+              </h2>
+              <p className="max-w-2xl mx-auto mt-6 text-2xl text-bold text-muted-foreground text-center" data-aos="fade-up" data-aos-delay="200">
+                At GM Groups, we take pride in our ventures—and none more than our beloved Burgershot outlet. This dream wouldn’t have been possible without the unwavering support of our sole investor, the Tokyo Family. Their full financial backing brought our vision to life, helping us serve great taste with unmatched passion. This is a joint venture between GM x TOKYO.
+              </p>
+            </div>
+
+          </div>
+        </section>
 
         <section id="about" className="py-24 sm:py-32">
           <div className="container px-4 mx-auto">
@@ -73,24 +118,31 @@ export default function BurgershotPage() {
                   Step into a classic American diner with a modern, chaotic twist. Our interior is a carefully crafted blend of retro charm and urban grit, providing the perfect backdrop for business deals, casual meetups, or a quick escape. The neon glow, the checkered floors, and the smell of freedom (and fries) make Burgershot an unforgettable Xlantis landmark.
                 </p>
               </div>
-               <Card className="overflow-hidden border-2 neon-border">
+              <Card className="overflow-hidden border-2 neon-border">
                 <Carousel
                   plugins={[plugin.current]}
                   className="w-full"
                   onMouseEnter={plugin.current.stop}
                   onMouseLeave={plugin.current.reset}
+                  opts={{
+                    loop: true,
+                    align: 'start',
+                    skipSnaps: false,
+                  }}
                 >
                   <CarouselContent>
                     {ambianceImages.map((image, index) => (
-                      <CarouselItem key={index} className="ken-burns-slide">
+                      <CarouselItem key={index}>
+                        <div className="relative overflow-hidden rounded-lg">
                           <Image
                             src={image.src}
                             alt={image.alt}
                             width={600}
                             height={400}
-                            className="object-cover w-full h-auto"
+                            className="object-cover w-full h-auto transition-transform duration-700 ease-in-out hover:scale-105"
                             data-ai-hint={image.hint}
                           />
+                        </div>
                       </CarouselItem>
                     ))}
                   </CarouselContent>
@@ -124,7 +176,7 @@ export default function BurgershotPage() {
             </div>
           </div>
         </section>
-        
+
         <section id="menu" className="py-24 sm:py-32">
           <div className="container px-4 mx-auto">
             <div className="mb-16 text-center">
@@ -135,7 +187,7 @@ export default function BurgershotPage() {
                 Simple, iconic, and dangerously good.
               </p>
             </div>
-            
+
             <div className="space-y-12">
               <div>
                 <h3 className="mb-6 text-3xl font-bold text-center text-accent font-headline">Burgers</h3>
@@ -159,32 +211,32 @@ export default function BurgershotPage() {
               <div>
                 <h3 className="mb-6 text-3xl font-bold text-center text-accent font-headline">Sides & Drinks</h3>
                 <div className="grid gap-8 md:grid-cols-2">
-                    {menuItems.sides.map((item) => (
-                        <Card key={item.name} className="text-center bg-card neon-border">
-                            <CardHeader>
-                                <CardTitle className="text-xl text-primary">{item.name}</CardTitle>
-                            </CardHeader>
-                             <CardContent className="flex-grow">
-                                <CardDescription>{item.description}</CardDescription>
-                            </CardContent>
-                            <CardContent>
-                                <p className="text-lg font-bold text-accent">{item.price}</p>
-                            </CardContent>
-                        </Card>
-                    ))}
-                    {menuItems.drinks.map((item) => (
-                        <Card key={item.name} className="text-center bg-card neon-border">
-                            <CardHeader>
-                                <CardTitle className="text-xl text-primary">{item.name}</CardTitle>
-                            </CardHeader>
-                            <CardContent className="flex-grow">
-                                <CardDescription>{item.description}</CardDescription>
-                            </CardContent>
-                            <CardContent>
-                               <p className="text-lg font-bold text-accent">{item.price}</p>
-                            </CardContent>
-                        </Card>
-                    ))}
+                  {menuItems.sides.map((item) => (
+                    <Card key={item.name} className="text-center bg-card neon-border">
+                      <CardHeader>
+                        <CardTitle className="text-xl text-primary">{item.name}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="flex-grow">
+                        <CardDescription>{item.description}</CardDescription>
+                      </CardContent>
+                      <CardContent>
+                        <p className="text-lg font-bold text-accent">{item.price}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  {menuItems.drinks.map((item) => (
+                    <Card key={item.name} className="text-center bg-card neon-border">
+                      <CardHeader>
+                        <CardTitle className="text-xl text-primary">{item.name}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="flex-grow">
+                        <CardDescription>{item.description}</CardDescription>
+                      </CardContent>
+                      <CardContent>
+                        <p className="text-lg font-bold text-accent">{item.price}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </div>
             </div>
