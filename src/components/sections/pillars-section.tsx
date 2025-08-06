@@ -1,13 +1,17 @@
 import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
+import gm from "../../../public/GM.png"
+import ambaan from "../../../public/Ambaan.png"
+import nimal from "../../../public/Nimal.png"
+
 const pillars = [
   {
     name: "Nimal Prince",
     title: "The Manager",
     description: "The engine of our operations. The Manager ensures every deal is sealed, every asset is managed, and the gears of our enterprise turn smoothly.",
     image: {
-      src: "https://cdn.discordapp.com/attachments/1402190606301794395/1402256964821455060/nimal.png?ex=68934111&is=6891ef91&hm=51dd3245356d411d9c513a2dd3d8ea5fd0f2f91a3be80f7cc5064fd155f46934&",
+      src: nimal,
       hint: "gta character male business"
     }
   },
@@ -16,7 +20,7 @@ const pillars = [
     title: "The Boss",
     description: "The architect of our empire. With a mind for strategy and a vision that cuts through the chaos, The Boss guides our every move.",
     image: {
-      src: "https://cdn.discordapp.com/attachments/1402190606301794395/1402391214288015451/GM.png?ex=6893be18&is=68926c98&hm=e6d0838f2999a7e1a8eb31364eeb97108800e5ac77de1c48f409f4f0bf51c6e1&",
+      src: gm,
       hint: "gta character male suit"
     }
   },
@@ -26,7 +30,7 @@ const pillars = [
     title: "The Legal Advisor",
     description: "The shadow navigates the treacherous waters of the law, ensuring our business remains untouchable.",
     image: {
-      src: "https://media.discordapp.net/attachments/1402190606301794395/1402216730826248315/Ambaan.png?ex=68931b98&is=6891ca18&hm=5150ed6ce7557295bb0f90d292c211edff34f1ee21f906e7991a280a4fea0633&=&format=webp&quality=lossless&width=533&height=800",
+      src: ambaan,
       hint: "gta character male lawyer"
     }
   }

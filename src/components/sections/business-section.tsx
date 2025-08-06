@@ -3,12 +3,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
+import bs from "../../../public/bs.png"
+
 export function BusinessSection() {
   return (
     <section 
       id="business" 
       className="relative py-32 text-white bg-center bg-cover bg-fixed sm:py-48"
-      style={{backgroundImage: "url('https://cdn.discordapp.com/attachments/1402190606301794395/1402196301814169631/BS_1.png?ex=68930891&is=6891b711&hm=c292387f17da90d3f31bf96773162176462243db88ca2339276111741034a154&')"}}
+      style={{backgroundImage: `url(${bs.src})`}}
       data-ai-hint="neon diner night"
     >
       <div className="absolute inset-0 bg-black/70" />

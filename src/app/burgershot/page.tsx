@@ -12,6 +12,10 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
+import bs_shop from "../../../public/bs.png"
+import gmxtokyo from "../../../public/GMxTKY_site.png"
+import kitchen from "../../../public/kitchen.png"
+
 const menuItems = {
   burgers: [
     { name: "Steahouse Supreme Burger", price: "$25,000", description: "Our signature classic. A mix of juicy chicken, bacon and steak patty, special sauce, lettuce, cheese, pickles, onions, ketchup on a sesame seed bun." },
@@ -30,17 +34,21 @@ const menuItems = {
   ],
 };
 
+import image1 from "../../../public/1.png";
+import image2 from "../../../public/2.png";
+import image3 from "../../../public/3.png";
+import image4 from "../../../public/bsoffice.png";
+
 const ambianceImages = [
-  { src: "https://cdn.discordapp.com/attachments/1402190606301794395/1402260583696437288/2.png?ex=6893446f&is=6891f2ef&hm=774df0da77b5fdec188a781e14f0a43752d6ead38149ea629aa155998e3281a0&", alt: "Burgershot interior view 1", hint: "diner interior night" },
-
-  { src: "https://cdn.discordapp.com/attachments/1402190606301794395/1402261583383494707/ChatGPT_Image_Aug_5_2025_05_36_01_PM.png?ex=6893455e&is=6891f3de&hm=3d82ee560818871e597f5ebe9b99c53e8ba1cd2ed8d032a024f4d03f2002868e&", alt: "Burgershot interior view 2", hint: "retro diner booth" },
-
-  { src: "https://cdn.discordapp.com/attachments/1402190606301794395/1402303900094300262/ChatGPT_Image_Aug_5_2025_08_23_47_PM.png?ex=68936cc7&is=68921b47&hm=9924db660df40d4f716d5657531bb4dbf0de3452b85a9bdee0886d0fb68b9ea7&", alt: "Burgershot interior view 3", hint: "neon sign food" },
+  { src: image1, alt: "Burgershot interior view 1", hint: "diner interior night" },
+  { src: image2, alt: "Burgershot interior view 2", hint: "retro diner booth" },
+  { src: image3, alt: "Burgershot exterior view ", hint: "drive thru" },
+  { src: image4, alt: "Burgershot interior view 4", hint: "neon sign food" },
 ];
 
 export default function BurgershotPage() {
   const plugin = React.useRef(
-    Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })
+    Autoplay({ delay: 2000, stopOnInteraction: false, stopOnMouseEnter: true })
   );
 
   return (
@@ -49,7 +57,8 @@ export default function BurgershotPage() {
       <main className="flex-grow">
         <section
           className="relative py-40 text-white bg-center bg-cover bg-fixed sm:py-60"
-          style={{ backgroundImage: "url('https://cdn.discordapp.com/attachments/1402190606301794395/1402196301814169631/BS_1.png?ex=68930891&is=6891b711&hm=c292387f17da90d3f31bf96773162176462243db88ca2339276111741034a154&')" }}
+          style={{ backgroundImage: `url(${bs_shop.src})` }}
+
           data-ai-hint="fast food restaurant interior"
         >
           <div className="absolute inset-0 bg-black/70" />
@@ -63,34 +72,11 @@ export default function BurgershotPage() {
           </div>
         </section>
 {/* INVESTORS SECTION */}
-        {/* <section id="investors" className="py-24 sm:py-32">
-          <div className="container px-4 mx-auto">
-            <div className="grid items-center gap-12 lg:grid-cols-2">
-              <div>
-                <h2 className="text-4xl font-bold tracking-tight text-white uppercase font-headline md:text-5xl">
-                  Meet Our <span className="text-primary">Investors</span>
-                </h2>
-                <p className="mt-6 text-lg text-muted-foreground">
-                  At GM Groups, we take pride in our ventures—and none more than our beloved Burgershot outlet. This dream wouldn’t have been possible without the unwavering support of our sole investor, the Tokyo Family. Their full financial backing brought our vision to life, helping us serve great taste with unmatched passion. This is a joint venture between GM x TOKYO.
-                </p>
-              </div>
-              <Card className="overflow-hidden border-2 neon-border lg:order-last">
-                <Image
-                  src="https://cdn.discordapp.com/attachments/1402190606301794395/1402507691057741844/GMxTKY_site.png?ex=68942a92&is=6892d912&hm=406ef97ee8013d0f89471277f6099bbdbb5c857c43c4c329ddf89fe7378d4675&"
-                  alt="Burgershot kitchen"
-                  width={600}
-                  height={400}
-                  className="object-cover w-full h-auto"
-                  data-ai-hint="restaurant kitchen action"
-                />
-              </Card>
-            </div>
-          </div>
-        </section> */}
+
         <section
           id="business"
           className="relative py-32 text-white bg-center bg-cover bg-fixed sm:py-48"
-          style={{ backgroundImage: "url('https://cdn.discordapp.com/attachments/1402190606301794395/1402507691057741844/GMxTKY_site.png?ex=68942a92&is=6892d912&hm=406ef97ee8013d0f89471277f6099bbdbb5c857c43c4c329ddf89fe7378d4675&')" }}
+          style={{ backgroundImage: `url(${gmxtokyo.src})` }}
           data-ai-hint="neon diner night"
         >
           <div className="absolute inset-0 bg-black/70" />
@@ -157,7 +143,7 @@ export default function BurgershotPage() {
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <Card className="overflow-hidden border-2 neon-border lg:order-last">
                 <Image
-                  src="https://cdn.discordapp.com/attachments/1402190606301794395/1402267165331030066/4.png?ex=68934a91&is=6891f911&hm=b3f26020c9e1b8e5a6aeaeae346b055ee844e138d613b180bed49528985b7b95&"
+                  src= {kitchen}
                   alt="Burgershot kitchen"
                   width={600}
                   height={400}
