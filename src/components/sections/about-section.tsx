@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 
-import gm_logo from "../../../public/gm_logo.png"
+import gm_logo from "../../../public/gm_logo_dark.png"
 
 export function AboutSection() {
   return (
