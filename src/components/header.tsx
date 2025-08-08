@@ -26,7 +26,7 @@ export function Header() {
         </Button>
       </nav>
       <div className="flex items-center gap-2">
-        <MusicToggle />
+        {/* <MusicToggle /> */}
         {/* Add mobile menu toggle here if needed */}
       </div>
     </header>
