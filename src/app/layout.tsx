@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AOSProvider } from '@/components/aos-provider';
+import { AutoplayMusicPlayer } from '@/components/autoplay-music-player';
 
 export const metadata: Metadata = {
   title: 'GM Groups Xlantis',
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <AOSProvider>
           {children}
+          <AutoplayMusicPlayer />
           <Toaster />
         </AOSProvider>
       </body>
