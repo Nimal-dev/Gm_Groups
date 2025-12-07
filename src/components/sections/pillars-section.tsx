@@ -24,7 +24,7 @@ const pillars = [
       hint: "gta character male suit"
     }
   },
-  
+
   {
     name: "Ambaan op",
     title: "The Legal Advisor",
@@ -41,8 +41,8 @@ export function PillarsSection() {
     <section id="pillars" className="py-24 bg-background/80 sm:py-32">
       <div className="container px-4 mx-auto">
         <div className="mb-16 text-center">
-          <h2 className="text-4xl font-bold tracking-tight text-white uppercase font-headline md:text-5xl" data-aos="fade-up" data-aos-delay="200">
-            Our<span className="text-primary">Pillars</span>
+          <h2 className="text-4xl font-bold tracking-tight text-snow-title uppercase font-festive md:text-5xl" data-aos="fade-up" data-aos-delay="200">
+            Our<span className="text-snow-primary">Pillars</span>
           </h2>
           <p className="max-w-2xl mx-auto mt-4 text-lg text-muted-foreground" data-aos="fade-up" data-aos-delay="200">
             Three core members form the foundation of our power.
@@ -62,7 +62,7 @@ export function PillarsSection() {
                 />
               </CardHeader>
               <CardContent className="p-6" data-aos="fade-up" data-aos-delay="200">
-                <CardTitle className="text-2xl font-bold uppercase text-primary font-headline">{pillar.name}</CardTitle>
+                <CardTitle className="text-2xl font-bold uppercase text-snow-primary font-festive">{pillar.name}</CardTitle>
                 <p className="mt-1 text-sm font-semibold tracking-widest text-accent">{pillar.title}</p>
                 <CardDescription className="mt-4 text-muted-foreground">{pillar.description}</CardDescription>
               </CardContent>

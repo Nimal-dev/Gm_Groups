@@ -10,16 +10,16 @@ export function AutoplayMusic() {
 
   useEffect(() => {
     // Create audio element
-    audioRef.current = new Audio('../../public/audio/lofi.mp3');
-    
+    audioRef.current = new Audio('../../public/audio/christmas.mp3');
+
     // Configure audio for autoplay
     if (audioRef.current) {
       audioRef.current.loop = true;
       audioRef.current.volume = 0.3; // Set initial volume to 30%
-      
+
       // Attempt to play audio
       const playPromise = audioRef.current.play();
-      
+
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
@@ -58,7 +58,7 @@ export function AutoplayMusic() {
 
   const toggleMute = () => {
     if (!audioRef.current) return;
-    
+
     audioRef.current.muted = !isMuted;
     setIsMuted(!isMuted);
   };
@@ -73,15 +73,15 @@ export function AutoplayMusic() {
         >
           {isPlaying ? (
             <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
             </svg>
           ) : (
             <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z"/>
+              <path d="M8 5v14l11-7z" />
             </svg>
           )}
         </button>
-        
+
         <button
           onClick={toggleMute}
           className="p-2 rounded-full hover:bg-white/10 transition-colors"
@@ -98,7 +98,7 @@ export function AutoplayMusic() {
             </svg>
           )}
         </button>
-        
+
         <div className="text-xs text-white/70">
           {isPlaying ? 'Now Playing' : 'Paused'}
         </div>
