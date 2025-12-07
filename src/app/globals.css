@@ -10,42 +10,51 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 248 39% 58%; /* Deep Purple */
+    --primary: 355 78% 56%;
+    /* Christmas Red */
     --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
+    --secondary: 142 76% 36%;
+    /* Christmas Green */
+    --secondary-foreground: 0 0% 98%;
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
-    --accent: 51 100% 50%; /* Electric Gold */
+    --accent: 48 96% 51%;
+    /* Christmas Gold */
     --accent-foreground: 0 0% 7%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
+    --ring: 142 76% 36%;
+    /* Green Ring */
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 0 0% 7%; /* Almost Black */
+    --background: 220 20% 10%;
+    /* Winter Night Dark Blue/Black */
     --foreground: 0 0% 98%;
-    --card: 0 0% 10%;
+    --card: 220 20% 14%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 7%;
+    --popover: 220 20% 10%;
     --popover-foreground: 0 0% 98%;
-    --primary: 248 39% 58%; /* Deep Purple */
+    --primary: 355 78% 56%;
+    /* Christmas Red */
     --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 14.9%;
+    --secondary: 142 76% 36%;
+    /* Christmas Green */
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 51 100% 50%; /* Electric Gold */
+    --muted: 220 20% 18%;
+    --muted-foreground: 220 10% 70%;
+    --accent: 48 96% 51%;
+    /* Christmas Gold */
     --accent-foreground: 0 0% 7%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 51 100% 50%;
+    --border: 220 20% 18%;
+    --input: 220 20% 18%;
+    --ring: 355 78% 56%;
+    /* Red Ring */
   }
 }
 
@@ -53,12 +62,15 @@
   * {
     @apply border-border;
   }
+
   html {
     @apply scroll-smooth;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   ::selection {
     @apply bg-primary/50 text-primary-foreground;
   }
@@ -66,18 +78,54 @@
 
 /* Neon glow effect for buttons */
 .neon-button {
-  @apply shadow-[0_0_5px_theme(colors.accent.DEFAULT),0_0_10px_theme(colors.accent.DEFAULT),0_0_20px_theme(colors.accent.DEFAULT)] transition-all duration-300;
+  @apply shadow-neon transition-all duration-300;
 }
+
 .neon-button:hover {
-  @apply shadow-[0_0_10px_theme(colors.accent.DEFAULT),0_0_20px_theme(colors.accent.DEFAULT),0_0_40px_theme(colors.accent.DEFAULT)];
+  @apply shadow-neon-strong;
 }
 
 /* Glowing border effect for cards */
 .neon-border {
-  @apply border-accent/20 shadow-[0_0_15px_-5px_theme(colors.accent.DEFAULT)] transition-all duration-300;
+  @apply border-accent/20 shadow-neon-border transition-all duration-300;
 }
+
 .neon-border:hover {
-  @apply border-accent/50 shadow-[0_0_25px_-5px_theme(colors.accent.DEFAULT)];
+  @apply border-accent/50 shadow-neon-border-strong;
+}
+
+/* Frosted Glass / Ice Effect */
+.glass-card {
+  @apply bg-white/5 backdrop-blur-md border border-white/20 shadow-lg transition-all duration-300;
+}
+
+.glass-card:hover {
+  @apply bg-white/10 border-white/40 shadow-glass;
+}
+
+/* Snow Capped Text Effects */
+.text-snow-title {
+  background: linear-gradient(180deg, #ffffff 40%, #bae6fd 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
+}
+
+.text-snow-primary {
+  background: linear-gradient(180deg, #ffffff 30%, theme('colors.primary.DEFAULT') 60%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
+}
+
+.text-snow-accent {
+  background: linear-gradient(180deg, #ffffff 30%, theme('colors.accent.DEFAULT') 60%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
 }
 
 @layer utilities {

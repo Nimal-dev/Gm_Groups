@@ -14,17 +14,17 @@ export function AutoplayMusicPlayer() {
 
   useEffect(() => {
     // Create audio element
-    audioRef.current = new Audio('/audio/lofi.mp3');
-    
+    audioRef.current = new Audio('/audio/christmas.mp3');
+
     if (audioRef.current) {
       audioRef.current.loop = true;
       audioRef.current.volume = volume;
-      
+
       // Handle audio events
       audioRef.current.addEventListener('ended', () => setIsPlaying(false));
       audioRef.current.addEventListener('play', () => setIsPlaying(true));
       audioRef.current.addEventListener('pause', () => setIsPlaying(false));
-      
+
       // Attempt autoplay
       const attemptAutoplay = async () => {
         try {
@@ -35,7 +35,7 @@ export function AutoplayMusicPlayer() {
           setIsPlaying(false);
         }
       };
-      
+
       // Try autoplay immediately
       attemptAutoplay();
     }
@@ -52,7 +52,7 @@ export function AutoplayMusicPlayer() {
   useEffect(() => {
     const handleFirstInteraction = () => {
       if (!hasInteracted && audioRef.current && !isPlaying) {
-        audioRef.current.play().catch(() => {});
+        audioRef.current.play().catch(() => { });
         setHasInteracted(true);
       }
     };
@@ -83,14 +83,14 @@ export function AutoplayMusicPlayer() {
 
   const toggleMute = () => {
     if (!audioRef.current) return;
-    
+
     audioRef.current.muted = !isMuted;
     setIsMuted(!isMuted);
   };
 
   const handleVolumeChange = (newVolume: number) => {
     if (!audioRef.current) return;
-    
+
     setVolume(newVolume);
     audioRef.current.volume = newVolume;
   };
@@ -101,10 +101,10 @@ export function AutoplayMusicPlayer() {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={toggleMusic} 
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleMusic}
                 className="text-white hover:bg-white/10 transition-colors"
               >
                 {isPlaying ? <Pause className="w-5 h-5" /> : <Music className="w-5 h-5" />}
@@ -118,10 +118,10 @@ export function AutoplayMusicPlayer() {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={toggleMute} 
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleMute}
                 className="text-white hover:bg-white/10 transition-colors"
               >
                 {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}

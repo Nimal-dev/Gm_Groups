@@ -63,15 +63,15 @@ export default function BurgershotPage() {
         >
           <div className="absolute inset-0 bg-black/70" />
           <div className="container relative z-10 px-4 mx-auto text-center">
-            <h1 className="text-5xl font-bold tracking-tight text-white uppercase font-headline md:text-7xl" data-aos="fade-up">
-              Welcome to <span className="text-primary">Burgershot</span>
+            <h1 className="text-5xl font-bold tracking-tight text-snow-title uppercase font-festive md:text-7xl" data-aos="fade-up">
+              Welcome to <span className="text-snow-primary">Burgershot</span>
             </h1>
             <p className="max-w-3xl mx-auto mt-6 text-2xl italic text-accent font-headline" data-aos="fade-up" data-aos-delay="200">
               &ldquo;The Taste of Freedom and Profit.&rdquo;
             </p>
           </div>
         </section>
-{/* INVESTORS SECTION */}
+        {/* INVESTORS SECTION */}
 
         <section
           id="business"
@@ -82,8 +82,8 @@ export default function BurgershotPage() {
           <div className="absolute inset-0 bg-black/70" />
           <div className="container relative z-10 px-4 mx-auto">
             <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-4xl font-bold tracking-tight text-white uppercase font-headline md:text-5xl" data-aos="fade-up">
-                MEET OUR <span className="text-primary">INVESTORS</span>
+              <h2 className="text-4xl font-bold tracking-tight text-snow-title uppercase font-festive md:text-5xl" data-aos="fade-up">
+                MEET OUR <span className="text-snow-primary">INVESTORS</span>
               </h2>
               <p className="max-w-2xl mx-auto mt-6 text-2xl text-bold text-muted-foreground text-center" data-aos="fade-up" data-aos-delay="200">
                 At GM Groups, we take pride in our ventures—and none more than our beloved Burgershot outlet. This dream wouldn’t have been possible without the unwavering support of our sole investor, the Tokyo Family. Their full financial backing brought our vision to life, helping us serve great taste with unmatched passion. This is a joint venture between GM x TOKYO.
@@ -92,13 +92,13 @@ export default function BurgershotPage() {
 
           </div>
         </section>
-{/* The abiance section */}
+        {/* The abiance section */}
         <section id="about" className="py-24 sm:py-32">
           <div className="container px-4 mx-auto">
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <div>
-                <h2 className="text-4xl font-bold tracking-tight text-white uppercase font-headline md:text-5xl">
-                  Our <span className="text-primary">Ambiance</span>
+                <h2 className="text-4xl font-bold tracking-tight text-snow-title uppercase font-festive md:text-5xl">
+                  Our <span className="text-snow-primary">Ambiance</span>
                 </h2>
                 <p className="mt-6 text-lg text-muted-foreground">
                   Step into a classic American diner with a modern, chaotic twist. Our interior is a carefully crafted blend of retro charm and urban grit, providing the perfect backdrop for business deals, casual meetups, or a quick escape. The neon glow, the checkered floors, and the smell of freedom (and fries) make Burgershot an unforgettable Xlantis landmark.
@@ -137,13 +137,13 @@ export default function BurgershotPage() {
             </div>
           </div>
         </section>
-{/* The Kitchen section */}
+        {/* The Kitchen section */}
         <section id="kitchen" className="py-24 bg-background/50 sm:py-32">
           <div className="container px-4 mx-auto">
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <Card className="overflow-hidden border-2 neon-border lg:order-last">
                 <Image
-                  src= {kitchen}
+                  src={kitchen}
                   alt="Burgershot kitchen"
                   width={600}
                   height={400}
@@ -152,8 +152,8 @@ export default function BurgershotPage() {
                 />
               </Card>
               <div className="lg:order-last">
-                <h2 className="text-4xl font-bold tracking-tight text-white uppercase font-headline md:text-5xl">
-                  The <span className="text-primary">Engine Room</span>
+                <h2 className="text-4xl font-bold tracking-tight text-snow-title uppercase font-festive md:text-5xl">
+                  The <span className="text-snow-primary">Engine Room</span>
                 </h2>
                 <p className="mt-6 text-lg text-muted-foreground">
                   This is where the magic happens. Our state-of-the-art kitchen is a well-oiled machine, churning out the city's favorite burgers with ruthless efficiency. We maintain the highest standards of cleanliness and quality, because even in a world of crime, we believe in a good, clean burger.
@@ -166,8 +166,8 @@ export default function BurgershotPage() {
         <section id="menu" className="py-24 sm:py-32">
           <div className="container px-4 mx-auto">
             <div className="mb-16 text-center">
-              <h2 className="text-4xl font-bold tracking-tight text-white uppercase font-headline md:text-5xl">
-                Our <span className="text-primary">Menu</span>
+              <h2 className="text-4xl font-bold tracking-tight text-snow-title uppercase font-festive md:text-5xl">
+                Our <span className="text-snow-primary">Menu</span>
               </h2>
               <p className="max-w-2xl mx-auto mt-4 text-lg text-muted-foreground">
                 Simple, iconic, and dangerously good.
@@ -176,12 +176,12 @@ export default function BurgershotPage() {
 
             <div className="space-y-12">
               <div>
-                <h3 className="mb-6 text-3xl font-bold text-center text-accent font-headline">Burgers</h3>
+                <h3 className="mb-6 text-3xl font-bold text-center text-snow-accent font-festive">Burgers</h3>
                 <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                   {menuItems.burgers.map((item) => (
                     <Card key={item.name} className="flex flex-col text-center bg-card neon-border">
                       <CardHeader>
-                        <CardTitle className="text-2xl text-primary">{item.name}</CardTitle>
+                        <CardTitle className="text-2xl text-snow-primary font-festive">{item.name}</CardTitle>
                       </CardHeader>
                       <CardContent className="flex-grow">
                         <CardDescription>{item.description}</CardDescription>
@@ -195,12 +195,12 @@ export default function BurgershotPage() {
               </div>
 
               <div>
-                <h3 className="mb-6 text-3xl font-bold text-center text-accent font-headline">Sides & Drinks</h3>
+                <h3 className="mb-6 text-3xl font-bold text-center text-snow-accent font-festive">Sides & Drinks</h3>
                 <div className="grid gap-8 md:grid-cols-2">
                   {menuItems.sides.map((item) => (
                     <Card key={item.name} className="text-center bg-card neon-border">
                       <CardHeader>
-                        <CardTitle className="text-xl text-primary">{item.name}</CardTitle>
+                        <CardTitle className="text-xl text-snow-primary font-festive">{item.name}</CardTitle>
                       </CardHeader>
                       <CardContent className="flex-grow">
                         <CardDescription>{item.description}</CardDescription>
@@ -213,7 +213,7 @@ export default function BurgershotPage() {
                   {menuItems.drinks.map((item) => (
                     <Card key={item.name} className="text-center bg-card neon-border">
                       <CardHeader>
-                        <CardTitle className="text-xl text-primary">{item.name}</CardTitle>
+                        <CardTitle className="text-xl text-snow-primary font-festive">{item.name}</CardTitle>
                       </CardHeader>
                       <CardContent className="flex-grow">
                         <CardDescription>{item.description}</CardDescription>

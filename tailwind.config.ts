@@ -1,4 +1,4 @@
-import type {Config} from 'tailwindcss';
+import type { Config } from 'tailwindcss';
 
 export default {
   darkMode: ['class'],
@@ -65,6 +65,13 @@ export default {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
+      },
+      boxShadow: {
+        neon: '0 0 5px theme(colors.accent.DEFAULT), 0 0 10px theme(colors.accent.DEFAULT), 0 0 20px theme(colors.accent.DEFAULT)',
+        'neon-strong': '0 0 10px theme(colors.accent.DEFAULT), 0 0 20px theme(colors.accent.DEFAULT), 0 0 40px theme(colors.accent.DEFAULT)',
+        'neon-border': '0 0 15px -5px theme(colors.accent.DEFAULT)',
+        'neon-border-strong': '0 0 25px -5px theme(colors.accent.DEFAULT)',
+        glass: '0 0 20px rgba(255, 255, 255, 0.2)',
       },
       borderRadius: {
         lg: 'var(--radius)',
