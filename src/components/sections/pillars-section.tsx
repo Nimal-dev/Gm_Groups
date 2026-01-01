@@ -42,7 +42,7 @@ export function PillarsSection() {
       <div className="container px-4 mx-auto">
         <div className="mb-16 text-center">
           <h2 className="text-4xl font-bold tracking-tight text-snow-title uppercase font-festive md:text-5xl" data-aos="fade-up" data-aos-delay="200">
-            Our<span className="text-snow-primary">Pillars</span>
+            Our<span className="text-snow-primary"> Pillars</span>
           </h2>
           <p className="max-w-2xl mx-auto mt-4 text-lg text-muted-foreground" data-aos="fade-up" data-aos-delay="200">
             Three core members form the foundation of our power.

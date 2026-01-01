@@ -6,7 +6,7 @@ export function BurgershotCTA() {
   return (
     <section id="burgershot-cta" className="py-20 bg-background/50 sm:py-28">
       <div className="container px-4 mx-auto text-center">
-        <h2 className="text-3xl font-bold tracking-tight text-snow-title uppercase font-festive md:text-4xl" data-aos="fade-up">
+        <h2 className="text-3xl font-bold tracking-tight uppercase md:text-4xl" data-aos="fade-up">
           Taste the Power
         </h2>
         <p className="max-w-2xl mx-auto mt-4 text-lg text-muted-foreground" data-aos="fade-up" data-aos-delay="200">

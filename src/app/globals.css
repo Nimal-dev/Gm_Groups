@@ -10,51 +10,43 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 355 78% 56%;
-    /* Christmas Red */
+    --primary: 240 5.9% 10%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 142 76% 36%;
-    /* Christmas Green */
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
-    --accent: 48 96% 51%;
-    /* Christmas Gold */
-    --accent-foreground: 0 0% 7%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 142 76% 36%;
-    /* Green Ring */
+    --ring: 240 10% 3.9%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 220 20% 10%;
-    /* Winter Night Dark Blue/Black */
+    --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
-    --card: 220 20% 14%;
+    --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
-    --popover: 220 20% 10%;
+    --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 355 78% 56%;
-    /* Christmas Red */
-    --primary-foreground: 0 0% 98%;
-    --secondary: 142 76% 36%;
-    /* Christmas Green */
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 220 20% 18%;
-    --muted-foreground: 220 10% 70%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
     --accent: 48 96% 51%;
-    /* Christmas Gold */
-    --accent-foreground: 0 0% 7%;
+    /* Keeping Gold as Brand Accent */
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 20% 18%;
-    --input: 220 20% 18%;
-    --ring: 355 78% 56%;
-    /* Red Ring */
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
   }
 }
 
@@ -101,31 +93,6 @@
 
 .glass-card:hover {
   @apply bg-white/10 border-white/40 shadow-glass;
-}
-
-/* Snow Capped Text Effects */
-.text-snow-title {
-  background: linear-gradient(180deg, #ffffff 40%, #bae6fd 90%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
-}
-
-.text-snow-primary {
-  background: linear-gradient(180deg, #ffffff 30%, theme('colors.primary.DEFAULT') 60%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
-}
-
-.text-snow-accent {
-  background: linear-gradient(180deg, #ffffff 30%, theme('colors.accent.DEFAULT') 60%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
 }
 
 @layer utilities {

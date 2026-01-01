@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowDown } from "lucide-react";
 import { Logo } from "@/components/logo";
 
-import gm_wp from "../../../public/GM_wallpaper_christmas.png";
+import gm_wp from "../../../public/gm_wallpaper.jpg";
 
 export function HeroSection() {
   return (
@@ -18,7 +18,7 @@ export function HeroSection() {
         <div className="mb-8 scale-150" data-aos="zoom-in">
           <Logo />
         </div>
-        <h1 className="text-4xl font-bold tracking-tight text-snow-title uppercase font-headline md:text-6xl lg:text-7xl" data-aos="fade-up" data-aos-delay="200">
+        <h1 className="text-4xl font-bold tracking-tight uppercase font-headline md:text-6xl lg:text-7xl" data-aos="fade-up" data-aos-delay="200">
           Dominating the Streets of Xlantis
         </h1>
         <div className="w-full max-w-md mt-6" data-aos="fade-up" data-aos-delay="400">
