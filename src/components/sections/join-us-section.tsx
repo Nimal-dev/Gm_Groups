@@ -27,7 +27,7 @@ export function JoinUsSection() {
       <div className="absolute inset-0 bg-gradient-to-t from-background via-black/80 to-black/70" />
       <div className="container relative z-10 px-4 mx-auto">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl font-bold tracking-tight text-snow-title uppercase font-festive md:text-5xl" data-aos="fade-up">
+          <h2 className="text-4xl font-bold tracking-tight uppercase md:text-5xl" data-aos="fade-up">
             Ready to Join The Elite?
           </h2>
           <p className="max-w-2xl mx-auto mt-6 text-xl text-muted-foreground" data-aos="fade-up" data-aos-delay="200">
@@ -41,7 +41,7 @@ export function JoinUsSection() {
               </Link>
             </Button>
             <div className="flex justify-center mt-4">
-              <Button asChild size="lg" className="flex items-center px-10 py-6 text-lg font-bold bg-violet">
+              <Button asChild size="lg" className="flex items-center px-10 py-6 text-lg font-bold text-white transition-all duration-300 border-0 bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-90 hover:scale-105 shadow-lg shadow-pink-500/20">
                 <Link href="https://www.instagram.com/ig.gmgroups/" target="_blank" rel="noopener noreferrer">
                   <InstagramIcon className="w-6 h-6 mr-2" />
                   Follow on Instagram
