@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowDown } from "lucide-react";
 import { motion } from "framer-motion";
 import gm_wp from "../../../public/gm_wallpaper.jpg";
@@ -13,10 +14,17 @@ export function HeroSection() {
       className="relative flex items-center justify-center w-full min-h-screen overflow-hidden text-white"
     >
       {/* Background Image with Parallax Effect could be added here, for now static fixed */}
-      <div
-        className="absolute inset-0 bg-center bg-cover bg-no-repeat bg-fixed transform scale-105"
-        style={{ backgroundImage: `url(${gm_wp.src})` }}
-      />
+      {/* Background Image with Parallax Effect */}
+      <div className="absolute inset-0">
+        <Image
+          src={gm_wp}
+          alt="GM Groups Wallpaper"
+          fill
+          priority
+          className="object-cover object-center transform scale-105"
+          sizes="100vw"
+        />
+      </div>
 
       {/* Cinematic Gradient Overlays */}
       <div className="absolute inset-0 bg-black/50" />

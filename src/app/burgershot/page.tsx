@@ -11,6 +11,7 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { motion } from "framer-motion";
 
 import bs_shop from "../../../public/bs.png"
 import gmxtokyo from "../../../public/GMxTKY_site.png"
@@ -57,18 +58,34 @@ export default function BurgershotPage() {
       <main className="flex-grow">
         <section
           className="relative py-40 text-white bg-center bg-cover bg-fixed sm:py-60"
-          style={{ backgroundImage: `url(${bs_shop.src})` }}
-
-          data-ai-hint="fast food restaurant interior"
         >
+          <Image
+            src={bs_shop}
+            alt="Burgershot Shop"
+            fill
+            className="object-cover object-center"
+            priority
+          />
           <div className="absolute inset-0 bg-black/70" />
           <div className="container relative z-10 px-4 mx-auto text-center">
-            <h1 className="text-5xl font-bold tracking-tight text-snow-title uppercase font-festive md:text-7xl" data-aos="fade-up">
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-5xl font-bold tracking-tight text-snow-title uppercase font-festive md:text-7xl"
+            >
               Welcome to <span className="text-snow-primary">Burgershot</span>
-            </h1>
-            <p className="max-w-3xl mx-auto mt-6 text-2xl italic text-accent font-headline" data-aos="fade-up" data-aos-delay="200">
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="max-w-3xl mx-auto mt-6 text-2xl italic text-accent font-headline"
+            >
               &ldquo;The Taste of Freedom and Profit.&rdquo;
-            </p>
+            </motion.p>
           </div>
         </section>
         {/* INVESTORS SECTION */}
@@ -76,18 +93,34 @@ export default function BurgershotPage() {
         <section
           id="business"
           className="relative py-32 text-white bg-center bg-cover bg-fixed sm:py-48"
-          style={{ backgroundImage: `url(${gmxtokyo.src})` }}
-          data-ai-hint="neon diner night"
         >
+          <Image
+            src={gmxtokyo}
+            alt="GM x Tokyo"
+            fill
+            className="object-cover object-center"
+          />
           <div className="absolute inset-0 bg-black/70" />
           <div className="container relative z-10 px-4 mx-auto">
             <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-4xl font-bold tracking-tight text-snow-title uppercase font-festive md:text-5xl" data-aos="fade-up">
+              <motion.h2
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="text-4xl font-bold tracking-tight text-snow-title uppercase font-festive md:text-5xl"
+              >
                 MEET OUR <span className="text-snow-primary">INVESTORS</span>
-              </h2>
-              <p className="max-w-2xl mx-auto mt-6 text-2xl text-bold text-muted-foreground text-center" data-aos="fade-up" data-aos-delay="200">
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                viewport={{ once: true }}
+                className="max-w-2xl mx-auto mt-6 text-2xl text-bold text-muted-foreground text-center"
+              >
                 At GM Groups, we take pride in our ventures—and none more than our beloved Burgershot outlet. This dream wouldn’t have been possible without the unwavering support of our sole investor, the Tokyo Family. Their full financial backing brought our vision to life, helping us serve great taste with unmatched passion. This is a joint venture between GM x TOKYO.
-              </p>
+              </motion.p>
             </div>
 
           </div>
