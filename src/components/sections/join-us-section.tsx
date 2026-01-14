@@ -1,6 +1,9 @@
+'use client';
+
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
+import { motion } from "framer-motion";
+import { scaleIn } from "@/lib/animation-utils";
 import gmxdc from "../../../public/gm_dc.png"
 
 const DiscordIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -20,36 +23,45 @@ export function JoinUsSection() {
   return (
     <section
       id="join"
-      className="relative py-32 text-white bg-center bg-cover bg-fixed sm:py-48"
-      style={{ backgroundImage: `url(${gmxdc.src})` }}
-      data-ai-hint="luxury cars night city"
+      className="relative py-32 sm:py-48 flex items-center justify-center overflow-hidden"
     >
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-black/80 to-black/70" />
-      <div className="container relative z-10 px-4 mx-auto">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl font-bold tracking-tight uppercase md:text-5xl" data-aos="fade-up">
-            Ready to Join The Elite?
+      <div
+        className="absolute inset-0 bg-center bg-cover bg-fixed transform scale-105 blur-[2px]"
+        style={{ backgroundImage: `url(${gmxdc.src})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-black/90 to-black/80" />
+
+      <div className="container relative z-10 px-4 mx-auto text-center">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={scaleIn}
+          className="max-w-3xl mx-auto"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight uppercase text-white mb-6">
+            Ready to Join The <span className="text-accent">Elite</span>?
           </h2>
-          <p className="max-w-2xl mx-auto mt-6 text-xl text-muted-foreground" data-aos="fade-up" data-aos-delay="200">
-            Loyalty is our currency and respect is our language. If you have what it takes to thrive in the high-stakes world of Xlantis, we are waiting for you!.
+          <p className="max-w-xl mx-auto text-xl text-muted-foreground mb-10 leading-relaxed">
+            Loyalty is our currency and respect is our language. If you have what it takes to thrive in the high-stakes world of Xlantis, we are waiting for you.
           </p>
-          <div className="mt-10" data-aos="fade-up" data-aos-delay="400">
-            <Button asChild size="lg" className="flex items-center px-10 py-6 text-lg font-bold text-background bg-accent neon-button hover:bg-accent/90">
+
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <Button asChild size="lg" className="flex items-center px-8 py-6 text-lg font-bold bg-[#5865F2] hover:bg-[#4752C4] text-white shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
               <Link href="https://discord.gg/jfgTHBnVYD" target="_blank" rel="noopener noreferrer">
                 <DiscordIcon className="w-6 h-6 mr-2" />
                 Join our Discord
               </Link>
             </Button>
-            <div className="flex justify-center mt-4">
-              <Button asChild size="lg" className="flex items-center px-10 py-6 text-lg font-bold text-white transition-all duration-300 border-0 bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-90 hover:scale-105 shadow-lg shadow-pink-500/20">
-                <Link href="https://www.instagram.com/ig.gmgroups/" target="_blank" rel="noopener noreferrer">
-                  <InstagramIcon className="w-6 h-6 mr-2" />
-                  Follow on Instagram
-                </Link>
-              </Button>
-            </div>
+
+            <Button asChild size="lg" className="flex items-center px-8 py-6 text-lg font-bold bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:brightness-110 text-white shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+              <Link href="https://www.instagram.com/ig.gmgroups/" target="_blank" rel="noopener noreferrer">
+                <InstagramIcon className="w-6 h-6 mr-2" />
+                Follow on Instagram
+              </Link>
+            </Button>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
