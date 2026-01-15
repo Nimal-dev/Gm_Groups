@@ -293,7 +293,7 @@ export default function CateringRequestPage() {
                                                     <h5 className="font-semibold text-white/90">1. QUANTITY & VALUE THRESHOLDS</h5>
                                                     <ul className="list-disc pl-4 space-y-1">
                                                         <li><strong>Definition of Unit:</strong> A "Unit" is defined as a Main Entrée (Burger/Sandwich) or Premium Side. Condiments/beverages do not count.</li>
-                                                        <li><strong>Minimum Order:</strong> 100 Qualifying Units OR a Minimum Order Value (MOV) of $4,500,000.</li>
+                                                        <li><strong>Minimum Order:</strong> 100 Qualifying Units OR a Minimum Order Value (MOV) of $5,000,000.</li>
                                                         <li><strong>Maximum Order:</strong> 500 Qualifying Units per batch. Orders exceeding 500 units require distinct negotiation with GM Management (10-day lead time).</li>
                                                     </ul>
                                                 </div>
