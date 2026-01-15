@@ -24,7 +24,7 @@ const fetchDashboardData = unstable_cache(
                     .lean(),
 
                 BulkOrder.find({ status: { $ne: 'Completed' } })
-                    .select('orderId customer amount status items createdAt')
+                    .select('orderId customer amount status details createdAt representative collectionDate surcharge eventDate')
                     .sort({ createdAt: -1 })
                     .lean(),
 

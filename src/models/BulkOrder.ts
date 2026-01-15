@@ -11,6 +11,10 @@ export interface IBulkOrder extends Document {
     messageId: string; // Discord Message ID of the ACTIVE order in staff channel
     channelId: string; // Discord Channel ID where the active order is
     isManual: boolean;
+    representative?: string;
+    collectionDate?: string;
+    surcharge?: string;
+    eventDate?: string;
 }
 
 const BulkOrderSchema: Schema = new Schema({
@@ -23,7 +27,11 @@ const BulkOrderSchema: Schema = new Schema({
     createdAt: { type: Number, default: Date.now },
     messageId: { type: String, required: false, index: true },
     channelId: { type: String, required: false },
-    isManual: { type: Boolean, default: true }
+    isManual: { type: Boolean, default: true },
+    representative: { type: String, required: false },
+    collectionDate: { type: String, required: false }, // Format: DD/MM/YYYY
+    surcharge: { type: String, required: false },
+    eventDate: { type: String, required: false } // Format: DD/MM/YYYY
 });
 
 // Indexes for filtering active orders

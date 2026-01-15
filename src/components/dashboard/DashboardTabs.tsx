@@ -206,7 +206,31 @@ function OrderRow({ order, detailed }: { order: any, detailed?: boolean }) {
                         <p className="text-xs text-muted-foreground">Order #{order.orderId}</p>
                     </div>
 
-                    {/* Always show details if they exist, but maybe collapsed? For now, showing fully as requested */}
+                    {/* Extended Details Grid */}
+                    {detailed && (
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-3 p-2 rounded bg-black/20 border border-white/5 text-xs">
+                            <div>
+                                <span className="text-muted-foreground block text-[10px]">Event Date</span>
+                                <span className="font-mono">{order.eventDate || order.deliveryDate || 'N/A'}</span>
+                            </div>
+                            <div>
+                                <span className="text-muted-foreground block text-[10px]">Collection</span>
+                                <span className="font-mono">{order.collectionDate || 'N/A'}</span>
+                            </div>
+                            <div>
+                                <span className="text-muted-foreground block text-[10px]">Surcharge</span>
+                                <span className={order.surcharge && order.surcharge !== 'None' ? "text-orange-400 font-mono" : "font-mono"}>
+                                    {order.surcharge || 'None'}
+                                </span>
+                            </div>
+                            <div>
+                                <span className="text-muted-foreground block text-[10px]">Representative</span>
+                                <span className="truncate block font-medium" title={order.representative}>{order.representative || 'Unknown'}</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Order Items / Details */}
                     {(detailed || order.details) && (
                         <div className="w-full bg-black/30 p-3 rounded-md border border-white/5 text-sm font-mono text-muted-foreground whitespace-pre-wrap">
                             {order.details}
