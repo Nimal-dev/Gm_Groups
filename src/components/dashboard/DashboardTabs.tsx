@@ -21,14 +21,17 @@ const BankLogsExplorer = dynamic(() => import('@/components/dashboard/BankLogsEx
     ssr: false
 });
 
+import { LeaveManagementCard } from '@/components/dashboard/LeaveManagementCard';
+
 interface DashboardTabsProps {
     activeStaff: any[];
     activeOrders: any[];
     allEmployees: any[];
     recentSalaries: any[];
+    activeLeaves: any[];
 }
 
-export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentSalaries }: DashboardTabsProps) {
+export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentSalaries, activeLeaves }: DashboardTabsProps) {
     return (
         <Tabs defaultValue="overview" className="space-y-6">
             <div className="overflow-x-auto pb-2">
@@ -44,10 +47,10 @@ export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentS
 
             {/* OVERVIEW TAB */}
             <TabsContent value="overview" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
-                    {/* Active Duty List (Small) */}
-                    <Card className="glass-card lg:col-span-1 h-[400px] flex flex-col">
+                    {/* Active Duty List */}
+                    <Card className="glass-card md:col-span-1 lg:col-span-1 h-[400px] flex flex-col">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-lg">
                                 <Clock className="w-5 h-5 text-accent" /> On Duty Now
@@ -67,7 +70,7 @@ export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentS
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                                                     <div className="flex flex-col">
-                                                        <span className="font-medium truncate max-w-[120px]">{staff.displayName || staff.username}</span>
+                                                        <span className="font-medium truncate max-w-[100px]">{staff.displayName || staff.username}</span>
                                                         <span className="text-[10px] text-accent opacity-80">{staff.rank}</span>
                                                     </div>
                                                 </div>
@@ -82,8 +85,13 @@ export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentS
                         </CardContent>
                     </Card>
 
+                    {/* Active Leaves */}
+                    <div className="md:col-span-1 lg:col-span-1">
+                        <LeaveManagementCard leaves={activeLeaves} employees={allEmployees} />
+                    </div>
+
                     {/* Active Orders Quick View */}
-                    <Card className="glass-card lg:col-span-2 h-[400px] flex flex-col">
+                    <Card className="glass-card md:col-span-2 lg:col-span-2 h-[400px] flex flex-col">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-lg">
                                 <ShoppingCart className="w-5 h-5 text-accent" /> High Priority Orders

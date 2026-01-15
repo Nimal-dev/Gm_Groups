@@ -31,6 +31,9 @@ export default async function DashboardPage() {
     const inProgressOrders = activeOrders.filter((o: any) => o.status === 'In Progress').length || activeOrders.filter((o: any) => o.status === 'Processing').length;
     const readyOrders = activeOrders.filter((o: any) => o.status === 'Ready').length;
 
+    // Destructure activeLeaves
+    const { activeLeaves } = data;
+
     return (
         <div className="min-h-screen p-6 md:p-8 space-y-8 pb-20">
 
@@ -58,7 +61,7 @@ export default async function DashboardPage() {
                     title="Last 30 Days Income"
                     value={`$${(data.bankStats?.totalIncome || 0).toLocaleString()}`}
                     subtitle="Total Deposits"
-                    icon={<DollarSign className="w-5 h-5 text-green-400" />}
+                    icon={<DollarSign className="w-5 h-3 text-green-400" />}
                     glow
                 />
 
@@ -104,6 +107,7 @@ export default async function DashboardPage() {
                 activeOrders={activeOrders}
                 allEmployees={allEmployees}
                 recentSalaries={recentSalaries}
+                activeLeaves={activeLeaves || []}
             />
         </div>
     );

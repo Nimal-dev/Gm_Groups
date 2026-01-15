@@ -17,7 +17,7 @@ const fetchDashboardData = unstable_cache(
 
             // Fetch data provided with lean() for performance
             // Use .select() to fetch ONLY what is needed for the dashboard cards/tables
-            const [activeStaff, activeOrders, allEmployees, recentSalaries] = await Promise.all([
+            const [activeStaff, activeOrders, allEmployees, recentSalaries, activeLeaves] = await Promise.all([
                 DutySession.find({ endTime: null })
                     .select('userId username startTime')
                     .sort({ startTime: -1 })
@@ -38,7 +38,12 @@ const fetchDashboardData = unstable_cache(
                 SalaryLog.find({})
                     .sort({ date: -1 })
                     .limit(10)
-                    .lean()
+                    .lean(),
+
+                // Fetch Active Leaves (EndDate >= Today)
+                import('@/models/Leave').then(m => m.default.find({
+                    endDate: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) }
+                }).sort({ endDate: 1 }).lean())
             ]);
 
             // Process Active Staff (InMemory Map is fast for small n)
@@ -74,6 +79,14 @@ const fetchDashboardData = unstable_cache(
                 date: s.date?.toISOString()
             }));
 
+            const serializedLeaves = activeLeaves.map((l: any) => ({
+                ...l,
+                _id: l._id.toString(),
+                startDate: l.startDate?.toISOString(),
+                endDate: l.endDate?.toISOString(),
+                createdAt: l.createdAt?.toISOString()
+            }));
+
             // Fetch Bank Stats (last 30 days) - Aggregation is efficient
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -99,6 +112,7 @@ const fetchDashboardData = unstable_cache(
                 activeOrders: serializedOrders,
                 allEmployees: serializedEmployees,
                 recentSalaries: serializedSalaries,
+                activeLeaves: serializedLeaves,
                 bankStats: { totalIncome, totalExpense },
                 timestamp: new Date().toISOString(),
                 error: null
@@ -123,6 +137,7 @@ export async function getDashboardData() {
             activeOrders: [],
             allEmployees: [],
             recentSalaries: [],
+            activeLeaves: [],
             bankStats: { totalIncome: 0, totalExpense: 0 },
             timestamp: new Date().toISOString(),
             error: error.message
