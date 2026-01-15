@@ -78,12 +78,20 @@ export async function getBankLogs(filter: BankLogFilter) {
                     _id: null,
                     totalIncome: {
                         $sum: {
-                            $cond: [{ $ne: ["$transactionType", "WITHDRAW"] }, "$amount", 0]
+                            $cond: [
+                                { $in: [{ $toUpper: "$transactionType" }, ["DEPOSIT", "TRANSFER"]] },
+                                "$amount",
+                                0
+                            ]
                         }
                     },
                     totalExpense: {
                         $sum: {
-                            $cond: [{ $eq: ["$transactionType", "WITHDRAW"] }, "$amount", 0]
+                            $cond: [
+                                { $eq: [{ $toUpper: "$transactionType" }, "WITHDRAW"] },
+                                "$amount",
+                                0
+                            ]
                         }
                     }
                 }

@@ -216,8 +216,8 @@ export function BankLogsExplorer() {
                                                     <div className="font-medium truncate" title={log.accountName}>{log.accountName}</div>
                                                     <div className="text-xs text-muted-foreground font-mono">{log.accountNumber}</div>
                                                 </TableCell>
-                                                <TableCell className={cn("font-bold font-mono", log.transactionType !== 'WITHDRAW' ? 'text-green-400' : 'text-red-400')}>
-                                                    {log.transactionType !== 'WITHDRAW' ? '+' : '-'}${log.amount.toLocaleString()}
+                                                <TableCell className={cn("font-bold font-mono", log.transactionType === 'WITHDRAW' ? 'text-red-400' : 'text-green-400')}>
+                                                    {log.transactionType === 'WITHDRAW' ? '-' : '+'}${log.amount.toLocaleString()}
                                                 </TableCell>
                                                 <TableCell className="max-w-[300px]">
                                                     <div className="text-sm truncate opacity-80" title={log.memo}>{log.memo}</div>
