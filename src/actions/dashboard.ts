@@ -88,10 +88,10 @@ const fetchDashboardData = unstable_cache(
                 }
             ]);
 
-            const totalIncome = bankStats.find((s: any) => s._id === 'DEPOSIT')?.total || 0;
-            const totalExpense = bankStats.reduce((acc: number, curr: any) =>
-                (curr._id === 'WITHDRAW' || curr._id === 'TRANSFER') ? acc + curr.total : acc, 0
+            const totalIncome = bankStats.reduce((acc: number, curr: any) =>
+                (curr._id !== 'WITHDRAW') ? acc + curr.total : acc, 0
             );
+            const totalExpense = bankStats.find((s: any) => s._id === 'WITHDRAW')?.total || 0;
 
             // Return optimized data
             return {

@@ -26,37 +26,43 @@ export function BankLogsExplorer() {
         to: new Date()
     });
 
-    const [data, setData] = useState<{ logs: any[], stats: any } | null>(null);
+    const [data, setData] = useState<{ logs: any[], stats: any, pagination?: any } | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const ITEMS_PER_PAGE = 7;
-
-    const currentLogs = data ? data.logs.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE) : [];
+    const ITEMS_PER_PAGE = 20; // Server defaults to 20
 
     // Auto-load on mount AND when filters change
     useEffect(() => {
         const timer = setTimeout(() => {
-            handleSearch();
+            handleSearch(1);
         }, 500); // Debounce search
         return () => clearTimeout(timer);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [transactionType, searchTerm, dateRange]);
 
-    const handleSearch = async () => {
+    const handleSearch = async (page: number = 1) => {
         setIsLoading(true);
+        // Optimistic update for page number
+        setCurrentPage(page);
+
         try {
             const result = await getBankLogs({
                 type: transactionType,
                 accountId: searchTerm || undefined,
-                dateRange: dateRange ? { from: dateRange.from!, to: dateRange.to! } : undefined
+                dateRange: dateRange ? { from: dateRange.from!, to: dateRange.to! } : undefined,
+                page: page,
+                pageSize: ITEMS_PER_PAGE
             });
 
             if (result.success) {
-                setData({ logs: result.logs, stats: result.stats });
-                setCurrentPage(1);
+                setData({
+                    logs: result.logs,
+                    stats: result.stats,
+                    pagination: result.pagination
+                });
             } else {
                 console.error(result.error);
             }
@@ -158,7 +164,7 @@ export function BankLogsExplorer() {
 
                         <div className="flex items-end">
                             <Button
-                                onClick={handleSearch}
+                                onClick={() => handleSearch(1)}
                                 disabled={isLoading}
                                 variant="outline"
                                 className="w-full md:w-auto border-white/10 hover:bg-white/5"
@@ -189,14 +195,14 @@ export function BankLogsExplorer() {
                                                 Select filters and click "Search Logs" to view records.
                                             </TableCell>
                                         </TableRow>
-                                    ) : currentLogs.length === 0 ? (
+                                    ) : (data?.logs || []).length === 0 ? (
                                         <TableRow>
                                             <TableCell colSpan={5} className="text-center h-48 text-muted-foreground">
                                                 No transactions found matching criteria.
                                             </TableCell>
                                         </TableRow>
                                     ) : (
-                                        currentLogs.map((log: any) => (
+                                        (data?.logs || []).map((log: any) => (
                                             <TableRow key={log.transactionId} className="border-white/5 hover:bg-white/5 group h-14">
                                                 <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
                                                     <ClientTime timestamp={log.date} />
@@ -210,8 +216,8 @@ export function BankLogsExplorer() {
                                                     <div className="font-medium truncate" title={log.accountName}>{log.accountName}</div>
                                                     <div className="text-xs text-muted-foreground font-mono">{log.accountNumber}</div>
                                                 </TableCell>
-                                                <TableCell className={cn("font-bold font-mono", log.transactionType === 'DEPOSIT' ? 'text-green-400' : 'text-red-400')}>
-                                                    {log.transactionType === 'DEPOSIT' ? '+' : '-'}${log.amount.toLocaleString()}
+                                                <TableCell className={cn("font-bold font-mono", log.transactionType !== 'WITHDRAW' ? 'text-green-400' : 'text-red-400')}>
+                                                    {log.transactionType !== 'WITHDRAW' ? '+' : '-'}${log.amount.toLocaleString()}
                                                 </TableCell>
                                                 <TableCell className="max-w-[300px]">
                                                     <div className="text-sm truncate opacity-80" title={log.memo}>{log.memo}</div>
@@ -229,17 +235,17 @@ export function BankLogsExplorer() {
                         </div>
 
                         {/* Pagination Controls */}
-                        {data && (
+                        {data && data.pagination && (
                             <div className="flex items-center justify-between p-4 border-t border-white/10 bg-black/20">
                                 <div className="text-xs text-muted-foreground">
-                                    Page {currentPage} of {Math.max(1, Math.ceil(data.logs.length / ITEMS_PER_PAGE))}
+                                    Page {currentPage} of {Math.max(1, data.pagination.totalPages)} | Total: {data.pagination.total}
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                                        disabled={currentPage === 1}
+                                        onClick={() => handleSearch(currentPage - 1)}
+                                        disabled={currentPage <= 1 || isLoading}
                                         className="h-8 w-8 p-0"
                                     >
                                         &lt;
@@ -247,8 +253,8 @@ export function BankLogsExplorer() {
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => setCurrentPage(p => Math.min(Math.ceil(data.logs.length / ITEMS_PER_PAGE), p + 1))}
-                                        disabled={currentPage >= Math.ceil(data.logs.length / ITEMS_PER_PAGE)}
+                                        onClick={() => handleSearch(currentPage + 1)}
+                                        disabled={currentPage >= data.pagination.totalPages || isLoading}
                                         className="h-8 w-8 p-0"
                                     >
                                         &gt;
@@ -256,10 +262,6 @@ export function BankLogsExplorer() {
                                 </div>
                             </div>
                         )}
-                    </div>
-                    {/* Debug Info (Temporary) */}
-                    <div className="p-2 border-t border-white/5 text-[10px] text-muted-foreground font-mono text-center">
-                        Total Records: {data?.logs.length || 0} | Page: {currentPage} | Filter: {transactionType}
                     </div>
                 </CardContent>
             </Card>
