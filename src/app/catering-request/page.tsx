@@ -281,18 +281,18 @@ export default function CateringRequestPage() {
 
                                     <div className="space-y-4 pt-4 border-t border-white/10">
                                         <Label className="flex items-center gap-2 text-white/80">
-                                            <Receipt className="w-4 h-4 text-purple-400" /> Bulk Order & Catering Policy
+                                            <Receipt className="w-4 h-4 text-purple-400" /> Bulk Order Policy
                                         </Label>
 
                                         <ScrollArea className="h-[300px] w-full rounded-md border border-white/10 bg-black/40 p-4 text-sm text-white/70">
                                             <div className="space-y-4">
-                                                <h4 className="font-bold text-white">GM BURGERSHOT: BULK ORDER & CATERING POLICY</h4>
+                                                <h4 className="font-bold text-white">GM BURGERSHOT: BULK ORDER POLICY</h4>
                                                 <p>To ensure operational efficiency and the highest standard of service, the following protocols apply to all bulk procurements.</p>
 
                                                 <div>
                                                     <h5 className="font-semibold text-white/90">1. QUANTITY & VALUE THRESHOLDS</h5>
                                                     <ul className="list-disc pl-4 space-y-1">
-                                                        <li><strong>Definition of Unit:</strong> A "Unit" is defined as a Main Entrée (Burger/Sandwich) or Premium Side. Condiments/beverages do not count.</li>
+                                                        <li><strong>Definition of Unit:</strong> A "Unit" is defined as a Main Entrée (Burger/Sandwich) or Premium Side.</li>
                                                         <li><strong>Minimum Order:</strong> 100 Qualifying Units OR a Minimum Order Value (MOV) of $5,000,000.</li>
                                                         <li><strong>Maximum Order:</strong> 500 Qualifying Units per batch. Orders exceeding 500 units require distinct negotiation with GM Management (10-day lead time).</li>
                                                     </ul>
@@ -322,12 +322,13 @@ export default function CateringRequestPage() {
                                                     <ul className="list-disc pl-4 space-y-1">
                                                         <li><strong>Tier 1 (3-4 Days Prior):</strong> 15% Surcharge.</li>
                                                         <li><strong>Tier 2 (24-48 Hours):</strong> 35% Rush Fee.</li>
+                                                        <li><strong>Tier 3 (&lt;24 Hours):</strong> 3x Total Invoice</li>
                                                     </ul>
                                                 </div>
 
                                                 <div>
                                                     <h5 className="font-semibold text-white/90">5. LIABILITY & WAIVER</h5>
-                                                    <p>Liability transfers to X-Club upon handover. X-Club assumes responsibility for cold chain storage (&lt;5°C) and safe reheating (&gt;75°C). X-Club indemnifies GM Burgershot against health claims for food consumed &gt;32 hours after handover or improperly stored.</p>
+                                                    <p>Liability transfers to X-Club upon handover. X-Club assumes responsibility for cold chain storage (&lt;5°C) and safe reheating (&gt;75°C). X-Club indemnifies GM Burgershot against health claims for food consumed &gt;32 hours after handover or improperly stored. The foods can be consumed till 1% durability. Any foods consumed &lt;1% is strictly forbidden and will not come under burgershot’s responsibility.</p>
                                                 </div>
                                                 <div>
                                                     <h5 className="font-semibold text-white/90">6.POLICY GOVERNANCE & AMENDMENTS</h5>
