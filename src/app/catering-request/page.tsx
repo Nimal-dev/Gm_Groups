@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { submitCateringRequest, getOrgMembers } from '@/actions/cateringRequest';
 import { Receipt, Calendar as CalendarIcon, Clock, User, Building2, Package, CheckCircle2, Loader2, UtensilsCrossed } from 'lucide-react';
@@ -28,6 +30,7 @@ export default function CateringRequestPage() {
     const [success, setSuccess] = useState(false);
     const [date, setDate] = useState<Date>();
     const [members, setMembers] = useState<{ id: string, name: string }[]>([]);
+    const [policyAccepted, setPolicyAccepted] = useState(false);
 
     const [formData, setFormData] = useState({
         orgName: '',
@@ -65,6 +68,16 @@ export default function CateringRequestPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!policyAccepted) {
+            toast({
+                title: "Policy Acceptance Required",
+                description: "You must read and accept the Bulk Order Policy to submit.",
+                variant: "destructive",
+            });
+            return;
+        }
+
         setLoading(true);
 
         const result = await submitCateringRequest(formData);
@@ -266,9 +279,87 @@ export default function CateringRequestPage() {
                                         />
                                     </div>
 
+                                    <div className="space-y-4 pt-4 border-t border-white/10">
+                                        <Label className="flex items-center gap-2 text-white/80">
+                                            <Receipt className="w-4 h-4 text-purple-400" /> Bulk Order & Catering Policy
+                                        </Label>
+
+                                        <ScrollArea className="h-[300px] w-full rounded-md border border-white/10 bg-black/40 p-4 text-sm text-white/70">
+                                            <div className="space-y-4">
+                                                <h4 className="font-bold text-white">GM BURGERSHOT: BULK ORDER & CATERING POLICY</h4>
+                                                <p>To ensure operational efficiency and the highest standard of service, the following protocols apply to all bulk procurements.</p>
+
+                                                <div>
+                                                    <h5 className="font-semibold text-white/90">1. QUANTITY & VALUE THRESHOLDS</h5>
+                                                    <ul className="list-disc pl-4 space-y-1">
+                                                        <li><strong>Definition of Unit:</strong> A "Unit" is defined as a Main Entrée (Burger/Sandwich) or Premium Side. Condiments/beverages do not count.</li>
+                                                        <li><strong>Minimum Order:</strong> 100 Qualifying Units OR a Minimum Order Value (MOV) of $4,500,000.</li>
+                                                        <li><strong>Maximum Order:</strong> 500 Qualifying Units per batch. Orders exceeding 500 units require distinct negotiation with GM Management (10-day lead time).</li>
+                                                    </ul>
+                                                </div>
+
+                                                <div>
+                                                    <h5 className="font-semibold text-white/90">2. SCHEDULING & LEAD TIMES</h5>
+                                                    <ul className="list-disc pl-4 space-y-1">
+                                                        <li><strong>Booking Lead Time:</strong> Min. 5 Business Days prior to Collection Date.</li>
+                                                        <li><strong>Confirmation:</strong> Order is confirmed ONLY AFTER the catering agreement is signed. Verbal/Text agreements are not binding.</li>
+                                                        <li><strong>"Day-Prior" Rule:</strong> Collections must be scheduled one (1) day prior to the event.</li>
+                                                        <li><strong>Cool-Down:</strong> X-Club limited to one (1) bulk order every 72 hours.</li>
+                                                    </ul>
+                                                </div>
+
+                                                <div>
+                                                    <h5 className="font-semibold text-white/90">3. FINANCIAL OBLIGATIONS</h5>
+                                                    <ul className="list-disc pl-4 space-y-1">
+                                                        <li><strong>Deposit:</strong> 50% Non-Refundable Deposit upon signing.</li>
+                                                        <li><strong>Final Settlement:</strong> Remaining 50% due 24 hours prior to collection. Goods released only after full payment.</li>
+                                                        <li><strong>Cancellations:</strong> &lt;4 Days Notice = Deposit forfeited. &lt;48 Hours Notice = 100% Invoice due.</li>
+                                                    </ul>
+                                                </div>
+
+                                                <div>
+                                                    <h5 className="font-semibold text-white/90">4. LATE BOOKINGS & SURCHARGES</h5>
+                                                    <ul className="list-disc pl-4 space-y-1">
+                                                        <li><strong>Tier 1 (3-4 Days Prior):</strong> 15% Surcharge.</li>
+                                                        <li><strong>Tier 2 (24-48 Hours):</strong> 35% Rush Fee.</li>
+                                                    </ul>
+                                                </div>
+
+                                                <div>
+                                                    <h5 className="font-semibold text-white/90">5. LIABILITY & WAIVER</h5>
+                                                    <p>Liability transfers to X-Club upon handover. X-Club assumes responsibility for cold chain storage (&lt;5°C) and safe reheating (&gt;75°C). X-Club indemnifies GM Burgershot against health claims for food consumed &gt;32 hours after handover or improperly stored.</p>
+                                                </div>
+                                                <div>
+                                                    <h5 className="font-semibold text-white/90">6.POLICY GOVERNANCE & AMENDMENTS</h5>
+                                                    <ul className="list-disc pl-4 space-y-1">
+                                                        <li><strong>Right to Modify:</strong> GM Burgershot reserves the right to review, amend, or update this policy at any time, specifically in the event that operational flaws, loopholes, or financial discrepancies are identified.
+                                                        </li>
+                                                        <li><strong>Notification:</strong> Any such amendments will be effective immediately upon written notification to the Client. Continued use of GM Burgershot’s catering services constitutes acceptance of the revised terms.
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </ScrollArea>
+
+                                        <div className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id="policy"
+                                                checked={policyAccepted}
+                                                onCheckedChange={(checked) => setPolicyAccepted(checked as boolean)}
+                                                className="border-white/20 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                                            />
+                                            <label
+                                                htmlFor="policy"
+                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-white/80"
+                                            >
+                                                I confirm I have read and accept the Bulk Order Policy.
+                                            </label>
+                                        </div>
+                                    </div>
+
                                     <Button
                                         type="submit"
-                                        disabled={loading}
+                                        disabled={loading || !policyAccepted}
                                         className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 hover:from-orange-700 hover:via-red-700 hover:to-pink-700 text-white border-0 shadow-neon transition-all duration-300 mt-4"
                                     >
                                         {loading ? (
