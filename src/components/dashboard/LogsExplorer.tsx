@@ -101,42 +101,44 @@ export function LogsExplorer({ employees }: LogsExplorerProps) {
 
                 {/* Results Table */}
                 <div className="rounded-md border border-white/10 flex-1 overflow-hidden relative">
-                    <ScrollArea className="h-[500px]">
-                        <Table>
-                            <TableHeader className="bg-black/20 sticky top-0 z-10">
-                                <TableRow className="hover:bg-transparent border-white/10">
-                                    <TableHead>Staff Name</TableHead>
-                                    <TableHead>Start Time</TableHead>
-                                    <TableHead>End Time</TableHead>
-                                    <TableHead>Duration</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {!hasSearched && logs.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={4} className="text-center h-24 text-muted-foreground">
-                                            Select filters and click "Fetch Logs" to view history.
-                                        </TableCell>
+                    <div className="h-full overflow-auto">
+                        <div className="min-w-[600px]">
+                            <Table>
+                                <TableHeader className="bg-black/20 sticky top-0 z-10">
+                                    <TableRow className="hover:bg-transparent border-white/10">
+                                        <TableHead>Staff Name</TableHead>
+                                        <TableHead>Start Time</TableHead>
+                                        <TableHead>End Time</TableHead>
+                                        <TableHead>Duration</TableHead>
                                     </TableRow>
-                                ) : logs.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={4} className="text-center h-24 text-muted-foreground">
-                                            No logs found for the selected criteria.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    logs.map((log: any) => (
-                                        <TableRow key={log._id} className="border-white/5 hover:bg-white/5">
-                                            <TableCell className="font-medium">{log.username}</TableCell>
-                                            <TableCell>{new Date(log.startTime).toLocaleString()}</TableCell>
-                                            <TableCell>{new Date(log.endTime).toLocaleString()}</TableCell>
-                                            <TableCell className="font-mono text-accent">{formatDuration(log.durationMs)}</TableCell>
+                                </TableHeader>
+                                <TableBody>
+                                    {!hasSearched && logs.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={4} className="text-center h-24 text-muted-foreground">
+                                                Select filters and click "Fetch Logs" to view history.
+                                            </TableCell>
                                         </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </ScrollArea>
+                                    ) : logs.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={4} className="text-center h-24 text-muted-foreground">
+                                                No logs found for the selected criteria.
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        logs.map((log: any) => (
+                                            <TableRow key={log._id} className="border-white/5 hover:bg-white/5">
+                                                <TableCell className="font-medium">{log.username}</TableCell>
+                                                <TableCell>{new Date(log.startTime).toLocaleString()}</TableCell>
+                                                <TableCell>{new Date(log.endTime).toLocaleString()}</TableCell>
+                                                <TableCell className="font-mono text-accent">{formatDuration(log.durationMs)}</TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </div>
                 </div>
             </CardContent>
         </Card>

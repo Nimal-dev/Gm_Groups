@@ -131,7 +131,7 @@ export function BankLogsExplorer() {
                 </CardHeader>
                 <CardContent className="space-y-4 flex-1 flex flex-col min-h-0">
                     {/* Filters */}
-                    <div className="flex flex-col xl:flex-row gap-4 p-4 rounded-lg bg-black/20 border border-white/5">
+                    <div className="flex flex-col lg:flex-row gap-4 p-4 rounded-lg bg-black/20 border border-white/5">
                         <div className="flex-1 space-y-2">
                             <label className="text-sm font-medium">Search Account</label>
                             <Input
@@ -167,7 +167,7 @@ export function BankLogsExplorer() {
                                 onClick={() => handleSearch(1)}
                                 disabled={isLoading}
                                 variant="outline"
-                                className="w-full md:w-auto border-white/10 hover:bg-white/5"
+                                className="w-full lg:w-auto border-white/10 hover:bg-white/5"
                             >
                                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCcw className="w-4 h-4 mr-2" />}
                                 Refresh
@@ -177,61 +177,63 @@ export function BankLogsExplorer() {
 
                     {/* Table */}
                     <div className="rounded-md border border-white/10 flex-1 overflow-hidden relative flex flex-col">
-                        <div className="flex-1 overflow-y-auto">
-                            <Table>
-                                <TableHeader className="bg-black/20 sticky top-0 z-10">
-                                    <TableRow className="hover:bg-transparent border-white/10">
-                                        <TableHead>Date</TableHead>
-                                        <TableHead>Type</TableHead>
-                                        <TableHead>Account</TableHead>
-                                        <TableHead>Amount</TableHead>
-                                        <TableHead>Memo / Details</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {!hasSearched && !data ? (
-                                        <TableRow>
-                                            <TableCell colSpan={5} className="text-center h-48 text-muted-foreground">
-                                                Select filters and click "Search Logs" to view records.
-                                            </TableCell>
+                        <div className="flex-1 overflow-auto">
+                            <div className="min-w-[800px]">
+                                <Table>
+                                    <TableHeader className="bg-black/20 sticky top-0 z-10">
+                                        <TableRow className="hover:bg-transparent border-white/10">
+                                            <TableHead>Date</TableHead>
+                                            <TableHead>Type</TableHead>
+                                            <TableHead>Account</TableHead>
+                                            <TableHead>Amount</TableHead>
+                                            <TableHead>Memo / Details</TableHead>
                                         </TableRow>
-                                    ) : (data?.logs || []).length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={5} className="text-center h-48 text-muted-foreground">
-                                                No transactions found matching criteria.
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        (data?.logs || []).map((log: any) => (
-                                            <TableRow key={log.transactionId} className="border-white/5 hover:bg-white/5 group h-14">
-                                                <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
-                                                    <ClientTime timestamp={log.date} />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Badge variant="outline" className={cn("text-[10px]", getTypeColor(log.transactionType))}>
-                                                        {log.transactionType}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell className="max-w-[200px]">
-                                                    <div className="font-medium truncate" title={log.accountName}>{log.accountName}</div>
-                                                    <div className="text-xs text-muted-foreground font-mono">{log.accountNumber}</div>
-                                                </TableCell>
-                                                <TableCell className={cn("font-bold font-mono", log.transactionType === 'WITHDRAW' ? 'text-red-400' : 'text-green-400')}>
-                                                    {log.transactionType === 'WITHDRAW' ? '-' : '+'}${log.amount.toLocaleString()}
-                                                </TableCell>
-                                                <TableCell className="max-w-[300px]">
-                                                    <div className="text-sm truncate opacity-80" title={log.memo}>{log.memo}</div>
-                                                    {log.transferredTo && (
-                                                        <div className="text-xs text-blue-300 mt-1 flex items-center gap-1">
-                                                            <ArrowUpRight className="w-3 h-3" /> To: {log.transferredTo}
-                                                        </div>
-                                                    )}
+                                    </TableHeader>
+                                    <TableBody>
+                                        {!hasSearched && !data ? (
+                                            <TableRow>
+                                                <TableCell colSpan={5} className="text-center h-48 text-muted-foreground">
+                                                    Select filters and click "Search Logs" to view records.
                                                 </TableCell>
                                             </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
+                                        ) : (data?.logs || []).length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={5} className="text-center h-48 text-muted-foreground">
+                                                    No transactions found matching criteria.
+                                                </TableCell>
+                                            </TableRow>
+                                        ) : (
+                                            (data?.logs || []).map((log: any) => (
+                                                <TableRow key={log.transactionId} className="border-white/5 hover:bg-white/5 group h-14">
+                                                    <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
+                                                        <ClientTime timestamp={log.date} />
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="outline" className={cn("text-[10px]", getTypeColor(log.transactionType))}>
+                                                            {log.transactionType}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="max-w-[200px]">
+                                                        <div className="font-medium truncate" title={log.accountName}>{log.accountName}</div>
+                                                        <div className="text-xs text-muted-foreground font-mono">{log.accountNumber}</div>
+                                                    </TableCell>
+                                                    <TableCell className={cn("font-bold font-mono", log.transactionType === 'WITHDRAW' ? 'text-red-400' : 'text-green-400')}>
+                                                        {log.transactionType === 'WITHDRAW' ? '-' : '+'}${log.amount.toLocaleString()}
+                                                    </TableCell>
+                                                    <TableCell className="max-w-[300px]">
+                                                        <div className="text-sm truncate opacity-80" title={log.memo}>{log.memo}</div>
+                                                        {log.transferredTo && (
+                                                            <div className="text-xs text-blue-300 mt-1 flex items-center gap-1">
+                                                                <ArrowUpRight className="w-3 h-3" /> To: {log.transferredTo}
+                                                            </div>
+                                                        )}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </div>
 
                         {/* Pagination Controls */}

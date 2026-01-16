@@ -118,12 +118,12 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
 
     return (
         <Card className="glass-card h-full flex flex-col">
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <CardTitle>Employee Management</CardTitle>
                     <CardDescription>Manage staff roster and details.</CardDescription>
                 </div>
-                <Button onClick={openAddDialog} className="neon-button bg-accent text-white hover:bg-accent/80">
+                <Button onClick={openAddDialog} className="w-full sm:w-auto neon-button bg-accent text-white hover:bg-accent/80">
                     <Plus className="w-4 h-4 mr-2" /> Add Employee
                 </Button>
             </CardHeader>
@@ -139,57 +139,59 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                 </div>
 
                 <div className="rounded-md border border-white/10 flex-1 overflow-hidden relative">
-                    <ScrollArea className="h-[600px]">
-                        <Table>
-                            <TableHeader className="bg-black/20 sticky top-0 z-10">
-                                <TableRow className="hover:bg-transparent border-white/10">
-                                    <TableHead>User ID</TableHead>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Rank</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {filteredEmployees.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
-                                            No members found.
-                                        </TableCell>
+                    <div className="h-full overflow-auto">
+                        <div className="min-w-[700px]">
+                            <Table>
+                                <TableHeader className="bg-black/20 sticky top-0 z-10">
+                                    <TableRow className="hover:bg-transparent border-white/10">
+                                        <TableHead>User ID</TableHead>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead>Rank</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
-                                ) : (
-                                    filteredEmployees.map((emp) => (
-                                        <TableRow key={emp.userId} className="border-white/5 hover:bg-white/5">
-                                            <TableCell className="font-mono text-xs text-muted-foreground">{emp.userId}</TableCell>
-                                            <TableCell className="font-medium">{emp.username}</TableCell>
-                                            <TableCell>{emp.rank}</TableCell>
-                                            <TableCell>
-                                                <Badge variant={emp.status === 'Active' ? 'secondary' : 'destructive'} className="text-xs">
-                                                    {emp.status}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex justify-end gap-2">
-                                                    <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-accent" onClick={() => openEditDialog(emp)}>
-                                                        <Pencil className="w-4 h-4" />
-                                                    </Button>
-                                                    <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-destructive" onClick={() => handleDelete(emp.userId)}>
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </Button>
-                                                </div>
+                                </TableHeader>
+                                <TableBody>
+                                    {filteredEmployees.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
+                                                No members found.
                                             </TableCell>
                                         </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </ScrollArea>
+                                    ) : (
+                                        filteredEmployees.map((emp) => (
+                                            <TableRow key={emp.userId} className="border-white/5 hover:bg-white/5">
+                                                <TableCell className="font-mono text-xs text-muted-foreground">{emp.userId}</TableCell>
+                                                <TableCell className="font-medium">{emp.username}</TableCell>
+                                                <TableCell>{emp.rank}</TableCell>
+                                                <TableCell>
+                                                    <Badge variant={emp.status === 'Active' ? 'secondary' : 'destructive'} className="text-xs">
+                                                        {emp.status}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-accent" onClick={() => openEditDialog(emp)}>
+                                                            <Pencil className="w-4 h-4" />
+                                                        </Button>
+                                                        <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-destructive" onClick={() => handleDelete(emp.userId)}>
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </div>
                 </div>
             </CardContent>
 
             {/* Dialog Form */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="glass-card border-white/10 sm:max-w-[425px]">
+                <DialogContent className="glass-card border-white/10 w-[95vw] max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle>{editingEmployee ? 'Edit Employee' : 'Add Employee'}</DialogTitle>
                         <DialogDescription>

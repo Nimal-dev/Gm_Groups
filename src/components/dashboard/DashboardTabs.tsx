@@ -91,7 +91,7 @@ export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentS
                     </div>
 
                     {/* Active Orders Quick View */}
-                    <Card className="glass-card md:col-span-2 lg:col-span-2 h-[400px] flex flex-col">
+                    <Card className="glass-card md:col-span-2 lg:col-span-2 h-auto min-h-[400px] flex flex-col">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-lg">
                                 <ShoppingCart className="w-5 h-5 text-accent" /> High Priority Orders
@@ -136,17 +136,17 @@ export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentS
             </TabsContent>
 
             {/* STAFF TAB */}
-            <TabsContent value="staff" className="space-y-6 h-[800px]">
+            <TabsContent value="staff" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
                 <EmployeeManagement employees={allEmployees} />
             </TabsContent>
 
             {/* LOGS TAB */}
-            <TabsContent value="logs" className="space-y-6 h-[800px]">
+            <TabsContent value="logs" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
                 <LogsExplorer employees={allEmployees} />
             </TabsContent>
 
             {/* BANK LOGS TAB */}
-            <TabsContent value="bank" className="space-y-6 h-[800px]">
+            <TabsContent value="bank" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
                 <BankLogsExplorer key="paginated-view" />
             </TabsContent>
 

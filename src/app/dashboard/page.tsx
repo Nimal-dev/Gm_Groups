@@ -35,7 +35,7 @@ export default async function DashboardPage() {
     const { activeLeaves } = data;
 
     return (
-        <div className="min-h-screen p-6 md:p-8 space-y-8 pb-20">
+        <div className="min-h-screen p-4 md:p-8 space-y-8 pb-20">
 
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
