@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Users, ShoppingCart, DollarSign, Activity, FileText } from 'lucide-react';
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
+import { LogoutButton } from '@/components/dashboard/LogoutButton';
 
 export const dynamic = 'force-dynamic'; // Ensure real-time data
 
@@ -48,6 +49,7 @@ export default async function DashboardPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
+                    <LogoutButton />
                     <Badge variant="outline" className="glass-card px-4 py-1 text-xs font-mono">
                         Last Updated: <ClientTime timestamp={data.timestamp || Date.now()} />
                     </Badge>
