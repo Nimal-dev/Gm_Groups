@@ -41,10 +41,17 @@ export async function generateReportData(startDate: Date, endDate: Date): Promis
         let totalExpense = 0;
 
         transactions.forEach((t: any) => {
-            if (t.transactionType === 'WITHDRAW') {
+            // Expenses: WITHDRAW or TRANSFER (Outgoing to someone)
+            // Check 'transferredTo' field OR 'memo' string for "transfer to"
+            const isTransferOut = t.transactionType === 'TRANSFER' && (
+                t.transferredTo ||
+                (t.memo && t.memo.toLowerCase().includes('transfer to'))
+            );
+
+            if (t.transactionType === 'WITHDRAW' || isTransferOut) {
                 totalExpense += t.amount;
             } else {
-                // DEPOSIT, TRANSFER (Incoming)
+                // Income: DEPOSIT or TRANSFER (Incoming/Internal without specific destination)
                 totalIncome += t.amount;
             }
         });
