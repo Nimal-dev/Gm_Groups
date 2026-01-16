@@ -20,6 +20,10 @@ const BankLogsExplorer = dynamic(() => import('@/components/dashboard/BankLogsEx
     loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Bank Records...</div>,
     ssr: false
 });
+const ReportsGenerator = dynamic(() => import('@/components/dashboard/ReportsGenerator').then(mod => mod.ReportsGenerator), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Report Tool...</div>,
+    ssr: false
+});
 
 import { LeaveManagementCard } from '@/components/dashboard/LeaveManagementCard';
 
@@ -42,6 +46,7 @@ export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentS
                     <TabsTrigger value="logs" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Duty Logs</TabsTrigger>
                     <TabsTrigger value="bank" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Bank Logs</TabsTrigger>
                     <TabsTrigger value="finances" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Salary History</TabsTrigger>
+                    <TabsTrigger value="reports" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Reports</TabsTrigger>
                 </TabsList>
             </div>
 
@@ -181,6 +186,10 @@ export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentS
                 </Card>
             </TabsContent>
 
+            {/* REPORTS TAB */}
+            <TabsContent value="reports" className="space-y-6">
+                <ReportsGenerator />
+            </TabsContent>
         </Tabs>
     );
 }
