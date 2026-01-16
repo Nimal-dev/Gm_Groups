@@ -87,24 +87,59 @@ const fetchDashboardData = unstable_cache(
                 createdAt: l.createdAt ? new Date(l.createdAt).toISOString() : null
             }));
 
-            // Fetch Bank Stats (last 30 days) - Aggregation is efficient
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            // Fetch Bank Stats (Current Month) - Aggregation is efficient
+            const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
-            const bankStats = await BankTransaction.aggregate([
-                { $match: { date: { $gte: thirtyDaysAgo } } },
+            const bankData = await BankTransaction.aggregate([
+                { $match: { date: { $gte: startOfMonth } } },
                 {
                     $group: {
-                        _id: '$transactionType',
-                        total: { $sum: '$amount' }
+                        _id: null,
+                        totalIncome: {
+                            $sum: {
+                                $cond: [
+                                    {
+                                        $or: [
+                                            { $eq: ["$transactionType", "DEPOSIT"] },
+                                            {
+                                                $and: [
+                                                    { $eq: ["$transactionType", "TRANSFER"] },
+                                                    { $eq: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "$amount",
+                                    0
+                                ]
+                            }
+                        },
+                        totalExpense: {
+                            $sum: {
+                                $cond: [
+                                    {
+                                        $or: [
+                                            { $eq: ["$transactionType", "WITHDRAW"] },
+                                            {
+                                                $and: [
+                                                    { $eq: ["$transactionType", "TRANSFER"] },
+                                                    { $ne: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "$amount",
+                                    0
+                                ]
+                            }
+                        }
                     }
                 }
             ]);
 
-            const totalIncome = bankStats.reduce((acc: number, curr: any) =>
-                (curr._id !== 'WITHDRAW') ? acc + curr.total : acc, 0
-            );
-            const totalExpense = bankStats.find((s: any) => s._id === 'WITHDRAW')?.total || 0;
+            const stats = bankData[0] || { totalIncome: 0, totalExpense: 0 };
+            const totalIncome = stats.totalIncome;
+            const totalExpense = stats.totalExpense;
 
             // Return optimized data
             return {

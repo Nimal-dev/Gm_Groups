@@ -42,10 +42,9 @@ export async function generateReportData(startDate: Date, endDate: Date): Promis
 
         transactions.forEach((t: any) => {
             // Expenses: WITHDRAW or TRANSFER (Outgoing to someone)
-            // Check 'transferredTo' field OR 'memo' string for "transfer to"
+            // Check 'memo' string for "transfer to". Ignore 'transferredTo' field as it might exist for incoming too.
             const isTransferOut = t.transactionType === 'TRANSFER' && (
-                t.transferredTo ||
-                (t.memo && t.memo.toLowerCase().includes('transfer to'))
+                t.memo && t.memo.toLowerCase().includes('transfer to')
             );
 
             if (t.transactionType === 'WITHDRAW' || isTransferOut) {

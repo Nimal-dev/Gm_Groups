@@ -22,7 +22,7 @@ export function BankLogsExplorer() {
     const [transactionType, setTransactionType] = useState<string>('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [dateRange, setDateRange] = useState<DateRange | undefined>({
-        from: new Date(new Date().setDate(new Date().getDate() - 30)), // Last 30 days default
+        from: new Date(new Date().getFullYear(), new Date().getMonth(), 1), // Start of current month
         to: new Date()
     });
 
@@ -217,14 +217,23 @@ export function BankLogsExplorer() {
                                                         <div className="font-medium truncate" title={log.accountName}>{log.accountName}</div>
                                                         <div className="text-xs text-muted-foreground font-mono">{log.accountNumber}</div>
                                                     </TableCell>
-                                                    <TableCell className={cn("font-bold font-mono", log.transactionType === 'WITHDRAW' ? 'text-red-400' : 'text-green-400')}>
-                                                        {log.transactionType === 'WITHDRAW' ? '-' : '+'}${log.amount.toLocaleString()}
-                                                    </TableCell>
+                                                    {(() => {
+                                                        const isExpense = log.transactionType === 'WITHDRAW' ||
+                                                            (log.transactionType === 'TRANSFER' &&
+                                                                (log.memo && log.memo.toLowerCase().includes('transfer to'))
+                                                            );
+                                                        return (
+                                                            <TableCell className={cn("font-bold font-mono", isExpense ? 'text-red-400' : 'text-green-400')}>
+                                                                {isExpense ? '-' : '+'}${log.amount.toLocaleString()}
+                                                            </TableCell>
+                                                        );
+                                                    })()}
                                                     <TableCell className="max-w-[300px]">
                                                         <div className="text-sm truncate opacity-80" title={log.memo}>{log.memo}</div>
-                                                        {log.transferredTo && (
+                                                        {(log.transferredTo || (log.memo && log.memo.toLowerCase().includes('transfer to'))) && (
                                                             <div className="text-xs text-blue-300 mt-1 flex items-center gap-1">
-                                                                <ArrowUpRight className="w-3 h-3" /> To: {log.transferredTo}
+                                                                <ArrowUpRight className="w-3 h-3" />
+                                                                To: {log.transferredTo || log.memo.split(/transfer to/i)[1]?.trim() || 'Unknown'}
                                                             </div>
                                                         )}
                                                     </TableCell>

@@ -86,7 +86,18 @@ export async function getBankLogs(filter: BankLogFilter) {
                     totalIncome: {
                         $sum: {
                             $cond: [
-                                { $in: [{ $toUpper: "$transactionType" }, ["DEPOSIT", "TRANSFER"]] },
+                                {
+                                    $or: [
+                                        { $eq: ["$transactionType", "DEPOSIT"] },
+                                        {
+                                            $and: [
+                                                { $eq: ["$transactionType", "TRANSFER"] },
+                                                // Only consider INCOMING if it does NOT have "transfer to"
+                                                { $eq: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] }
+                                            ]
+                                        }
+                                    ]
+                                },
                                 "$amount",
                                 0
                             ]
@@ -95,7 +106,18 @@ export async function getBankLogs(filter: BankLogFilter) {
                     totalExpense: {
                         $sum: {
                             $cond: [
-                                { $eq: [{ $toUpper: "$transactionType" }, "WITHDRAW"] },
+                                {
+                                    $or: [
+                                        { $eq: ["$transactionType", "WITHDRAW"] },
+                                        {
+                                            $and: [
+                                                { $eq: ["$transactionType", "TRANSFER"] },
+                                                // Only consider OUTGOING if it HAS "transfer to"
+                                                { $ne: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] }
+                                            ]
+                                        }
+                                    ]
+                                },
                                 "$amount",
                                 0
                             ]
