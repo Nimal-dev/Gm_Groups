@@ -65,8 +65,8 @@ export async function generateReportData(startDate: Date, endDate: Date): Promis
         return {
             success: true,
             data: {
-                startDate: start.toLocaleDateString(),
-                endDate: end.toLocaleDateString(),
+                startDate: start.toISOString(),
+                endDate: end.toISOString(),
                 totalIncome,
                 totalExpense,
                 netProfit,

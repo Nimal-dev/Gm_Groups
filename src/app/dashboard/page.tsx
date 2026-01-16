@@ -8,7 +8,15 @@ import { LogoutButton } from '@/components/dashboard/LogoutButton';
 
 export const dynamic = 'force-dynamic'; // Ensure real-time data
 
+import { auth } from '@/auth';
+
 export default async function DashboardPage() {
+    const session = await auth();
+    const role = session?.user?.role || 'staff'; // Default to staff if role is missing but authorized
+
+    // Safety check - although middleware handles this, good to have redundancy
+    if (!session?.user) return null;
+
     const data = await getDashboardData();
     const { activeStaff, activeOrders, allEmployees, recentSalaries, error } = data;
 
@@ -45,13 +53,13 @@ export default async function DashboardPage() {
                         Command Center
                     </h1>
                     <p className="text-muted-foreground">
-                        Real-time overview of business operations & staff activity.
+                        {role === 'admin' ? 'Full operational control & oversight.' : 'Staff operations dashboard.'}
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
                     <LogoutButton />
                     <Badge variant="outline" className="glass-card px-4 py-1 text-xs font-mono">
-                        Last Updated: <ClientTime timestamp={data.timestamp || Date.now()} />
+                        Role: {role.toUpperCase()}
                     </Badge>
                 </div>
             </div>
@@ -59,20 +67,24 @@ export default async function DashboardPage() {
             {/* Top Stats Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
 
-                <StatsCard
-                    title="Current Month Income"
-                    value={`$${(data.bankStats?.totalIncome || 0).toLocaleString()}`}
-                    subtitle="Total Deposits"
-                    icon={<DollarSign className="w-5 h-3 text-green-400" />}
-                    glow
-                />
+                {role === 'admin' && (
+                    <>
+                        <StatsCard
+                            title="Current Month Income"
+                            value={`$${(data.bankStats?.totalIncome || 0).toLocaleString()}`}
+                            subtitle="Total Deposits"
+                            icon={<DollarSign className="w-5 h-3 text-green-400" />}
+                            glow
+                        />
 
-                <StatsCard
-                    title="Current Month Expense"
-                    value={`$${(data.bankStats?.totalExpense || 0).toLocaleString()}`}
-                    subtitle="Withdrawals & Transfers"
-                    icon={<Activity className="w-5 h-5 text-red-400" />}
-                />
+                        <StatsCard
+                            title="Current Month Expense"
+                            value={`$${(data.bankStats?.totalExpense || 0).toLocaleString()}`}
+                            subtitle="Withdrawals & Transfers"
+                            icon={<Activity className="w-5 h-5 text-red-400" />}
+                        />
+                    </>
+                )}
 
                 <StatsCard
                     title="Active Duty"
@@ -110,6 +122,7 @@ export default async function DashboardPage() {
                 allEmployees={allEmployees}
                 recentSalaries={recentSalaries}
                 activeLeaves={activeLeaves || []}
+                userRole={role}
             />
         </div>
     );

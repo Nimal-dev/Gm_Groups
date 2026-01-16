@@ -10,9 +10,7 @@ export function LogoutButton() {
 
     const handleLogout = async () => {
         setIsPending(true);
-        // Prevent auto-redirect to keep domain context, then manually redirect
-        await signOut({ redirect: false });
-        window.location.href = '/';
+        await signOut({ callbackUrl: '/' });
     };
 
     return (

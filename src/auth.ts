@@ -10,26 +10,51 @@ import { z } from 'zod';
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
     ...authConfig,
-    secret: process.env.AUTH_SECRET,
+    secret: process.env.AUTH_SECRET || 'fallback_secret_for_dev_only_12345',
     trustHost: true,
+    callbacks: {
+        async jwt({ token, user }) {
+            console.log('JWT Callback:', { token, user });
+            if (user) {
+                token.role = user.role;
+            }
+            return token;
+        },
+        async session({ session, token }) {
+            console.log('Session Callback:', { session, token });
+            if (session.user && token.role) {
+                session.user.role = token.role as string;
+            }
+            return session;
+        },
+    },
     providers: [
         Credentials({
             async authorize(credentials) {
                 const parsedCredentials = z
-                    .object({ username: z.string(), password: z.string().min(6) })
+                    .object({ username: z.string(), password: z.string().min(1) })
                     .safeParse(credentials);
 
                 if (parsedCredentials.success) {
                     const { username, password } = parsedCredentials.data;
 
-                    // Simple hardcoded check for now. 
-                    // User can update this to DB logic later.
-                    // TODO: Replace with DB call
+                    // Admin Credential
                     if (username === 'Nimal' && password === 'Nimal@gm6814') {
                         return {
                             id: '1',
                             name: 'Admin User',
                             email: 'admin@gm.groups',
+                            role: 'admin',
+                        };
+                    }
+
+                    // Staff Credential
+                    if (username === 'Staff' && password === 'Staff@gm123') {
+                        return {
+                            id: '2',
+                            name: 'Staff Member',
+                            email: 'staff@gm.groups',
+                            role: 'staff',
                         };
                     }
                 }

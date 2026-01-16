@@ -33,20 +33,34 @@ interface DashboardTabsProps {
     allEmployees: any[];
     recentSalaries: any[];
     activeLeaves: any[];
+    userRole?: string;
 }
 
-export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentSalaries, activeLeaves }: DashboardTabsProps) {
+export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentSalaries, activeLeaves, userRole = 'staff' }: DashboardTabsProps) {
+    const isAdmin = userRole === 'admin';
+
     return (
         <Tabs defaultValue="overview" className="space-y-6">
             <div className="overflow-x-auto pb-2">
                 <TabsList className="glass-card bg-transparent border-0 p-1">
                     <TabsTrigger value="overview" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Overview</TabsTrigger>
                     <TabsTrigger value="orders" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Active Orders</TabsTrigger>
-                    <TabsTrigger value="staff" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Staff Management</TabsTrigger>
-                    <TabsTrigger value="logs" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Duty Logs</TabsTrigger>
-                    <TabsTrigger value="bank" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Bank Logs</TabsTrigger>
-                    <TabsTrigger value="finances" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Salary History</TabsTrigger>
-                    <TabsTrigger value="reports" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Reports</TabsTrigger>
+
+                    {isAdmin && (
+                        <>
+                            <TabsTrigger value="staff" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Staff Management</TabsTrigger>
+                            <TabsTrigger value="logs" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Duty Logs</TabsTrigger>
+                            <TabsTrigger value="bank" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Bank Logs</TabsTrigger>
+                            <TabsTrigger value="finances" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Salary History</TabsTrigger>
+                            <TabsTrigger value="reports" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Reports</TabsTrigger>
+                        </>
+                    )}
+
+                    {!isAdmin && (
+                        // Staff only sees Duty Logs from the extra list? Or maybe just Logs?
+                        // Let's allow Logs for staff too as it lets them see their own hours theoretically (or general activity)
+                        <TabsTrigger value="logs" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Duty Logs</TabsTrigger>
+                    )}
                 </TabsList>
             </div>
 
@@ -140,56 +154,62 @@ export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentS
                 </Card>
             </TabsContent>
 
-            {/* STAFF TAB */}
-            <TabsContent value="staff" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
-                <EmployeeManagement employees={allEmployees} />
-            </TabsContent>
+            {/* STAFF TAB - Admin Only */}
+            {isAdmin && (
+                <TabsContent value="staff" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
+                    <EmployeeManagement employees={allEmployees} />
+                </TabsContent>
+            )}
 
-            {/* LOGS TAB */}
+            {/* LOGS TAB - Everyone */}
             <TabsContent value="logs" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
                 <LogsExplorer employees={allEmployees} />
             </TabsContent>
 
-            {/* BANK LOGS TAB */}
-            <TabsContent value="bank" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
-                <BankLogsExplorer key="paginated-view" />
-            </TabsContent>
+            {isAdmin && (
+                <>
+                    {/* BANK LOGS TAB */}
+                    <TabsContent value="bank" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
+                        <BankLogsExplorer key="paginated-view" />
+                    </TabsContent>
 
-            {/* FINANCES TAB */}
-            <TabsContent value="finances" className="space-y-6">
-                <Card className="glass-card">
-                    <CardHeader>
-                        <CardTitle>Recent Salary Logs</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-2">
-                            {recentSalaries.map((log: any) => (
-                                <div key={log._id} className="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-lg bg-black/20 hover:bg-black/40 transition-colors">
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-2 rounded-full bg-green-500/10 text-green-500">
-                                            <DollarSign className="w-5 h-5" />
+                    {/* FINANCES TAB */}
+                    <TabsContent value="finances" className="space-y-6">
+                        <Card className="glass-card">
+                            <CardHeader>
+                                <CardTitle>Recent Salary Logs</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-2">
+                                    {recentSalaries.map((log: any) => (
+                                        <div key={log._id} className="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-lg bg-black/20 hover:bg-black/40 transition-colors">
+                                            <div className="flex items-center gap-4">
+                                                <div className="p-2 rounded-full bg-green-500/10 text-green-500">
+                                                    <DollarSign className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-mono font-medium">${log.amount.toLocaleString()}</p>
+                                                    <p className="text-xs text-muted-foreground">To ID: {log.userId}</p>
+                                                </div>
+                                            </div>
+                                            <div className="mt-2 md:mt-0 text-right">
+                                                <p className="text-sm text-muted-foreground">Processed by {log.processedBy}</p>
+                                                <p className="text-xs opacity-50">{new Date(log.date).toLocaleString()}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="font-mono font-medium">${log.amount.toLocaleString()}</p>
-                                            <p className="text-xs text-muted-foreground">To ID: {log.userId}</p>
-                                        </div>
-                                    </div>
-                                    <div className="mt-2 md:mt-0 text-right">
-                                        <p className="text-sm text-muted-foreground">Processed by {log.processedBy}</p>
-                                        <p className="text-xs opacity-50">{new Date(log.date).toLocaleString()}</p>
-                                    </div>
+                                    ))}
+                                    {recentSalaries.length === 0 && <p className="text-center py-10 text-muted-foreground">No recent salary records.</p>}
                                 </div>
-                            ))}
-                            {recentSalaries.length === 0 && <p className="text-center py-10 text-muted-foreground">No recent salary records.</p>}
-                        </div>
-                    </CardContent>
-                </Card>
-            </TabsContent>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
 
-            {/* REPORTS TAB */}
-            <TabsContent value="reports" className="space-y-6">
-                <ReportsGenerator />
-            </TabsContent>
+                    {/* REPORTS TAB */}
+                    <TabsContent value="reports" className="space-y-6">
+                        <ReportsGenerator />
+                    </TabsContent>
+                </>
+            )}
         </Tabs>
     );
 }

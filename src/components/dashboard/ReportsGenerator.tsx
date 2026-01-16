@@ -25,6 +25,7 @@ export function ReportsGenerator() {
     // Report Metadata
     const [reportTo, setReportTo] = useState('High Command');
     const [reportFrom, setReportFrom] = useState('');
+    const [membersRemoved, setMembersRemoved] = useState('');
 
     const [loading, setLoading] = useState(false);
     const [generatedText, setGeneratedText] = useState('');
@@ -47,7 +48,8 @@ export function ReportsGenerator() {
                 throw new Error(result.error || 'Unknown error occurred');
             }
 
-            const report = formatReport(reportType, result.data, reportTo, reportFrom);
+            // Pass membersRemoved to the formatter
+            const report = formatReport(reportType, result.data, reportTo, reportFrom, membersRemoved);
             setGeneratedText(report);
             toast({
                 title: "Report generated successfully!",
@@ -140,6 +142,17 @@ export function ReportsGenerator() {
                         </div>
                     </div>
 
+                    <div className="space-y-2">
+                        <Label>Members Removed</Label>
+                        <Input
+                            type="number"
+                            placeholder="0"
+                            value={membersRemoved}
+                            onChange={(e) => setMembersRemoved(e.target.value)}
+                            className="glass-input"
+                        />
+                    </div>
+
                     <Button
                         onClick={handleGenerate}
                         disabled={loading}
@@ -172,48 +185,57 @@ export function ReportsGenerator() {
     );
 }
 
-function formatReport(type: string, data: any, to: string, from: string) {
+function formatReport(type: string, data: any, to: string, from: string, membersRemoved: string) {
     // Format currency
-    const fmt = (n: number) => `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const fmt = (n: number) => `$ ${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const pad = (str: string, length: number) => str.padEnd(length);
+    const padStart = (str: string, length: number) => str.padStart(length);
+    const center = (str: string, width: number = 80) => {
+        const padding = Math.max(0, Math.floor((width - str.length) / 2));
+        return ' '.repeat(padding) + str;
+    };
+
+    const generatedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const periodStart = new Date(data.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const periodEnd = new Date(data.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
     return `
-GM BURGERSHOT ${type.toUpperCase()} REPORT
+${center('GM BURGERSHOT')}
+${center(`${type.toUpperCase()} PERFORMANCE REVIEW`)}
 
-Date: ${new Date().toLocaleDateString()}
-To: ${to}
+REPORT METADATA
+================================================================================
+Date Generated: ${generatedDate}
+Report Period:  ${periodStart} - ${periodEnd}
+Prepared By:    ${from || '[Name]'}
+Recipient:      ${to || 'High Command'}
+================================================================================
 
-From: ${from}
-Start date: ${data.startDate}
-End Date: ${data.endDate}
+FINANCIAL OVERVIEW
+--------------------------------------------------------------------------------
+ Metric                   | Amount
+--------------------------|-----------------------------------------------------
+ Total Revenue            | ${padStart(fmt(data.totalIncome), 20)}
+ Total Operational Costs  | ${padStart(fmt(data.totalExpense), 20)}
+--------------------------|-----------------------------------------------------
+ NET OPERATIONAL PROFIT   | ${padStart(fmt(data.netProfit), 20)}
+--------------------------------------------------------------------------------
 
+HUMAN RESOURCES SUMMARY
+--------------------------------------------------------------------------------
+ Metric                   | Count
+--------------------------|-----------------------------------------------------
+ New Members              | ${padStart(data.membersAdded.toString(), 20)}
+ Members Removed          | ${padStart(membersRemoved || '0', 20)}
+--------------------------------------------------------------------------------
 
-Description             Amount
-                        ($)
+CERTIFICATION
+--------------------------------------------------------------------------------
+I hereby certify that the information provided in this report is accurate and
+reflects the financial and operational status of GM Burgershot.
 
-TOTAL INCOME            ${fmt(data.totalIncome)}
-
-
-TOTAL                   ${fmt(data.totalExpense)}
-EXPENSES
-
-
-NET PROFIT              ${fmt(data.netProfit)}
-
-
-Members Added           ${data.membersAdded}
-
-
-Members                 ${data.membersRemoved}
-Removed
-
-
-Acknowledgement
-
-By signing below, I acknowledge that the above financial summary and membership
-data are accurate and complete to the best of my knowledge.
-
-Restaurant Manager: ______________________________
-
-Date: ____________________
-`.trim();
+Signature: NIMAL PRINCE
+Title:     Restaurant Manager
+Date:      ${generatedDate}
+`.replace(/^\n/, '');
 }
