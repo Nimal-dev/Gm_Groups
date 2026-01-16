@@ -53,7 +53,7 @@ const fetchDashboardData = unstable_cache(
                     _id: session._id.toString(),
                     userId: session.userId,
                     username: session.username,
-                    startTime: session.startTime?.toISOString() || null,
+                    startTime: session.startTime ? new Date(session.startTime).toISOString() : null,
                     displayName: employeeRecord ? employeeRecord.username : session.username,
                     rank: employeeRecord ? employeeRecord.rank : 'Staff'
                 };
@@ -70,21 +70,21 @@ const fetchDashboardData = unstable_cache(
             const serializedEmployees = allEmployees.map((e: any) => ({
                 ...e,
                 _id: e._id.toString(),
-                joinedAt: e.joinedAt?.toISOString() || null
+                joinedAt: e.joinedAt ? new Date(e.joinedAt).toISOString() : null
             }));
 
             const serializedSalaries = recentSalaries.map((s: any) => ({
                 ...s,
                 _id: s._id.toString(),
-                date: s.date?.toISOString()
+                date: s.date ? new Date(s.date).toISOString() : new Date().toISOString()
             }));
 
             const serializedLeaves = activeLeaves.map((l: any) => ({
                 ...l,
                 _id: l._id.toString(),
-                startDate: l.startDate?.toISOString(),
-                endDate: l.endDate?.toISOString(),
-                createdAt: l.createdAt?.toISOString()
+                startDate: l.startDate ? new Date(l.startDate).toISOString() : null,
+                endDate: l.endDate ? new Date(l.endDate).toISOString() : null,
+                createdAt: l.createdAt ? new Date(l.createdAt).toISOString() : null
             }));
 
             // Fetch Bank Stats (last 30 days) - Aggregation is efficient
