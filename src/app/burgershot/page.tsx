@@ -201,66 +201,106 @@ export default function BurgershotPage() {
         <section id="menu" className="py-24 sm:py-32">
           <div className="container px-4 mx-auto">
             <div className="mb-16 text-center">
-              <h2 className="text-4xl font-bold tracking-tight text-snow-title uppercase font-festive md:text-5xl">
+              <motion.h2
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="text-5xl font-bold tracking-tight text-snow-title uppercase font-festive md:text-6xl"
+              >
                 Our <span className="text-snow-primary">Menu</span>
-              </h2>
-              <p className="max-w-2xl mx-auto mt-4 text-lg text-muted-foreground">
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                viewport={{ once: true }}
+                className="max-w-2xl mx-auto mt-4 text-xl italic text-muted-foreground font-headline"
+              >
                 Simple, iconic, and dangerously good.
-              </p>
+              </motion.p>
             </div>
 
-            <div className="space-y-12">
-              <div>
-                <h3 className="mb-6 text-3xl font-bold text-center text-snow-accent font-festive">Burgers</h3>
-                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                  {menuItems.burgers.map((item) => (
-                    <Card key={item.name} className="flex flex-col text-center bg-card neon-border">
-                      <CardHeader>
-                        <CardTitle className="text-2xl text-snow-primary font-festive">{item.name}</CardTitle>
-                      </CardHeader>
-                      <CardContent className="flex-grow">
-                        <CardDescription>{item.description}</CardDescription>
-                      </CardContent>
-                      <CardContent>
-                        <p className="text-xl font-bold text-accent">{item.price}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
+            {/* Menu Brochure Container */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="relative max-w-6xl mx-auto overflow-hidden shadow-2xl bg-card/80 backdrop-blur-md rounded-xl neon-border"
+            >
+              {/* Decorative inner border */}
+              <div className="absolute inset-2 border-2 border-double border-accent/20 rounded-lg pointer-events-none z-10" />
 
-              <div>
-                <h3 className="mb-6 text-3xl font-bold text-center text-snow-accent font-festive">Sides & Drinks</h3>
-                <div className="grid gap-8 md:grid-cols-2">
-                  {menuItems.sides.map((item) => (
-                    <Card key={item.name} className="text-center bg-card neon-border">
-                      <CardHeader>
-                        <CardTitle className="text-xl text-snow-primary font-festive">{item.name}</CardTitle>
-                      </CardHeader>
-                      <CardContent className="flex-grow">
-                        <CardDescription>{item.description}</CardDescription>
-                      </CardContent>
-                      <CardContent>
-                        <p className="text-lg font-bold text-accent">{item.price}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                  {menuItems.drinks.map((item) => (
-                    <Card key={item.name} className="text-center bg-card neon-border">
-                      <CardHeader>
-                        <CardTitle className="text-xl text-snow-primary font-festive">{item.name}</CardTitle>
-                      </CardHeader>
-                      <CardContent className="flex-grow">
-                        <CardDescription>{item.description}</CardDescription>
-                      </CardContent>
-                      <CardContent>
-                        <p className="text-lg font-bold text-accent">{item.price}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
+              <div className="grid md:grid-cols-2 relative z-20">
+                {/* Left Page: Burgers */}
+                <div className="p-8 md:p-12 lg:p-16 border-b md:border-b-0 md:border-r border-accent/20">
+                  <div className="flex items-center justify-center mb-10">
+                    <div className="h-px bg-accent/50 flex-grow" />
+                    <h3 className="px-6 text-3xl font-bold text-snow-accent font-festive uppercase tracking-wider">Burgers</h3>
+                    <div className="h-px bg-accent/50 flex-grow" />
+                  </div>
+
+                  <div className="space-y-10">
+                    {menuItems.burgers.map((item) => (
+                      <div key={item.name} className="group">
+                        <div className="flex items-baseline w-full mb-2">
+                          <span className="text-xl font-bold text-snow-primary font-festive shrink-0">{item.name}</span>
+                          <div className="flex-grow mx-4 border-b-2 border-dotted border-accent/30 h-4" />
+                          <span className="text-xl font-bold text-accent shrink-0">{item.price}</span>
+                        </div>
+                        <p className="text-base text-muted-foreground/80 leading-relaxed italic">{item.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right Page: Sides & Drinks */}
+                <div className="p-8 md:p-12 lg:p-16">
+                  {/* Sides */}
+                  <div className="mb-12">
+                    <div className="flex items-center justify-center mb-10">
+                      <div className="h-px bg-accent/50 flex-grow" />
+                      <h3 className="px-6 text-3xl font-bold text-snow-accent font-festive uppercase tracking-wider">Sides</h3>
+                      <div className="h-px bg-accent/50 flex-grow" />
+                    </div>
+                    <div className="space-y-10">
+                      {menuItems.sides.map((item) => (
+                        <div key={item.name} className="group">
+                          <div className="flex items-baseline w-full mb-2">
+                            <span className="text-xl font-bold text-snow-primary font-festive shrink-0">{item.name}</span>
+                            <div className="flex-grow mx-4 border-b-2 border-dotted border-accent/30 h-4" />
+                            <span className="text-xl font-bold text-accent shrink-0">{item.price}</span>
+                          </div>
+                          <p className="text-base text-muted-foreground/80 leading-relaxed italic">{item.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Drinks */}
+                  <div>
+                    <div className="flex items-center justify-center mb-10">
+                      <div className="h-px bg-accent/50 flex-grow" />
+                      <h3 className="px-6 text-3xl font-bold text-snow-accent font-festive uppercase tracking-wider">Drinks</h3>
+                      <div className="h-px bg-accent/50 flex-grow" />
+                    </div>
+                    <div className="space-y-10">
+                      {menuItems.drinks.map((item) => (
+                        <div key={item.name} className="group">
+                          <div className="flex items-baseline w-full mb-2">
+                            <span className="text-xl font-bold text-snow-primary font-festive shrink-0">{item.name}</span>
+                            <div className="flex-grow mx-4 border-b-2 border-dotted border-accent/30 h-4" />
+                            <span className="text-xl font-bold text-accent shrink-0">{item.price}</span>
+                          </div>
+                          <p className="text-base text-muted-foreground/80 leading-relaxed italic">{item.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </section>
 
