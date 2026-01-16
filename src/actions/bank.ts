@@ -145,7 +145,7 @@ export async function getBankLogs(filter: BankLogFilter) {
         };
 
     } catch (error: any) {
-        console.error('Fetch Bank Logs Error:', error);
+
         return {
             success: false,
             error: error.message,

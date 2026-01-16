@@ -52,15 +52,9 @@ export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentS
                             <TabsTrigger value="logs" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Duty Logs</TabsTrigger>
                             <TabsTrigger value="bank" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Bank Logs</TabsTrigger>
                             <TabsTrigger value="finances" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Salary History</TabsTrigger>
-                            <TabsTrigger value="reports" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Reports</TabsTrigger>
                         </>
                     )}
-
-                    {!isAdmin && (
-                        // Staff only sees Duty Logs from the extra list? Or maybe just Logs?
-                        // Let's allow Logs for staff too as it lets them see their own hours theoretically (or general activity)
-                        <TabsTrigger value="logs" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Duty Logs</TabsTrigger>
-                    )}
+                    <TabsTrigger value="reports" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Reports</TabsTrigger>
                 </TabsList>
             </div>
 
@@ -203,13 +197,13 @@ export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentS
                             </CardContent>
                         </Card>
                     </TabsContent>
-
-                    {/* REPORTS TAB */}
-                    <TabsContent value="reports" className="space-y-6">
-                        <ReportsGenerator />
-                    </TabsContent>
                 </>
             )}
+
+            {/* REPORTS TAB - For everyone now (restricted inside) */}
+            <TabsContent value="reports" className="space-y-6">
+                <ReportsGenerator userRole={userRole} />
+            </TabsContent>
         </Tabs>
     );
 }

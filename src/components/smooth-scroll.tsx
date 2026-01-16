@@ -12,7 +12,7 @@ export default function SmoothScroll() {
         let rafId: number | null = null
 
         try {
-            console.log('SmoothScroll: Initializing Lenis...')
+
 
             lenisInstance = new Lenis({
                 duration: 1.5,
@@ -26,7 +26,6 @@ export default function SmoothScroll() {
 
             lenisRef.current = lenisInstance;
             (window as any).lenis = lenisInstance;
-            console.log('SmoothScroll: Lenis initialized', lenisInstance)
 
             function raf(time: number) {
                 if (lenisInstance) {
@@ -37,11 +36,10 @@ export default function SmoothScroll() {
 
             rafId = requestAnimationFrame(raf)
         } catch (error) {
-            console.error('SmoothScroll: Error initializing Lenis:', error)
+            // Silently fail or use a proper logger
         }
 
         return () => {
-            console.log('SmoothScroll: Unmounting...')
             if (rafId) cancelAnimationFrame(rafId)
             if (lenisInstance) {
                 lenisInstance.destroy();

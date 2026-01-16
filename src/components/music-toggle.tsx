@@ -14,20 +14,20 @@ export function MusicToggle() {
   useEffect(() => {
     // Create audio element with the actual music file
     audioRef.current = new Audio('/audio/lofi.mp3');
-    
+
     if (audioRef.current) {
       audioRef.current.loop = true;
       audioRef.current.volume = volume;
-      
+
       // Handle audio events
       audioRef.current.addEventListener('ended', () => {
         setIsPlaying(false);
       });
-      
+
       audioRef.current.addEventListener('play', () => {
         setIsPlaying(true);
       });
-      
+
       audioRef.current.addEventListener('pause', () => {
         setIsPlaying(false);
       });
@@ -47,22 +47,22 @@ export function MusicToggle() {
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play().catch(error => {
-        console.log('Audio play failed:', error);
+      audioRef.current.play().catch(() => {
+        // Silently fail if playback is blocked
       });
     }
   };
 
   const toggleMute = () => {
     if (!audioRef.current) return;
-    
+
     audioRef.current.muted = !isMuted;
     setIsMuted(!isMuted);
   };
 
   const handleVolumeChange = (newVolume: number) => {
     if (!audioRef.current) return;
-    
+
     setVolume(newVolume);
     audioRef.current.volume = newVolume;
   };
@@ -72,10 +72,10 @@ export function MusicToggle() {
       <div className="flex items-center gap-2">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleMusic} 
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMusic}
               className="text-white hover:bg-accent/20 hover:text-accent"
             >
               {isPlaying ? <Pause className="w-5 h-5" /> : <Music className="w-5 h-5" />}
@@ -89,10 +89,10 @@ export function MusicToggle() {
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleMute} 
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMute}
               className="text-white hover:bg-accent/20 hover:text-accent"
             >
               {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}

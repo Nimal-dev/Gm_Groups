@@ -14,14 +14,14 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     trustHost: true,
     callbacks: {
         async jwt({ token, user }) {
-            console.log('JWT Callback:', { token, user });
+
             if (user) {
                 token.role = user.role;
             }
             return token;
         },
         async session({ session, token }) {
-            console.log('Session Callback:', { session, token });
+
             if (session.user && token.role) {
                 session.user.role = token.role as string;
             }
@@ -59,7 +59,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     }
                 }
 
-                console.log('Invalid credentials');
+
                 return null;
             },
         }),
