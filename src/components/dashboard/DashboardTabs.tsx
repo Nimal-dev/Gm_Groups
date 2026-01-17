@@ -100,7 +100,7 @@ export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentS
 
                     {/* Active Leaves */}
                     <div className="md:col-span-1 lg:col-span-1">
-                        <LeaveManagementCard leaves={activeLeaves} employees={allEmployees} />
+                        <LeaveManagementCard leaves={activeLeaves} employees={allEmployees} userRole={userRole} />
                     </div>
 
                     {/* Active Orders Quick View */}

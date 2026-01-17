@@ -18,8 +18,9 @@ import { cn } from '@/lib/utils';
 import { DateRange } from 'react-day-picker';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-export function LeaveManagementCard({ leaves, employees }: { leaves: any[], employees: any[] }) {
+export function LeaveManagementCard({ leaves, employees, userRole }: { leaves: any[], employees: any[], userRole: string }) {
     const { toast } = useToast();
+    const isAdmin = userRole === 'admin';
     const [isLoading, setIsLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState('');
@@ -76,54 +77,56 @@ export function LeaveManagementCard({ leaves, employees }: { leaves: any[], empl
                     </CardTitle>
                     <CardDescription>Track active planned absences</CardDescription>
                 </div>
-                <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogTrigger asChild>
-                        <Button size="sm" variant="outline" className="h-8 border-white/10 hover:bg-white/5">
-                            <Plus className="w-4 h-4 mr-1" /> Add
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px] bg-black/90 border-white/10 text-white">
-                        <DialogHeader>
-                            <DialogTitle>Add Leave Request</DialogTitle>
-                            <DialogDescription>
-                                Set a leave period for a staff member.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid gap-2">
-                                <Label>Employee</Label>
-                                <Select value={selectedEmployee} onValueChange={setSelectedEmployee}>
-                                    <SelectTrigger className="bg-white/5 border-white/10">
-                                        <SelectValue placeholder="Select staff..." />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {employees.map((e) => (
-                                            <SelectItem key={e.userId} value={e.userId}>{e.username}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="grid gap-2">
-                                <Label>Date Range</Label>
-                                <DateRangePicker date={dateRange} setDate={setDateRange} />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label>Reason (Optional)</Label>
-                                <Textarea
-                                    className="bg-white/5 border-white/10"
-                                    placeholder="e.g. Vacation, Sick Leave..."
-                                    value={reason}
-                                    onChange={(e) => setReason(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <DialogFooter>
-                            <Button onClick={handleCreateLeave} disabled={isLoading} className="bg-blue-600 hover:bg-blue-500">
-                                {isLoading ? 'Saving...' : 'Add Leave'}
+                {isAdmin && (
+                    <Dialog open={open} onOpenChange={setOpen}>
+                        <DialogTrigger asChild>
+                            <Button size="sm" variant="outline" className="h-8 border-white/10 hover:bg-white/5">
+                                <Plus className="w-4 h-4 mr-1" /> Add
                             </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px] bg-black/90 border-white/10 text-white">
+                            <DialogHeader>
+                                <DialogTitle>Add Leave Request</DialogTitle>
+                                <DialogDescription>
+                                    Set a leave period for a staff member.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                                <div className="grid gap-2">
+                                    <Label>Employee</Label>
+                                    <Select value={selectedEmployee} onValueChange={setSelectedEmployee}>
+                                        <SelectTrigger className="bg-white/5 border-white/10">
+                                            <SelectValue placeholder="Select staff..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {employees.map((e) => (
+                                                <SelectItem key={e.userId} value={e.userId}>{e.username}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label>Date Range</Label>
+                                    <DateRangePicker date={dateRange} setDate={setDateRange} />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label>Reason (Optional)</Label>
+                                    <Textarea
+                                        className="bg-white/5 border-white/10"
+                                        placeholder="e.g. Vacation, Sick Leave..."
+                                        value={reason}
+                                        onChange={(e) => setReason(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button onClick={handleCreateLeave} disabled={isLoading} className="bg-blue-600 hover:bg-blue-500">
+                                    {isLoading ? 'Saving...' : 'Add Leave'}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                )}
             </CardHeader>
             <CardContent className="flex-1 min-h-0">
                 <ScrollArea className="h-full pr-4">
@@ -138,14 +141,16 @@ export function LeaveManagementCard({ leaves, employees }: { leaves: any[], empl
                                 <div key={leave._id} className="relative group flex flex-col p-3 rounded-lg bg-white/5 border border-white/5 hover:border-blue-500/30 transition-colors">
                                     <div className="flex items-center justify-between mb-1">
                                         <span className="font-medium text-blue-200">{leave.username}</span>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => handleDelete(leave._id)}
-                                            className="h-6 w-6 opacity-0 group-hover:opacity-100 hover:text-red-400 transition-opacity absolute top-2 right-2"
-                                        >
-                                            <Trash2 className="w-3 h-3" />
-                                        </Button>
+                                        {isAdmin && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleDelete(leave._id)}
+                                                className="h-6 w-6 opacity-0 group-hover:opacity-100 hover:text-red-400 transition-opacity absolute top-2 right-2"
+                                            >
+                                                <Trash2 className="w-3 h-3" />
+                                            </Button>
+                                        )}
                                     </div>
                                     <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
                                         <CalendarIcon className="w-3 h-3" />
