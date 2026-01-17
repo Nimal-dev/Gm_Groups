@@ -64,6 +64,11 @@ export function BankLogsExplorer() {
                     pagination: result.pagination
                 });
             } else {
+                if (result.error === 'Unauthorized Access') {
+                    // Force reload or show specific UI
+                    window.location.reload(); // Simplest fix for now as per plan
+                    return;
+                }
                 console.error(result.error);
             }
         } catch (err) {

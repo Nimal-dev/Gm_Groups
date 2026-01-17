@@ -4,6 +4,7 @@ import connectToDatabase from '@/lib/db';
 import Employee, { IEmployee } from '@/models/Employee';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { auth } from '@/auth';
 
 // Schema Validation
 const EmployeeSchema = z.object({
@@ -16,6 +17,11 @@ const EmployeeSchema = z.object({
 
 export async function addEmployee(formData: z.infer<typeof EmployeeSchema>) {
     try {
+        const session = await auth();
+        if (!session?.user || session.user.role !== 'admin') {
+            throw new Error("Unauthorized: Admin access required");
+        }
+
         const validated = EmployeeSchema.parse(formData);
         await connectToDatabase();
 
@@ -39,6 +45,11 @@ export async function addEmployee(formData: z.infer<typeof EmployeeSchema>) {
 
 export async function updateEmployee(userId: string, data: Partial<z.infer<typeof EmployeeSchema>>) {
     try {
+        const session = await auth();
+        if (!session?.user || session.user.role !== 'admin') {
+            throw new Error("Unauthorized: Admin access required");
+        }
+
         await connectToDatabase();
 
         const result = await Employee.findOneAndUpdate(
@@ -61,6 +72,11 @@ export async function updateEmployee(userId: string, data: Partial<z.infer<typeo
 
 export async function deleteEmployee(userId: string) {
     try {
+        const session = await auth();
+        if (!session?.user || session.user.role !== 'admin') {
+            throw new Error("Unauthorized: Admin access required");
+        }
+
         await connectToDatabase();
         const result = await Employee.findOneAndDelete({ userId });
 

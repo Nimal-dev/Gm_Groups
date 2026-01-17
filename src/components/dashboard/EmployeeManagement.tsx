@@ -93,6 +93,9 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                 setIsDialogOpen(false);
             } else {
                 toast({ title: "Error", description: result.error, variant: "destructive" });
+                if (result.error.includes('Unauthorized')) {
+                    setTimeout(() => window.location.reload(), 1500);
+                }
             }
         } catch (error) {
             toast({ title: "Error", description: "Something went wrong", variant: "destructive" });

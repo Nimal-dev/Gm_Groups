@@ -114,6 +114,10 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                 title: "Failed to generate",
                 description: error.message || "Check inputs and try again."
             });
+
+            if (error.message === 'Unauthorized Access') {
+                setTimeout(() => window.location.reload(), 1500);
+            }
         } finally {
             setLoading(false);
         }
