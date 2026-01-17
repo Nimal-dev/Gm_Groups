@@ -32,7 +32,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="flex h-screen w-full items-center justify-center bg-[url('/img/hero-bg.jpg')] bg-cover bg-center md:bg-black/90 relative overflow-hidden">
+        <div className="flex h-screen w-full items-center justify-center bg-[url('/gm_wallpaper.jpg')] bg-cover bg-center md:bg-black/90 relative overflow-hidden">
             {/* Overlay for better text readability if bg image is used */}
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-0"></div>
 
