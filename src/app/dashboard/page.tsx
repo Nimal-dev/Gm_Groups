@@ -71,7 +71,7 @@ export default async function DashboardPage() {
                     <>
                         <StatsCard
                             title="Current Month Income"
-                            value={`$${(data.bankStats?.totalIncome || 0).toLocaleString()}`}
+                            value={`$${(data.bankStats?.totalIncome || 0).toLocaleString('en-US')}`}
                             subtitle="Total Deposits"
                             icon={<DollarSign className="w-5 h-3 text-green-400" />}
                             glow
@@ -79,7 +79,7 @@ export default async function DashboardPage() {
 
                         <StatsCard
                             title="Current Month Expense"
-                            value={`$${(data.bankStats?.totalExpense || 0).toLocaleString()}`}
+                            value={`$${(data.bankStats?.totalExpense || 0).toLocaleString('en-US')}`}
                             subtitle="Withdrawals & Transfers"
                             icon={<Activity className="w-5 h-5 text-red-400" />}
                         />

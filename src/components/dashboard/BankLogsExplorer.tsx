@@ -100,7 +100,7 @@ export function BankLogsExplorer() {
                             </div>
                             <div>
                                 <p className="text-sm text-green-400/80">Total Income</p>
-                                <h3 className="text-2xl font-bold font-mono text-green-400">${data.stats.totalIncome.toLocaleString()}</h3>
+                                <h3 className="text-2xl font-bold font-mono text-green-400">${data.stats.totalIncome.toLocaleString('en-US')}</h3>
                             </div>
                         </CardContent>
                     </Card>
@@ -111,7 +111,7 @@ export function BankLogsExplorer() {
                             </div>
                             <div>
                                 <p className="text-sm text-red-400/80">Total Expense</p>
-                                <h3 className="text-2xl font-bold font-mono text-red-400">${data.stats.totalExpense.toLocaleString()}</h3>
+                                <h3 className="text-2xl font-bold font-mono text-red-400">${data.stats.totalExpense.toLocaleString('en-US')}</h3>
                             </div>
                         </CardContent>
                     </Card>
@@ -229,7 +229,7 @@ export function BankLogsExplorer() {
                                                             );
                                                         return (
                                                             <TableCell className={cn("font-bold font-mono", isExpense ? 'text-red-400' : 'text-green-400')}>
-                                                                {isExpense ? '-' : '+'}${log.amount.toLocaleString()}
+                                                                {isExpense ? '-' : '+'}${log.amount.toLocaleString('en-US')}
                                                             </TableCell>
                                                         );
                                                     })()}

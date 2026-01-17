@@ -182,7 +182,7 @@ export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentS
                                                     <DollarSign className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-mono font-medium">${log.amount.toLocaleString()}</p>
+                                                    <p className="font-mono font-medium">${log.amount.toLocaleString('en-US')}</p>
                                                     <p className="text-xs text-muted-foreground">To ID: {log.userId}</p>
                                                 </div>
                                             </div>
