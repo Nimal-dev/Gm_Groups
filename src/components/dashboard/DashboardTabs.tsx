@@ -34,6 +34,10 @@ const BulkOrderManager = dynamic(() => import('@/components/dashboard/BulkOrderM
     loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Bulk Order System...</div>,
     ssr: false
 });
+const PayrollManagement = dynamic(() => import('@/components/dashboard/SalaryManagement').then(mod => mod.PayrollManagement), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Payroll...</div>,
+    ssr: false
+});
 
 import { LeaveManagementCard } from '@/components/dashboard/LeaveManagementCard';
 
@@ -96,6 +100,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                             <TabsTrigger value="staff" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Staff Management</TabsTrigger>
                             <TabsTrigger value="logs" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Duty Logs</TabsTrigger>
                             <TabsTrigger value="bank" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Bank Logs</TabsTrigger>
+                            <TabsTrigger value="payroll" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Payroll</TabsTrigger>
                             <TabsTrigger value="finances" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Salary History</TabsTrigger>
                         </>
                     )}
@@ -326,6 +331,15 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                     </CardContent>
                 </Card>
             </TabsContent>
+
+            {/* PAYROLL TAB - Admin Only */}
+            {
+                isAdmin && (
+                    <TabsContent value="payroll" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
+                        <PayrollManagement employees={allEmployees} />
+                    </TabsContent>
+                )
+            }
 
             {/* STAFF TAB - Admin Only */}
             {

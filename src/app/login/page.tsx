@@ -1,19 +1,14 @@
 'use client';
 
-import { useActionState, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
-import { authenticate } from '@/actions/auth';
+import { discordLogin } from '@/actions/auth';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lock, User, Eye, EyeOff, Home } from 'lucide-react';
+import { Lock, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function LoginPage() {
-    const [errorMessage, dispatch] = useActionState(authenticate, undefined);
-    const [showPassword, setShowPassword] = useState(false);
-
     const containerVariants = {
         hidden: { opacity: 0, y: 20 },
         visible: {
@@ -73,66 +68,18 @@ export default function LoginPage() {
                             Welcome Back
                         </CardTitle>
                         <CardDescription className="text-center text-white/50 text-sm">
-                            Enter your credentials to access the command center
+                            Access via Discord
                         </CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <form action={dispatch} className="space-y-5">
-                            <motion.div variants={itemVariants} className="space-y-2">
-                                <div className="relative group">
-                                    <div className="absolute left-3 top-3 text-white/40 group-focus-within:text-purple-400 transition-colors">
-                                        <User className="w-4 h-4" />
-                                    </div>
-                                    <Input
-                                        type="text"
-                                        name="username"
-                                        placeholder="Username"
-                                        required
-                                        className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-purple-500/50 focus:ring-purple-500/20 h-10 transition-all duration-300"
-                                    />
-                                </div>
-                            </motion.div>
-                            <motion.div variants={itemVariants} className="space-y-2">
-                                <div className="relative group">
-                                    <div className="absolute left-3 top-3 text-white/40 group-focus-within:text-purple-400 transition-colors">
-                                        <Lock className="w-4 h-4" />
-                                    </div>
-                                    <Input
-                                        type={showPassword ? "text" : "password"}
-                                        name="password"
-                                        placeholder="Password"
-                                        required
-                                        minLength={6}
-                                        className="pl-10 pr-10 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-purple-500/50 focus:ring-purple-500/20 h-10 transition-all duration-300"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-3 text-white/40 hover:text-white transition-colors focus:outline-none"
-                                    >
-                                        {showPassword ? (
-                                            <EyeOff className="w-4 h-4" />
-                                        ) : (
-                                            <Eye className="w-4 h-4" />
-                                        )}
-                                    </button>
-                                </div>
-                            </motion.div>
+                    <CardContent className="space-y-5">
 
-                            {errorMessage && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: 'auto' }}
-                                    className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center font-medium"
-                                >
-                                    {errorMessage}
-                                </motion.div>
-                            )}
-
+                        {/* DISCORD LOGIN BUTTON */}
+                        <form action={discordLogin}>
                             <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                                <LoginButton />
+                                <DiscordButton />
                             </motion.div>
                         </form>
+
                     </CardContent>
                 </Card>
                 <motion.p
@@ -147,18 +94,27 @@ export default function LoginPage() {
     );
 }
 
-function LoginButton() {
+function DiscordButton() {
     const { pending } = useFormStatus();
 
     return (
-        <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-medium shadow-lg hover:shadow-purple-500/20 transition-all duration-300 h-10" aria-disabled={pending}>
+        <Button
+            className="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-medium shadow-lg h-10 flex items-center justify-center gap-2 transition-all"
+            type="submit"
+            disabled={pending}
+        >
             {pending ? (
-                <div className="flex items-center gap-2">
+                <>
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    <span>Verifying...</span>
-                </div>
+                    <span>Connecting...</span>
+                </>
             ) : (
-                'Sign In'
+                <>
+                    <svg className="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.772-.6083 1.1588a18.2915 18.2915 0 00-5.4925 0 12.636 12.636 0 00-.6165-1.1588.0776.0776 0 00-.0787-.0371 19.7363 19.7363 0 00-4.8853 1.5151.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561 20.0304 20.0304 0 005.9937 3.0335.0777.0777 0 00.0842-.0276c.4616-.6268.8687-1.291 1.2227-1.9961a.076.076 0 00-.0416-.1057 13.1141 13.1141 0 01-1.8716-.8913.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.6982.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286 20.0792 20.0792 0 006.0028-3.0345.077.077 0 00.0322-.0543c.4236-4.2763-.42-8.5414-3.528-12.7937a.074.074 0 00-.032-.0278zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419z" />
+                    </svg>
+                    Login with Discord
+                </>
             )}
         </Button>
     );

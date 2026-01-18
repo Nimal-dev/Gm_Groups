@@ -1,91 +1,104 @@
-
+// ... (imports)
 import NextAuth from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
+import Discord from 'next-auth/providers/discord';
 import { authConfig } from './auth.config';
-import { z } from 'zod';
 import connectToDatabase from '@/lib/db';
-import User from '@/models/User';
+import Employee from '@/models/Employee';
 
+/**
+ * NextAuth Configuration
+ * 
+ * Handles authentication via Discord OAuth.
+ * - Verifies user existence in the internal `Employee` database.
+ * - Assigns roles (Admin, Bulkhead, Staff) based on Employee Rank.
+ * - Logs login activity to the central bot logging system.
+ * - Persists Employee Name and Role in the session.
+ */
 export const { auth, signIn, signOut, handlers } = NextAuth({
     ...authConfig,
-    secret: process.env.AUTH_SECRET || 'fallback_secret_for_dev_only_12345',
+    secret: process.env.AUTH_SECRET,
     trustHost: true,
     callbacks: {
-        async jwt({ token, user }) {
+        /**
+         * JWT Callback
+         * Persists user role and name into the JWT token.
+         */
+        async jwt({ token, user, profile }) {
             if (user) {
                 token.role = user.role;
                 token.id = user.id;
+                token.name = user.name; // Explicitly update token name from DB
             }
             return token;
         },
+        /**
+         * Session Callback
+         * Populates the client-side session object with role and name from the token.
+         */
         async session({ session, token }) {
             if (session.user && token) {
                 session.user.role = token.role as string;
                 session.user.id = token.id as string;
+                session.user.name = token.name; // Explicitly set session name
             }
             return session;
         },
+        /**
+         * SignIn Callback
+         * Validates the Discord user against the Employee database.
+         */
+        async signIn({ user, account, profile }) {
+            if (account?.provider === 'discord' && profile) {
+                try {
+                    await connectToDatabase();
+                    // Check if the Discord User ID exists in the Employee collection
+                    const employee = await Employee.findOne({ userId: profile.id, status: 'Active' });
+
+                    if (!employee) {
+                        console.log(`Access Denied: User ${profile.username} (${profile.id}) is not an active employee.`);
+                        return false; // Valid Discord user, but not an employee -> Deny Access
+                    }
+
+                    // Map Rank to Website Role
+                    const rank = employee.rank.toLowerCase();
+                    let role = 'staff'; // Default role (Covering Staff, Recruit, Novice, etc.)
+
+                    if (rank.includes('owner') || rank.includes('boss') || rank.includes('management') || rank.includes('manager') || rank.includes('lawyer')) {
+                        role = 'admin';
+                    } else if (rank.includes('head') || rank.includes('bulk') || rank.includes('lead')) {
+                        role = 'bulkhead';
+                    }
+
+                    // Attach the determined role and name to the user object so it passes to the JWT/Session
+                    user.role = role;
+                    user.name = employee.username; // Use DB Employee Name instead of Discord Username
+
+                    // Log the login activity
+                    const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
+                    fetch(`${BOT_URL}/api/website-log`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'Login',
+                            user: employee.username,
+                            details: `User ${employee.username} logged in via Discord.`,
+                            role: role
+                        })
+                    }).catch(err => console.error('Failed to log Discord login:', err));
+
+                    return true;
+                } catch (error) {
+                    console.error('Error during Discord sign-in verification:', error);
+                    return false;
+                }
+            }
+            return false; // Deny any non-Discord login attempts
+        },
     },
     providers: [
-        Credentials({
-            async authorize(credentials) {
-                const parsedCredentials = z
-                    .object({ username: z.string(), password: z.string().min(1) })
-                    .safeParse(credentials);
-
-                if (parsedCredentials.success) {
-                    const { username, password } = parsedCredentials.data;
-
-                    try {
-                        await connectToDatabase();
-                        // Find user by username
-                        const user = await User.findOne({ username });
-
-                        // Check if user exists and password matches (PLAIN TEXT)
-                        if (user && user.password === password) {
-                            return {
-                                id: user._id.toString(),
-                                name: user.username,
-                                role: user.role,
-                            };
-                        }
-                    } catch (error) {
-                        console.error('Database auth error:', error);
-                    }
-
-                    // Fallback: Admin Credential
-                    if (username === 'Nimal' && password === 'Nimal@gm6814') {
-                        return {
-                            id: '1',
-                            name: 'Admin User',
-                            email: 'admin@gm.groups',
-                            role: 'admin',
-                        };
-                    }
-
-                    // Fallback: Staff Credential
-                    if (username === 'Staff' && password === 'Staff@gm123') {
-                        return {
-                            id: '2',
-                            name: 'Staff Member',
-                            email: 'staff@gm.groups',
-                            role: 'staff',
-                        };
-                    }
-
-                    // Fallback: Bulkhead Credential
-                    if (username === 'Bulkhead' && password === 'Bulkhead@gm123') {
-                        return {
-                            id: '3',
-                            name: 'Bulkhead Manager',
-                            email: 'bulkhead@gm.groups',
-                            role: 'bulkhead',
-                        };
-                    }
-                }
-
-                return null;
-            },
+        Discord({
+            clientId: process.env.AUTH_DISCORD_ID,
+            clientSecret: process.env.AUTH_DISCORD_SECRET,
         }),
     ],
 });

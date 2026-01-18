@@ -11,6 +11,7 @@ import { logActivity } from '@/actions/log';
 const EmployeeSchema = z.object({
     userId: z.string().min(1, "User ID is required"),
     username: z.string().min(1, "Username is required"),
+    nickname: z.string().optional(),
     rank: z.string().min(1, "Rank is required"),
     status: z.enum(['Active', 'Inactive']).default('Active'),
     joinedAt: z.date().optional()
@@ -37,7 +38,7 @@ export async function addEmployee(formData: z.infer<typeof EmployeeSchema>) {
         });
 
         revalidatePath('/dashboard');
-        await logActivity('Add Employee', `Added new employee: ${validated.username} (Rank: ${validated.rank})`);
+        await logActivity('Add Employee', `Added new employee: ${validated.username} (${validated.nickname || 'No Nickname'}) (Rank: ${validated.rank})`);
         return { success: true };
     } catch (error: any) {
         console.error('Add Employee Error:', error);

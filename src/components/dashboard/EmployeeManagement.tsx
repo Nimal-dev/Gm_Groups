@@ -22,6 +22,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 const EmployeeSchema = z.object({
     userId: z.string().min(1, "User ID is required"),
     username: z.string().min(1, "Username is required"),
+    nickname: z.string().optional(),
     rank: z.string().min(1, "Rank is required"),
     status: z.enum(['Active', 'Inactive']).default('Active'),
 });
@@ -41,6 +42,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
 
     const filteredEmployees = employees.filter(emp =>
         emp.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (emp.nickname && emp.nickname.toLowerCase().includes(searchTerm.toLowerCase())) ||
         emp.userId.includes(searchTerm) ||
         emp.rank.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -50,6 +52,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
         defaultValues: {
             userId: '',
             username: '',
+            nickname: '',
             rank: 'Employee',
             status: 'Active'
         }
@@ -61,6 +64,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
         form.reset({
             userId: '',
             username: '',
+            nickname: '',
             rank: 'Employee',
             status: 'Active'
         });
@@ -72,6 +76,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
         form.reset({
             userId: emp.userId,
             username: emp.username,
+            nickname: emp.nickname || '',
             rank: emp.rank,
             status: emp.status
         });
@@ -134,7 +139,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                 <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                        placeholder="Search by name, ID or rank..."
+                        placeholder="Search by name, nickname, ID or rank..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-8 bg-black/20 border-white/10"
@@ -148,7 +153,8 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                                 <TableHeader className="bg-black/20 sticky top-0 z-10">
                                     <TableRow className="hover:bg-transparent border-white/10">
                                         <TableHead>User ID</TableHead>
-                                        <TableHead>Name</TableHead>
+                                        <TableHead>Username</TableHead>
+                                        {/* <TableHead>Nickname</TableHead> */}
                                         <TableHead>Rank</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead className="text-right">Actions</TableHead>
@@ -157,7 +163,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                                 <TableBody>
                                     {filteredEmployees.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
+                                            <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
                                                 No members found.
                                             </TableCell>
                                         </TableRow>
@@ -166,6 +172,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                                             <TableRow key={emp.userId} className="border-white/5 hover:bg-white/5">
                                                 <TableCell className="font-mono text-xs text-muted-foreground">{emp.userId}</TableCell>
                                                 <TableCell className="font-medium">{emp.username}</TableCell>
+                                                {/* <TableCell className="text-muted-foreground">{emp.nickname || '-'}</TableCell> */}
                                                 <TableCell>{emp.rank}</TableCell>
                                                 <TableCell>
                                                     <Badge variant={emp.status === 'Active' ? 'secondary' : 'destructive'} className="text-xs">
@@ -213,13 +220,22 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                             {form.formState.errors.userId && <p className="text-xs text-destructive">{form.formState.errors.userId.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label>Username / Nickname</Label>
+                            <Label>Username</Label>
                             <Input
                                 {...form.register('username')}
-                                placeholder="Dante Valestro"
+                                placeholder="Discord Username"
                                 className="bg-black/20 border-white/10"
                             />
                             {form.formState.errors.username && <p className="text-xs text-destructive">{form.formState.errors.username.message}</p>}
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Nickname (Display Name)</Label>
+                            <Input
+                                {...form.register('nickname')}
+                                placeholder="Dante Valestro"
+                                className="bg-black/20 border-white/10"
+                            />
+                            {form.formState.errors.nickname && <p className="text-xs text-destructive">{form.formState.errors.nickname.message}</p>}
                         </div>
                         <div className="space-y-2">
                             <Label>Rank</Label>
