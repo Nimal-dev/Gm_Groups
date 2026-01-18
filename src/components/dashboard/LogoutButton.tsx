@@ -4,13 +4,15 @@ import { useState } from 'react';
 import { signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { LogOut, Loader2 } from 'lucide-react';
+import { logActivity } from '@/actions/log';
 
 export function LogoutButton() {
     const [isPending, setIsPending] = useState(false);
 
     const handleLogout = async () => {
         setIsPending(true);
-        await signOut({ callbackUrl: '/' });
+        await logActivity('Logout', `User logged out.`);
+        await signOut({ callbackUrl: '/login' });
     };
 
     return (

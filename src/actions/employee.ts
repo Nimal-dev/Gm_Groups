@@ -5,6 +5,7 @@ import Employee, { IEmployee } from '@/models/Employee';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { auth } from '@/auth';
+import { logActivity } from '@/actions/log';
 
 // Schema Validation
 const EmployeeSchema = z.object({
@@ -36,6 +37,7 @@ export async function addEmployee(formData: z.infer<typeof EmployeeSchema>) {
         });
 
         revalidatePath('/dashboard');
+        await logActivity('Add Employee', `Added new employee: ${validated.username} (Rank: ${validated.rank})`);
         return { success: true };
     } catch (error: any) {
         console.error('Add Employee Error:', error);
@@ -63,6 +65,7 @@ export async function updateEmployee(userId: string, data: Partial<z.infer<typeo
         }
 
         revalidatePath('/dashboard');
+        await logActivity('Update Employee', `Updated employee ${userId} fields: ${Object.keys(data).join(', ')}`);
         return { success: true };
     } catch (error: any) {
         console.error('Update Employee Error:', error);
@@ -85,6 +88,7 @@ export async function deleteEmployee(userId: string) {
         }
 
         revalidatePath('/dashboard');
+        await logActivity('Remove Employee', `Removed employee with UserID: ${userId}`);
         return { success: true };
     } catch (error: any) {
         console.error('Delete Employee Error:', error);

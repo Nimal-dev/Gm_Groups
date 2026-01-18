@@ -2,11 +2,12 @@
 
 import { useActionState, useState } from 'react';
 import { useFormStatus } from 'react-dom';
+import Link from 'next/link';
 import { authenticate } from '@/actions/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lock, User, Eye, EyeOff } from 'lucide-react';
+import { Lock, User, Eye, EyeOff, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function LoginPage() {
@@ -39,6 +40,16 @@ export default function LoginPage() {
             {/* Background animated blobs for modern feel */}
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[100px] animate-pulse z-0"></div>
             <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[100px] animate-pulse z-0 hidden md:block"></div>
+
+            <Link
+                href="/"
+                className="absolute top-6 left-6 flex items-center gap-2 text-white/50 hover:text-white transition-colors z-20 group"
+            >
+                <div className="p-2 rounded-full bg-white/5 border border-white/10 group-hover:bg-white/10 transition-all">
+                    <Home className="w-5 h-5" />
+                </div>
+                <span className="text-sm font-medium opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">Return Home</span>
+            </Link>
 
             <motion.div
                 className="z-10 w-full max-w-sm px-4"

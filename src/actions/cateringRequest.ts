@@ -1,5 +1,7 @@
 'use server';
 
+import { logActivity } from '@/actions/log';
+
 export async function submitCateringRequest(data: {
     orgName: string;
     repName: string;
@@ -26,6 +28,7 @@ export async function submitCateringRequest(data: {
             throw new Error(result.error || 'Failed to submit catering request');
         }
 
+        await logActivity('Catering Request', `New Request from ${data.orgName} (${data.repName}). Event Date: ${data.eventDateStr}.`);
         return { success: true, message: result.message };
     } catch (error: any) {
         console.error('Catering Request Error:', error);

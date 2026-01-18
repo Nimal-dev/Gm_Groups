@@ -18,7 +18,7 @@ export default async function DashboardPage() {
     if (!session?.user) return null;
 
     const data = await getDashboardData();
-    const { activeStaff, activeOrders, allEmployees, recentSalaries, error } = data;
+    const { activeStaff, activeOrders, allEmployees, recentSalaries, recurringOrders, error } = data; // Added recurringOrders
 
     if (error) {
         return (
@@ -119,6 +119,7 @@ export default async function DashboardPage() {
             <DashboardTabs
                 activeStaff={activeStaff}
                 activeOrders={activeOrders}
+                recurringOrders={recurringOrders || []}
                 allEmployees={allEmployees}
                 recentSalaries={recentSalaries}
                 activeLeaves={activeLeaves || []}

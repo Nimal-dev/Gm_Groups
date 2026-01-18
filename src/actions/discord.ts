@@ -1,6 +1,6 @@
 'use server';
 
-export async function sendReportToDiscord(content: string) {
+export async function sendReportToDiscord(content: string, type?: string) {
     const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
 
     try {
@@ -9,7 +9,7 @@ export async function sendReportToDiscord(content: string) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ content }),
+            body: JSON.stringify({ content, type }),
             cache: 'no-store'
         });
 

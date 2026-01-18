@@ -6,7 +6,7 @@ import BulkOrder from '@/models/BulkOrder';
 import Employee from '@/models/Employee';
 import SalaryLog from '@/models/SalaryLog';
 import BankTransaction from '@/models/BankTransaction';
-
+import RecurringOrder from '@/models/RecurringOrder';
 import { unstable_cache } from 'next/cache';
 
 // Internal data fetching function
@@ -17,21 +17,19 @@ const fetchDashboardData = unstable_cache(
 
             // Fetch data provided with lean() for performance
             // Use .select() to fetch ONLY what is needed for the dashboard cards/tables
-            const [activeStaff, activeOrders, allEmployees, recentSalaries, activeLeaves] = await Promise.all([
+            const [activeStaff, activeOrders, allEmployees, recentSalaries, activeLeaves, recurringOrders] = await Promise.all([
                 DutySession.find({ endTime: null })
                     .select('userId username startTime')
                     .sort({ startTime: -1 })
                     .lean(),
 
-                BulkOrder.find({ status: { $ne: 'Completed' } })
-                    .select('orderId customer amount status details createdAt representative collectionDate surcharge eventDate')
+                BulkOrder.find({})
+                    .select('orderId customer amount status details createdAt representative collectionDate surcharge eventDate deliveryDate messageId channelId isManual')
                     .sort({ createdAt: -1 })
                     .lean(),
 
-                // We need rank/username for mapping activeStaff, but maybe not everything else?
-                // Keeping it mostly full for now as it's not huge, but excluding sensitive fields if any were added.
                 Employee.find({ status: 'Active' })
-                    .select('userId username rank status')
+                    .select('userId username rank status joinedAt')
                     .sort({ rank: 1, username: 1 })
                     .lean(),
 
@@ -40,10 +38,13 @@ const fetchDashboardData = unstable_cache(
                     .limit(10)
                     .lean(),
 
-                // Fetch Active Leaves (EndDate >= Today)
                 import('@/models/Leave').then(m => m.default.find({
                     endDate: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) }
-                }).sort({ endDate: 1 }).lean())
+                }).sort({ endDate: 1 }).lean()),
+
+                RecurringOrder.find({})
+                    .sort({ createdAt: -1 })
+                    .lean()
             ]);
 
             // Process Active Staff (InMemory Map is fast for small n)
@@ -65,6 +66,12 @@ const fetchDashboardData = unstable_cache(
                 _id: order._id.toString(),
                 createdAt: order.createdAt ? new Date(order.createdAt).toISOString() : new Date().toISOString(),
                 // Ensure items are serializable if they have nested ObjectIds (usually not for this simple schema)
+            }));
+
+            const serializedRecurring = recurringOrders.map((order: any) => ({
+                ...order,
+                _id: order._id.toString(),
+                createdAt: order.createdAt ? new Date(order.createdAt).toISOString() : new Date().toISOString()
             }));
 
             const serializedEmployees = allEmployees.map((e: any) => ({
@@ -141,10 +148,10 @@ const fetchDashboardData = unstable_cache(
             const totalIncome = stats.totalIncome;
             const totalExpense = stats.totalExpense;
 
-            // Return optimized data
             return {
                 activeStaff: activeStaffWithDetails,
                 activeOrders: serializedOrders,
+                recurringOrders: serializedRecurring,
                 allEmployees: serializedEmployees,
                 recentSalaries: serializedSalaries,
                 activeLeaves: serializedLeaves,
@@ -154,11 +161,11 @@ const fetchDashboardData = unstable_cache(
             };
         } catch (error: any) {
             console.error('Data Fetch Error (Inside Cache):', error);
-            throw new Error(error.message); // Throw to handle in wrapper
+            throw new Error(error.message);
         }
     },
-    ['dashboard-data-cache'], // Key parts
-    { revalidate: 60, tags: ['dashboard-data'] } // Revalidate every 60 seconds
+    ['dashboard-data-cache'],
+    { revalidate: 60, tags: ['dashboard-data'] }
 );
 
 export async function getDashboardData() {
@@ -166,10 +173,10 @@ export async function getDashboardData() {
         return await fetchDashboardData();
     } catch (error: any) {
         console.error('Dashboard Data Fetch Error:', error);
-        // Fallback or empty return on failure
         return {
             activeStaff: [],
             activeOrders: [],
+            recurringOrders: [],
             allEmployees: [],
             recentSalaries: [],
             activeLeaves: [],

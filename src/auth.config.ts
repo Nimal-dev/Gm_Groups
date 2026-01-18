@@ -5,6 +5,7 @@ export const authConfig = {
     pages: {
         signIn: '/login', // Redirect to custom login page
     },
+    trustHost: true,
     callbacks: {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;

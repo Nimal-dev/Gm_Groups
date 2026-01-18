@@ -1,11 +1,17 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
+import { endRecurringOrder } from '@/actions/bulk-orders';
+
 import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Clock, ShoppingCart, DollarSign, Activity } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Users, Clock, ShoppingCart, DollarSign, Activity, RefreshCw, X, Loader2 } from 'lucide-react';
 
 // Lazy Load heavy tab components (Client-side only)
 const EmployeeManagement = dynamic(() => import('@/components/dashboard/EmployeeManagement').then(mod => mod.EmployeeManagement), {
@@ -24,26 +30,65 @@ const ReportsGenerator = dynamic(() => import('@/components/dashboard/ReportsGen
     loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Report Tool...</div>,
     ssr: false
 });
+const BulkOrderManager = dynamic(() => import('@/components/dashboard/BulkOrderManager').then(mod => mod.BulkOrderManager), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Bulk Order System...</div>,
+    ssr: false
+});
 
 import { LeaveManagementCard } from '@/components/dashboard/LeaveManagementCard';
 
 interface DashboardTabsProps {
     activeStaff: any[];
     activeOrders: any[];
+    recurringOrders: any[]; // Added
     allEmployees: any[];
     recentSalaries: any[];
     activeLeaves: any[];
     userRole?: string;
 }
 
-export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentSalaries, activeLeaves, userRole = 'staff' }: DashboardTabsProps) {
+export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allEmployees, recentSalaries, activeLeaves, userRole = 'staff' }: DashboardTabsProps) {
+    const { toast } = useToast();
+    const router = useRouter();
+    const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
+
     const isAdmin = userRole === 'admin';
+    const isBulkhead = userRole === 'bulkhead';
+    const canManageBulk = isAdmin || isBulkhead;
+
+    const [hpPage, setHpPage] = useState(1);
+    const HP_ITEMS_PER_PAGE = 2;
+
+    const highPriorityOrders = activeOrders.filter((o: any) => ['Pending', 'In Progress', 'Processing'].includes(o.status));
+    const totalHpPages = Math.ceil(highPriorityOrders.length / HP_ITEMS_PER_PAGE);
+    const displayedHpOrders = highPriorityOrders.slice((hpPage - 1) * HP_ITEMS_PER_PAGE, hpPage * HP_ITEMS_PER_PAGE);
+
+    const activeContracts = recurringOrders.filter((o: any) => o.status === 'Active');
+    const endedContracts = recurringOrders.filter((o: any) => o.status === 'Ended');
+
+    const handleEndContract = async (contractId: string) => {
+        if (!confirm('Are you sure you want to end this recurring contract? This action cannot be undone.')) return;
+
+        setLoadingMap(prev => ({ ...prev, [contractId]: true }));
+        const res = await endRecurringOrder(contractId);
+        setLoadingMap(prev => ({ ...prev, [contractId]: false }));
+
+        if (res.success) {
+            toast({ title: 'Contract Ended', description: 'The recurring contract has been stopped.', className: 'bg-green-600 border-none' });
+            router.refresh();
+        } else {
+            toast({ title: 'Error', description: res.error, variant: 'destructive' });
+        }
+    };
 
     return (
         <Tabs defaultValue="overview" className="space-y-6">
             <div className="overflow-x-auto pb-2">
                 <TabsList className="glass-card bg-transparent border-0 p-1">
                     <TabsTrigger value="overview" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Overview</TabsTrigger>
+                    {canManageBulk && (
+                        <TabsTrigger value="bulk" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Create Bulk Orders</TabsTrigger>
+                    )}
                     <TabsTrigger value="orders" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Active Orders</TabsTrigger>
 
                     {isAdmin && (
@@ -54,9 +99,120 @@ export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentS
                             <TabsTrigger value="finances" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Salary History</TabsTrigger>
                         </>
                     )}
+
+                    <TabsTrigger value="recurring" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Recurring Orders</TabsTrigger>
                     <TabsTrigger value="reports" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Reports</TabsTrigger>
                 </TabsList>
             </div>
+
+            {/* OVERVIEW TAB */}
+            {/* ... (Overview Content - Line 81) ... */}
+
+            {/* RECURRING ORDERS TAB */}
+            <TabsContent value="recurring" className="space-y-6">
+                {/* Active Contracts */}
+                <Card className="glass-card">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <RefreshCw className="w-5 h-5 text-green-400" /> Active Recurring Contracts
+                        </CardTitle>
+                        <CardDescription>Automated recurring orders currently active.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {activeContracts.map((contract: any) => (
+                                <div key={contract._id} className="p-4 rounded-lg bg-white/5 border border-l-4 border-l-green-500 border-white/5 flex flex-col justify-between group transition-colors hover:bg-white/10">
+                                    <div>
+                                        <div className="flex justify-between items-start mb-2 pr-2">
+                                            <h3 className="font-bold text-lg">{contract.customer}</h3>
+                                            <Badge variant="outline" className="text-green-400 border-green-500/50 bg-green-500/10">Active</Badge>
+                                        </div>
+
+                                        <div className="space-y-2 text-sm text-muted-foreground font-mono">
+                                            <div className="flex justify-between">
+                                                <span>Amount:</span>
+                                                <span className="text-white">{contract.amount}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span>Frequency:</span>
+                                                <span className="text-white">Every {contract.intervalDays} Days</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span>Start Date:</span>
+                                                <span className="text-white">{contract.startDate}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-3 pt-3 border-t border-white/10">
+                                            <p className="text-xs text-muted-foreground mb-1">Standard Items:</p>
+                                            <p className="text-xs line-clamp-2 italic opacity-70">{contract.items}</p>
+                                        </div>
+                                    </div>
+
+                                    {canManageBulk && (
+                                        <div className="mt-4 pt-4 border-t border-white/10 flex justify-end">
+                                            <Button
+                                                variant="destructive"
+                                                size="sm"
+                                                onClick={() => handleEndContract(contract._id)}
+                                                disabled={loadingMap[contract._id]}
+                                                className="w-full text-xs h-8"
+                                            >
+                                                {loadingMap[contract._id] ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <X className="w-3 h-3 mr-2" />} End Contract
+                                            </Button>
+                                        </div>
+                                    )}
+
+                                    <div className="mt-2 text-[10px] text-muted-foreground text-center">
+                                        <span>Created by {contract.creatorName}</span>
+                                    </div>
+                                </div>
+                            ))}
+                            {activeContracts.length === 0 && (
+                                <div className="col-span-full text-center py-10 text-muted-foreground">
+                                    <RefreshCw className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                                    <p>No active recurring contracts.</p>
+                                </div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Ended Contracts Log */}
+                <Card className="glass-card">
+                    <CardHeader>
+                        <CardTitle className="text-lg text-muted-foreground flex items-center gap-2">
+                            <Clock className="w-4 h-4" /> Ended Contracts History
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {endedContracts.length > 0 ? (
+                            <div className="space-y-2">
+                                {endedContracts.map((contract: any) => (
+                                    <div key={contract._id} className="flex flex-col md:flex-row justify-between items-center p-3 rounded bg-white/5 opacity-70 hover:opacity-100 transition-opacity border border-white/5">
+                                        <div className="flex items-center gap-4 w-full md:w-auto">
+                                            <div className="p-2 rounded bg-red-500/10 text-red-500"><X className="w-4 h-4" /></div>
+                                            <div>
+                                                <h4 className="font-bold text-sm">{contract.customer}</h4>
+                                                <p className="text-xs text-muted-foreground font-mono max-w-[200px] truncate">{contract.items}</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-left md:text-right mt-2 md:mt-0 w-full md:w-auto flex justify-between md:block">
+                                            <Badge variant="secondary" className="mb-1 pointer-events-none opacity-50">Ended</Badge>
+                                            <div className="text-[10px] text-muted-foreground">
+                                                <p>Amount: {contract.amount}</p>
+                                                <p>Ended: {contract.endedAt ? new Date(contract.endedAt).toLocaleDateString() : 'Just now'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-center py-4 text-xs text-muted-foreground">No ended contracts history.</p>
+                        )}
+                    </CardContent>
+                </Card>
+            </TabsContent>
 
             {/* OVERVIEW TAB */}
             <TabsContent value="overview" className="space-y-6">
@@ -103,23 +259,42 @@ export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentS
                         <LeaveManagementCard leaves={activeLeaves} employees={allEmployees} userRole={userRole} />
                     </div>
 
-                    {/* Active Orders Quick View */}
-                    <Card className="glass-card md:col-span-2 lg:col-span-2 h-auto min-h-[400px] flex flex-col">
-                        <CardHeader>
+                    {/* Active Orders Quick View (Paginator) */}
+                    <Card className="glass-card md:col-span-2 lg:col-span-2 h-[400px] flex flex-col">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="flex items-center gap-2 text-lg">
-                                <ShoppingCart className="w-5 h-5 text-accent" /> High Priority Orders
+                                <ShoppingCart className="w-5 h-5 text-accent" /> High Priority
                             </CardTitle>
+                            {totalHpPages > 1 && (
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setHpPage(p => Math.max(1, p - 1))}
+                                        disabled={hpPage === 1}
+                                        className="p-1 rounded hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed"
+                                    >
+                                        &lt;
+                                    </button>
+                                    <span className="text-xs text-muted-foreground font-mono">{hpPage}/{totalHpPages}</span>
+                                    <button
+                                        onClick={() => setHpPage(p => Math.min(totalHpPages, p + 1))}
+                                        disabled={hpPage === totalHpPages}
+                                        className="p-1 rounded hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed"
+                                    >
+                                        &gt;
+                                    </button>
+                                </div>
+                            )}
                         </CardHeader>
                         <CardContent className="flex-1 min-h-0">
                             <ScrollArea className="h-full pr-4">
-                                {activeOrders.length === 0 ? (
+                                {highPriorityOrders.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center h-full text-muted-foreground opacity-50">
                                         <ShoppingCart className="w-10 h-10 mb-2" />
-                                        <p>No active orders</p>
+                                        <p>No high priority orders</p>
                                     </div>
                                 ) : (
                                     <div className="space-y-3">
-                                        {activeOrders.slice(0, 5).map((order: any) => (
+                                        {displayedHpOrders.map((order: any) => (
                                             <OrderRow key={order.orderId} order={order} detailed />
                                         ))}
                                     </div>
@@ -135,76 +310,93 @@ export function DashboardTabs({ activeStaff, activeOrders, allEmployees, recentS
                 <Card className="glass-card">
                     <CardHeader>
                         <CardTitle>All Active Bulk Orders</CardTitle>
-                        <CardDescription>Managing {activeOrders.length} ongoing requests.</CardDescription>
+                        <CardDescription>Managing {activeOrders.filter((o: any) => !['Completed', 'Cancelled'].includes(o.status)).length} ongoing requests.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
-                            {activeOrders.map((order: any) => (
-                                <OrderRow key={order.orderId} order={order} detailed />
-                            ))}
-                            {activeOrders.length === 0 && <p className="text-center py-10 text-muted-foreground">No active orders found.</p>}
+                            {activeOrders
+                                .filter((o: any) => !['Completed', 'Cancelled'].includes(o.status))
+                                .map((order: any) => (
+                                    <OrderRow key={order.orderId} order={order} detailed />
+                                ))}
+                            {activeOrders.filter((o: any) => !['Completed', 'Cancelled'].includes(o.status)).length === 0 && (
+                                <p className="text-center py-10 text-muted-foreground">No active orders found.</p>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
             </TabsContent>
 
             {/* STAFF TAB - Admin Only */}
-            {isAdmin && (
-                <TabsContent value="staff" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
-                    <EmployeeManagement employees={allEmployees} />
-                </TabsContent>
-            )}
+            {
+                isAdmin && (
+                    <TabsContent value="staff" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
+                        <EmployeeManagement employees={allEmployees} />
+                    </TabsContent>
+                )
+            }
 
             {/* LOGS TAB - Everyone */}
             <TabsContent value="logs" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
                 <LogsExplorer employees={allEmployees} />
             </TabsContent>
 
-            {isAdmin && (
-                <>
-                    {/* BANK LOGS TAB */}
-                    <TabsContent value="bank" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
-                        <BankLogsExplorer key="paginated-view" />
-                    </TabsContent>
+            {
+                isAdmin && (
+                    <>
+                        {/* BANK LOGS TAB */}
+                        <TabsContent value="bank" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
+                            <BankLogsExplorer key="paginated-view" />
+                        </TabsContent>
 
-                    {/* FINANCES TAB */}
-                    <TabsContent value="finances" className="space-y-6">
-                        <Card className="glass-card">
-                            <CardHeader>
-                                <CardTitle>Recent Salary Logs</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-2">
-                                    {recentSalaries.map((log: any) => (
-                                        <div key={log._id} className="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-lg bg-black/20 hover:bg-black/40 transition-colors">
-                                            <div className="flex items-center gap-4">
-                                                <div className="p-2 rounded-full bg-green-500/10 text-green-500">
-                                                    <DollarSign className="w-5 h-5" />
+                        {/* FINANCES TAB */}
+                        <TabsContent value="finances" className="space-y-6">
+                            <Card className="glass-card">
+                                <CardHeader>
+                                    <CardTitle>Recent Salary Logs</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-2">
+                                        {recentSalaries.map((log: any) => (
+                                            <div key={log._id} className="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-lg bg-black/20 hover:bg-black/40 transition-colors">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="p-2 rounded-full bg-green-500/10 text-green-500">
+                                                        <DollarSign className="w-5 h-5" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-mono font-medium">${log.amount.toLocaleString('en-US')}</p>
+                                                        <p className="text-xs text-muted-foreground">To ID: {log.userId}</p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <p className="font-mono font-medium">${log.amount.toLocaleString('en-US')}</p>
-                                                    <p className="text-xs text-muted-foreground">To ID: {log.userId}</p>
+                                                <div className="mt-2 md:mt-0 text-right">
+                                                    <p className="text-sm text-muted-foreground">Processed by {log.processedBy}</p>
+                                                    <p className="text-xs opacity-50">{new Date(log.date).toLocaleString()}</p>
                                                 </div>
                                             </div>
-                                            <div className="mt-2 md:mt-0 text-right">
-                                                <p className="text-sm text-muted-foreground">Processed by {log.processedBy}</p>
-                                                <p className="text-xs opacity-50">{new Date(log.date).toLocaleString()}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                    {recentSalaries.length === 0 && <p className="text-center py-10 text-muted-foreground">No recent salary records.</p>}
-                                </div>
-                            </CardContent>
-                        </Card>
+                                        ))}
+                                        {recentSalaries.length === 0 && <p className="text-center py-10 text-muted-foreground">No recent salary records.</p>}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                    </>
+                )
+            }
+
+            {/* BULK ORDER MANAGER TAB */}
+            {
+                canManageBulk && (
+                    <TabsContent value="bulk" className="space-y-6">
+                        <BulkOrderManager activeOrders={activeOrders} userRole={userRole} />
                     </TabsContent>
-                </>
-            )}
+                )
+            }
 
             {/* REPORTS TAB - For everyone now (restricted inside) */}
             <TabsContent value="reports" className="space-y-6">
                 <ReportsGenerator userRole={userRole} />
             </TabsContent>
-        </Tabs>
+        </Tabs >
     );
 }
 
@@ -266,12 +458,13 @@ function OrderRow({ order, detailed }: { order: any, detailed?: boolean }) {
                         <Clock className="w-3 h-3" />
                         <span className="text-sm font-medium">{order.deliveryDate}</span>
                     </div>
+                    {/* Technical IDs hidden for cleaner UI
                     {detailed && (
                         <div className="mt-2 text-[10px] text-muted-foreground font-mono opacity-50 space-y-0.5">
                             <p title="Message ID">MSG: {order.messageId || 'N/A'}</p>
                             <p title="Channel ID">CH: {order.channelId || 'N/A'}</p>
                         </div>
-                    )}
+                    )} */}
                 </div>
             </div>
         </div>
