@@ -58,8 +58,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                         // Allow login but as 'client'
                         console.log(`User ${profile.username} (${profile.id}) is not an employee. Logging in as Client.`);
                         user.role = 'client';
-                        user.name = profile.username || (profile.global_name ?? undefined) || 'Client';
-                        user.id = profile.id; // Ensure ID is mapped from profile
+                        user.name = (profile as any).username || (profile as any).global_name || 'Client';
+                        user.id = (profile as any).id || profile.sub; // Ensure ID is mapped from profile
                         return true;
                     }
 
