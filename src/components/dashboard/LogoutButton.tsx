@@ -1,22 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { logout } from '@/actions/auth';
+import { signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { LogOut, Loader2 } from 'lucide-react';
 import { logActivity } from '@/actions/log';
-import { useSession } from 'next-auth/react';
 
 export function LogoutButton() {
-    const { data: session } = useSession();
     const [isPending, setIsPending] = useState(false);
 
     const handleLogout = async () => {
         setIsPending(true);
-        const user = session?.user?.name || 'Unknown User';
-        const role = session?.user?.role || 'Unknown Role';
-        await logActivity('Logout', `User ${user} (${role}) logged out via Dashboard.`, user, role);
-        await logout();
+        await logActivity('Logout', `User logged out.`);
+        await signOut({ callbackUrl: '/login' });
     };
 
     return (

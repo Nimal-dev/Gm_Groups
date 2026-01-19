@@ -31,10 +31,6 @@ export const metadata: Metadata = {
   },
 };
 
-import SessionProvider from '@/components/providers/SessionProvider';
-
-// ... (existing imports)
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -43,10 +39,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${poppins.variable} font-body antialiased`}>
-        <SessionProvider>
-          {children}
-          <Toaster />
-        </SessionProvider>
+        {children}
+        <Toaster />
       </body>
     </html>
   );

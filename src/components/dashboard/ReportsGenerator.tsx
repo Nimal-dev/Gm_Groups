@@ -14,7 +14,6 @@ import { sendReportToDiscord } from '@/actions/discord';
 import { logActivity } from '@/actions/log';
 import { useToast } from '@/hooks/use-toast';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { useSession } from 'next-auth/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
@@ -40,7 +39,6 @@ const RecurringFormSchema = z.object({
 type RecurringFormValues = z.infer<typeof RecurringFormSchema>;
 
 export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) {
-    const { data: session } = useSession();
     const { toast } = useToast();
     const isAdmin = userRole === 'admin';
     const canManageBulk = userRole === 'admin' || userRole === 'bulkhead';
@@ -209,7 +207,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                 title: "Generated successfully!",
                 description: "You can copy the text below."
             });
-            await logActivity('Generate Report', `Generated ${reportType} for ${reportTo || 'Unknown Client'} (From: ${reportFrom || 'Unknown'})`, session?.user?.name || 'Unknown', session?.user?.role || 'Unknown');
+            await logActivity('Generate Report', `Generated ${reportType} for ${reportTo || 'Unknown Client'} (From: ${reportFrom || 'Unknown'})`);
         } catch (error: any) {
             console.error(error);
             toast({ variant: "destructive", title: "Failed", description: error.message });

@@ -19,39 +19,59 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     secret: process.env.AUTH_SECRET,
     trustHost: true,
     callbacks: {
-        ...authConfig.callbacks,
         /**
          * JWT Callback
          * Persists user role and name into the JWT token.
          */
         async jwt({ token, user, profile }) {
-            if (user && profile) {
+            if (user) {
+                token.role = user.role;
+                token.id = user.id;
+                token.name = user.name; // Explicitly update token name from DB
+            }
+            return token;
+        },
+        /**
+         * Session Callback
+         * Populates the client-side session object with role and name from the token.
+         */
+        async session({ session, token }) {
+            if (session.user && token) {
+                session.user.role = token.role as string;
+                session.user.id = token.id as string;
+                session.user.name = token.name; // Explicitly set session name
+            }
+            return session;
+        },
+        /**
+         * SignIn Callback
+         * Validates the Discord user against the Employee database.
+         */
+        async signIn({ user, account, profile }) {
+            if (account?.provider === 'discord' && profile) {
                 try {
                     await connectToDatabase();
-
+                    // Check if the Discord User ID exists in the Employee collection
                     const employee = await Employee.findOne({ userId: profile.id, status: 'Active' });
 
-
-                    if (employee) {
-                        const rank = employee.rank.toLowerCase();
-                        let role = 'staff';
-
-
-                        if (rank.includes('owner') || rank.includes('boss') || rank.includes('management') || rank.includes('manager') || rank.includes('lawyer')) {
-                            role = 'admin';
-                        } else if (rank.includes('head') || rank.includes('bulk') || rank.includes('lead')) {
-                            role = 'bulkhead';
-                        }
-
-
-                        token.role = role;
-                        token.name = employee.username;
-                    } else {
-
-                        token.role = 'client';
-                        token.name = (profile as any).username || (profile as any).global_name || 'Client';
+                    if (!employee) {
+                        console.log(`Access Denied: User ${profile.username} (${profile.id}) is not an active employee.`);
+                        return false; // Valid Discord user, but not an employee -> Deny Access
                     }
-                    token.id = profile.id;
+
+                    // Map Rank to Website Role
+                    const rank = employee.rank.toLowerCase();
+                    let role = 'staff'; // Default role (Covering Staff, Recruit, Novice, etc.)
+
+                    if (rank.includes('owner') || rank.includes('boss') || rank.includes('management') || rank.includes('manager') || rank.includes('lawyer')) {
+                        role = 'admin';
+                    } else if (rank.includes('head') || rank.includes('bulk') || rank.includes('lead')) {
+                        role = 'bulkhead';
+                    }
+
+                    // Attach the determined role and name to the user object so it passes to the JWT/Session
+                    user.role = role;
+                    user.name = employee.username; // Use DB Employee Name instead of Discord Username
 
                     // Log the login activity
                     const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
@@ -60,24 +80,19 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             action: 'Login',
-                            user: token.name,
-                            details: `User ${token.name} logged in via Discord.`,
-                            role: token.role
+                            user: employee.username,
+                            details: `User ${employee.username} logged in via Discord.`,
+                            role: role
                         })
                     }).catch(err => console.error('Failed to log Discord login:', err));
 
+                    return true;
                 } catch (error) {
-                    console.error('Error in JWT callback:', error);
-                    token.role = 'client'; // Fallback
-                    token.name = (profile as any).username || 'Client';
+                    console.error('Error during Discord sign-in verification:', error);
+                    return false;
                 }
             }
-            return token;
-        },
-
-        async signIn({ user, account, profile }) {
-            // We authorize everyone, role is handled in JWT
-            return true;
+            return false; // Deny any non-Discord login attempts
         },
     },
     providers: [

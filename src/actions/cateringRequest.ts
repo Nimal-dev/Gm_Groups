@@ -1,7 +1,6 @@
 'use server';
 
 import { logActivity } from '@/actions/log';
-import { auth } from '@/auth';
 
 export async function submitCateringRequest(data: {
     orgName: string;
@@ -12,11 +11,6 @@ export async function submitCateringRequest(data: {
     club: string;
 }) {
     const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
-    const session = await auth();
-
-    if (!session || !session.user) {
-        return { success: false, error: 'You must be logged in to submit a request.' };
-    }
 
     try {
         const response = await fetch(`${BOT_URL}/api/catering-request`, {
@@ -24,13 +18,7 @@ export async function submitCateringRequest(data: {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                ...data,
-                submittedBy: {
-                    discordId: session.user.id,
-                    username: session.user.name || session.user.email || 'Unknown'
-                }
-            }),
+            body: JSON.stringify(data),
             cache: 'no-store'
         });
 
@@ -40,7 +28,7 @@ export async function submitCateringRequest(data: {
             throw new Error(result.error || 'Failed to submit catering request');
         }
 
-        await logActivity('Catering Request', `New Request from ${data.orgName} (${data.repName}). Event Date: ${data.eventDateStr}.`, session.user.name || 'Unknown', session.user.role || 'client');
+        await logActivity('Catering Request', `New Request from ${data.orgName} (${data.repName}). Event Date: ${data.eventDateStr}.`);
         return { success: true, message: result.message };
     } catch (error: any) {
         console.error('Catering Request Error:', error);

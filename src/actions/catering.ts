@@ -43,9 +43,7 @@ export async function processCateringRequest(requestId: string, action: 'accept'
 
         await logActivity(
             action === 'accept' ? 'Accept Catering Request' : 'Decline Catering Request',
-            `${action === 'accept' ? 'Accepted' : 'Declined'} request ID ${requestId}. ${reason ? `Reason: ${reason}` : ''}`,
-            session.user.name || 'Staff',
-            session.user.role || 'staff'
+            `${action === 'accept' ? 'Accepted' : 'Declined'} request ID ${requestId}. ${reason ? `Reason: ${reason}` : ''}`
         );
 
         return { success: true, message: data.message };

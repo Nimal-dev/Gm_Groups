@@ -38,7 +38,7 @@ export async function addEmployee(formData: z.infer<typeof EmployeeSchema>) {
         });
 
         revalidatePath('/dashboard');
-        await logActivity('Add Employee', `Added new employee: ${validated.username} (${validated.nickname || 'No Nickname'}) (Rank: ${validated.rank})`, session.user.name || 'Admin', 'admin');
+        await logActivity('Add Employee', `Added new employee: ${validated.username} (${validated.nickname || 'No Nickname'}) (Rank: ${validated.rank})`);
         return { success: true };
     } catch (error: any) {
         console.error('Add Employee Error:', error);
@@ -66,7 +66,7 @@ export async function updateEmployee(userId: string, data: Partial<z.infer<typeo
         }
 
         revalidatePath('/dashboard');
-        await logActivity('Update Employee', `Updated employee ${userId} fields: ${Object.keys(data).join(', ')}`, session.user.name || 'Admin', 'admin');
+        await logActivity('Update Employee', `Updated employee ${userId} fields: ${Object.keys(data).join(', ')}`);
         return { success: true };
     } catch (error: any) {
         console.error('Update Employee Error:', error);
@@ -89,7 +89,7 @@ export async function deleteEmployee(userId: string) {
         }
 
         revalidatePath('/dashboard');
-        await logActivity('Remove Employee', `Removed employee with UserID: ${userId}`, session.user.name || 'Admin', 'admin');
+        await logActivity('Remove Employee', `Removed employee with UserID: ${userId}`);
         return { success: true };
     } catch (error: any) {
         console.error('Delete Employee Error:', error);

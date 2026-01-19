@@ -1,13 +1,14 @@
 'use server';
 
+import { auth } from '@/auth';
 
-export async function logActivity(action: string, details: string, user: string = 'System', role: string = 'System') {
+export async function logActivity(action: string, details: string) {
     const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
 
     try {
-        // Auth removed to prevent circular dependency
-        // Caller must provide context
-
+        const session = await auth();
+        const user = session?.user?.name || 'Anonymous';
+        const role = session?.user?.role || 'Guest';
 
         const response = await fetch(`${BOT_URL}/api/website-log`, {
             method: 'POST',
