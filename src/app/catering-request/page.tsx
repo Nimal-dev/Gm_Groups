@@ -28,6 +28,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
+// ... (existing imports)
+
 const CateringSchema = z.object({
     orgName: z.string().min(1, "Organization name is required"),
     repName: z.string().min(1, "Representative name is required"),
@@ -43,9 +49,18 @@ const CateringSchema = z.object({
 type CateringFormValues = z.infer<typeof CateringSchema>;
 
 export default function CateringRequestPage() {
+    const { data: session, status } = useSession();
+    const router = useRouter();
     const { toast } = useToast();
     const [success, setSuccess] = useState(false);
     const [members, setMembers] = useState<{ id: string, name: string }[]>([]);
+
+    useEffect(() => {
+        if (status === 'unauthenticated') {
+            toast({ title: "Login Required", description: "You must be logged in to submit a request.", variant: "destructive" });
+            router.push('/login?callbackUrl=/catering-request');
+        }
+    }, [status, router, toast]);
 
     const form = useForm<CateringFormValues>({
         resolver: zodResolver(CateringSchema),
@@ -58,6 +73,12 @@ export default function CateringRequestPage() {
             policyAccepted: false
         }
     });
+
+    if (status === 'loading') {
+        return <div className="flex items-center justify-center min-h-screen bg-black text-white"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+    }
+
+    if (!session) return null; // Prevent flash of content
 
     const isSubmitting = form.formState.isSubmitting;
 

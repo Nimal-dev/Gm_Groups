@@ -1,6 +1,7 @@
 'use server';
 
 import { logActivity } from '@/actions/log';
+import { auth } from '@/auth';
 
 export async function submitCateringRequest(data: {
     orgName: string;
@@ -11,6 +12,11 @@ export async function submitCateringRequest(data: {
     club: string;
 }) {
     const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
+    const session = await auth();
+
+    if (!session || !session.user) {
+        return { success: false, error: 'You must be logged in to submit a request.' };
+    }
 
     try {
         const response = await fetch(`${BOT_URL}/api/catering-request`, {
@@ -18,7 +24,13 @@ export async function submitCateringRequest(data: {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify({
+                ...data,
+                submittedBy: {
+                    discordId: session.user.id,
+                    username: session.user.name || session.user.email || 'Unknown'
+                }
+            }),
             cache: 'no-store'
         });
 

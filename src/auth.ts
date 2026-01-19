@@ -55,8 +55,12 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     const employee = await Employee.findOne({ userId: profile.id, status: 'Active' });
 
                     if (!employee) {
-                        console.log(`Access Denied: User ${profile.username} (${profile.id}) is not an active employee.`);
-                        return false; // Valid Discord user, but not an employee -> Deny Access
+                        // Allow login but as 'client'
+                        console.log(`User ${profile.username} (${profile.id}) is not an employee. Logging in as Client.`);
+                        user.role = 'client';
+                        user.name = profile.username || (profile.global_name ?? undefined) || 'Client';
+                        user.id = profile.id; // Ensure ID is mapped from profile
+                        return true;
                     }
 
                     // Map Rank to Website Role

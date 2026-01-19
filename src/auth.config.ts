@@ -10,12 +10,17 @@ export const authConfig = {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
             const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
+            const isClient = auth?.user?.role === 'client';
 
             if (isOnDashboard) {
-                if (isLoggedIn) return true;
-                return false; // Redirect unauthenticated users to login page
-            } else if (isLoggedIn && nextUrl.pathname === '/login') {
-                return Response.redirect(new URL('/dashboard', nextUrl));
+                if (isLoggedIn && !isClient) return true;
+                return false; // Redirect unauthenticated OR client users to login (or home)
+            } else if (isLoggedIn) {
+                if (nextUrl.pathname === '/login') {
+                    // Redirect clients to catering request, staff to dashboard
+                    if (isClient) return Response.redirect(new URL('/catering-request', nextUrl));
+                    return Response.redirect(new URL('/dashboard', nextUrl));
+                }
             }
             return true;
         },
