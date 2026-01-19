@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { endRecurringOrder } from '@/actions/bulk-orders';
@@ -63,6 +63,18 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
     const [hpPage, setHpPage] = useState(1);
     const HP_ITEMS_PER_PAGE = 2;
 
+    const [pendingCateringCount, setPendingCateringCount] = useState(0);
+
+    useEffect(() => {
+        // Fetch pending catering requests count for notification badge
+        import('@/actions/catering').then(async (mod) => {
+            const res = await mod.getCateringRequests();
+            if (res.success) {
+                setPendingCateringCount(res.requests.length);
+            }
+        });
+    }, []);
+
     const highPriorityOrders = activeOrders.filter((o: any) => ['Pending', 'In Progress', 'Processing'].includes(o.status));
     const totalHpPages = Math.ceil(highPriorityOrders.length / HP_ITEMS_PER_PAGE);
     const displayedHpOrders = highPriorityOrders.slice((hpPage - 1) * HP_ITEMS_PER_PAGE, hpPage * HP_ITEMS_PER_PAGE);
@@ -91,9 +103,25 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                 <TabsList className="glass-card bg-transparent border-0 p-1">
                     <TabsTrigger value="overview" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Overview</TabsTrigger>
                     {canManageBulk && (
-                        <TabsTrigger value="bulk" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Create Bulk Orders</TabsTrigger>
+                        <TabsTrigger value="bulk" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent relative">
+                            Bulk Orders
+                            {pendingCateringCount > 0 && (
+                                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                </span>
+                            )}
+                        </TabsTrigger>
                     )}
-                    <TabsTrigger value="orders" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Active Orders</TabsTrigger>
+                    <TabsTrigger value="orders" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent relative">
+                        Active Orders
+                        {highPriorityOrders.length > 0 && (
+                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                            </span>
+                        )}
+                    </TabsTrigger>
 
                     {isAdmin && (
                         <>
@@ -402,8 +430,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                 canManageBulk && (
                     <TabsContent value="bulk" className="space-y-6">
                         <BulkOrderManager activeOrders={activeOrders} userRole={userRole} />
-                    </TabsContent>
-                )
+                    </TabsContent>)
             }
 
             {/* REPORTS TAB - For everyone now (restricted inside) */}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +17,8 @@ import { CalendarIcon, Package, User, DollarSign, RefreshCw, Send, X, Check, Tru
 import { useToast } from '@/hooks/use-toast';
 import { createCitizenOrder, createRecurringOrder, updateOrderStatus, endRecurringOrder } from '@/actions/bulk-orders';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { CateringRequestsManager } from '@/components/dashboard/CateringRequestsManager';
+import { getCateringRequests } from '@/actions/catering';
 
 export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole }: { activeOrders: any[], recurringOrders?: any[], userRole: string }) {
     const { toast } = useToast();
@@ -33,6 +35,14 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
 
     // Recurring Form State
     const [recurringForm, setRecurringForm] = useState({ customer: '', clientRep: '', items: '', amount: '', startDate: '', intervalDays: '7', deliveryDetails: '', securityDeposit: '' });
+
+    const [pendingCount, setPendingCount] = useState(0);
+
+    useEffect(() => {
+        getCateringRequests().then(res => {
+            if (res.success) setPendingCount(res.requests.length);
+        });
+    }, []);
 
     // --- HANDLERS ---
 
@@ -112,14 +122,28 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                 <CardDescription>Create new orders or manage existing ones.</CardDescription>
             </CardHeader>
             <CardContent>
-                <Tabs defaultValue="manage" className="space-y-4">
+                <Tabs defaultValue="requests" className="space-y-4">
                     <TabsList className="bg-black/20 w-full justify-start overflow-x-auto">
+                        <TabsTrigger value="requests" className="relative">
+                            Pending Requests
+                            {pendingCount > 0 && (
+                                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                </span>
+                            )}
+                        </TabsTrigger>
                         <TabsTrigger value="manage">Active Orders</TabsTrigger>
                         <TabsTrigger value="contracts">Active Contracts</TabsTrigger>
                         <TabsTrigger value="citizen">New Citizen Order</TabsTrigger>
                         <TabsTrigger value="event">New Event Request</TabsTrigger>
                         <TabsTrigger value="recurring">New Recurring Contract</TabsTrigger>
                     </TabsList>
+
+                    {/* REQUESTS TAB */}
+                    <TabsContent value="requests">
+                        <CateringRequestsManager />
+                    </TabsContent>
 
                     {/* MANAGE TAB */}
                     <TabsContent value="manage" className="space-y-4">
