@@ -8,7 +8,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Lock, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+
+// ...
+
 export default function LoginPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <LoginForm />
+        </Suspense>
+    );
+}
+
+function LoginForm() {
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
     const containerVariants = {
         hidden: { opacity: 0, y: 20 },
         visible: {
@@ -29,10 +44,8 @@ export default function LoginPage() {
 
     return (
         <div className="flex h-screen w-full items-center justify-center bg-[url('/gm_wallpaper.jpg')] bg-cover bg-center md:bg-black/90 relative overflow-hidden">
-            {/* Overlay for better text readability if bg image is used */}
+            {/* ... Background elements ... */}
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-0"></div>
-
-            {/* Background animated blobs for modern feel */}
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[100px] animate-pulse z-0"></div>
             <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[100px] animate-pulse z-0 hidden md:block"></div>
 
@@ -54,6 +67,7 @@ export default function LoginPage() {
             >
                 <Card className="glass-card border border-white/10 shadow-2xl backdrop-blur-xl bg-black/40">
                     <CardHeader className="space-y-2 pb-6">
+                        {/* ... Header content ... */}
                         <motion.div
                             className="flex justify-center mb-2"
                             initial={{ scale: 0 }}
@@ -72,14 +86,12 @@ export default function LoginPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-5">
-
-                        {/* DISCORD LOGIN BUTTON */}
                         <form action={discordLogin}>
+                            <input type="hidden" name="callbackUrl" value={callbackUrl} />
                             <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                                 <DiscordButton />
                             </motion.div>
                         </form>
-
                     </CardContent>
                 </Card>
                 <motion.p
