@@ -33,7 +33,7 @@ export async function logPayment(userId: string, amount: number, notes?: string)
             date: new Date()
         });
 
-        await logActivity('Salary Payment', `Paid $${amount} to ${employee.username} (${userId}). Note: ${notes || 'None'}`);
+        await logActivity('Salary Payment', `Paid $${amount} to ${employee.username} (${userId}). Note: ${notes || 'None'}`, session.user.name || 'Admin', session.user.role || 'admin');
         revalidatePath('/dashboard');
 
         return { success: true };

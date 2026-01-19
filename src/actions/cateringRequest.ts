@@ -40,7 +40,7 @@ export async function submitCateringRequest(data: {
             throw new Error(result.error || 'Failed to submit catering request');
         }
 
-        await logActivity('Catering Request', `New Request from ${data.orgName} (${data.repName}). Event Date: ${data.eventDateStr}.`);
+        await logActivity('Catering Request', `New Request from ${data.orgName} (${data.repName}). Event Date: ${data.eventDateStr}.`, session.user.name || 'Unknown', session.user.role || 'client');
         return { success: true, message: result.message };
     } catch (error: any) {
         console.error('Catering Request Error:', error);

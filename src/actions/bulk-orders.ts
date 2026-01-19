@@ -29,7 +29,7 @@ export async function createCitizenOrder(data: { to: string, amount: string, eve
         if (!res.ok) throw new Error(result.error || 'Failed to create order');
 
         revalidateTag('dashboard-data'); // Force refresh
-        await logActivity('Create Citizen Order', `Created Citizen Order #${result.orderId} for ${data.to}. Amount: ${data.amount}`);
+        await logActivity('Create Citizen Order', `Created Citizen Order #${result.orderId} for ${data.to}. Amount: ${data.amount}`, user.name || 'Web User', user.role || 'staff');
         return { success: true, message: result.message, orderId: result.orderId };
     } catch (error: any) {
         console.error('Create Citizen Order Error:', error);
@@ -61,7 +61,7 @@ export async function createRecurringOrder(data: { customer: string, clientRep?:
         if (!res.ok) throw new Error(result.error || 'Failed to create contract');
 
         revalidateTag('dashboard-data'); // Force refresh
-        await logActivity('Create Recurring Order', `Created Recurring Order for ${data.customer}. Deposit: ${data.securityDeposit || 0}`);
+        await logActivity('Create Recurring Order', `Created Recurring Order for ${data.customer}. Deposit: ${data.securityDeposit || 0}`, user.name || 'Web User', user.role || 'staff');
         return { success: true, message: result.message };
     } catch (error: any) {
         console.error('Create Recurring Order Error:', error);
@@ -96,7 +96,7 @@ export async function updateOrderStatus(orderId: string | number, messageId: str
         if (!res.ok) throw new Error(result.error || 'Failed to update status');
 
         revalidateTag('dashboard-data'); // Force refresh
-        await logActivity('Update Order Status', `Updated Order #${orderId} to status: ${status}. Reason: ${reason || 'N/A'}`);
+        await logActivity('Update Order Status', `Updated Order #${orderId} to status: ${status}. Reason: ${reason || 'N/A'}`, user.name || 'Web User', user.role || 'staff');
         return { success: true, message: result.message };
     } catch (error: any) {
         console.error('Update Status Error:', error);
@@ -127,7 +127,7 @@ export async function endRecurringOrder(contractId: string) {
         if (!res.ok) throw new Error(result.error || 'Failed to end contract');
 
         revalidateTag('dashboard-data'); // Force refresh
-        await logActivity('End Recurring Contract', `Ended Recurring Contract ${contractId}.`);
+        await logActivity('End Recurring Contract', `Ended Recurring Contract ${contractId}.`, user.name || 'Web User', user.role || 'staff');
         return { success: true, message: result.message };
     } catch (error: any) {
         console.error('End Recurring Order Error:', error);

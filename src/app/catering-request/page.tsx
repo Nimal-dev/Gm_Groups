@@ -14,7 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { submitCateringRequest, getOrgMembers } from '@/actions/cateringRequest';
-import { Receipt, Calendar as CalendarIcon, Clock, User, Building2, UtensilsCrossed, CheckCircle2, Loader2 } from 'lucide-react';
+import { Receipt, Calendar as CalendarIcon, Clock, User, Building2, UtensilsCrossed, CheckCircle2, Loader2, LogOut } from 'lucide-react';
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -29,6 +29,7 @@ import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 import { useSession } from 'next-auth/react';
+import { logout } from '@/actions/auth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -139,8 +140,20 @@ export default function CateringRequestPage() {
                     transition={{ duration: 0.5 }}
                     className="w-full max-w-3xl"
                 >
-                    <Card className="glass-card border-white/10 overflow-hidden">
+                    <Card className="glass-card border-white/10 overflow-hidden relative">
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 via-yellow-500 to-red-500" />
+
+                        <div className="absolute top-4 right-4 z-20">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => logout()}
+                                className="text-white/50 hover:text-red-400 hover:bg-white/5 gap-2 transition-colors"
+                            >
+                                <LogOut className="w-4 h-4" />
+                                <span className="text-xs">Logout</span>
+                            </Button>
+                        </div>
 
                         <CardHeader className="text-center pb-8 pt-10">
                             <motion.div
