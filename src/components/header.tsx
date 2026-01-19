@@ -58,10 +58,10 @@ export function Header() {
       </nav>
 
       <div className="flex items-center gap-4">
-        <Button variant="ghost" asChild className="hidden text-white md:flex hover:bg-white/10 rounded-full mr-2">
+        <Button variant="ghost" asChild className="flex text-white hover:bg-white/10 rounded-full mr-2">
           <Link href="/dashboard" className="flex items-center gap-2">
             <LayoutDashboard className="w-4 h-4" />
-            <span>Dashboard</span>
+            <span className="hidden sm:inline">Dashboard</span>
           </Link>
         </Button>
 
