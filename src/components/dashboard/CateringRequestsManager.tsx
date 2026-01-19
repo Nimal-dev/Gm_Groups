@@ -68,9 +68,9 @@ export function CateringRequestsManager() {
         <Card className="glass-card">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <ClipboardList className="w-5 h-5 text-accent" /> Pending Catering Requests
+                    <ClipboardList className="w-5 h-5 text-accent" /> Pending Event Requests
                 </CardTitle>
-                <CardDescription>Review and manage incoming catering requests from the website.</CardDescription>
+                <CardDescription>Review and manage incoming Event requests from the website.</CardDescription>
             </CardHeader>
             <CardContent>
                 <ScrollArea className="h-[500px] pr-4">

@@ -125,7 +125,7 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                 <Tabs defaultValue="requests" className="space-y-4">
                     <TabsList className="bg-black/20 w-full justify-start overflow-x-auto">
                         <TabsTrigger value="requests" className="relative">
-                            Pending Requests
+                            Event Requests
                             {pendingCount > 0 && (
                                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>

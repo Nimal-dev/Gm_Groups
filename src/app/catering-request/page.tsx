@@ -131,7 +131,7 @@ export default function CateringRequestPage() {
                                 <UtensilsCrossed className="w-8 h-8 text-orange-400" />
                             </motion.div>
                             <CardTitle className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-white/70">
-                                Catering Request
+                                Event Bulk Catering Request
                             </CardTitle>
                             <CardDescription className="text-lg text-muted-foreground mt-2">
                                 Book your major event catering with GM Groups.
