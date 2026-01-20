@@ -186,3 +186,39 @@ export async function getDashboardData() {
         };
     }
 }
+
+export async function getLiveActiveStaff() {
+    try {
+        await connectToDatabase();
+
+        // Fetch only active sessions
+        const activeStaff = await DutySession.find({ endTime: null })
+            .select('userId username startTime')
+            .sort({ startTime: -1 })
+            .lean();
+
+        // Get details for these staff members
+        const userIds = activeStaff.map((s: any) => s.userId);
+        const employees = await Employee.find({ userId: { $in: userIds } })
+            .select('userId username rank')
+            .lean();
+
+        // Combine data
+        const activeStaffWithDetails = activeStaff.map((session: any) => {
+            const employeeRecord = employees.find((e: any) => e.userId === session.userId);
+            return {
+                _id: session._id.toString(),
+                userId: session.userId,
+                username: session.username,
+                startTime: session.startTime ? new Date(session.startTime).toISOString() : null,
+                displayName: employeeRecord ? employeeRecord.username : session.username,
+                rank: employeeRecord ? employeeRecord.rank : 'Staff'
+            };
+        });
+
+        return { success: true, activeStaff: activeStaffWithDetails };
+    } catch (error: any) {
+        console.error('Live Staff Fetch Error:', error);
+        return { success: false, error: error.message };
+    }
+}

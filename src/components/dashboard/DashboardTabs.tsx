@@ -256,34 +256,16 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-lg">
                                 <Clock className="w-5 h-5 text-accent" /> On Duty Now
+                                {activeStaff.length > 0 && (
+                                    <span className="ml-auto relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                    </span>
+                                )}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="flex-1 min-h-0">
-                            <ScrollArea className="h-full pr-4">
-                                {activeStaff.length === 0 ? (
-                                    <div className="flex flex-col items-center justify-center h-full text-muted-foreground opacity-50">
-                                        <Users className="w-10 h-10 mb-2" />
-                                        <p>No active staff</p>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-3">
-                                        {activeStaff.map((staff: any) => (
-                                            <div key={staff.userId} className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium truncate max-w-[100px]">{staff.displayName || staff.username}</span>
-                                                        <span className="text-[10px] text-accent opacity-80">{staff.rank}</span>
-                                                    </div>
-                                                </div>
-                                                <span className="text-xs text-muted-foreground font-mono">
-                                                    {formatDuration(staff.startTime)}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </ScrollArea>
+                            <ActiveStaffList initialStaff={activeStaff} />
                         </CardContent>
                     </Card>
 
@@ -523,6 +505,99 @@ function getStatusStyles(status: string) {
         return { badge: 'border-orange-500 text-orange-400 bg-orange-500/10' };
     }
     return { badge: 'border-gray-500 text-gray-400 bg-gray-500/10' };
+}
+
+// Polling Component for Active Staff
+function ActiveStaffList({ initialStaff }: { initialStaff: any[] }) {
+    const [staffList, setStaffList] = useState(initialStaff);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    // Force re-render for timer updates
+    const [, setTick] = useState(0);
+
+    const fetchStaff = async () => {
+        setIsRefreshing(true);
+        try {
+            // Dynamically import to avoid server-client boundary issues if any, though regular import works too
+            const mod = await import('@/actions/dashboard');
+            const res = await mod.getLiveActiveStaff();
+            if (res.success && res.activeStaff) {
+                setStaffList(res.activeStaff);
+            }
+        } catch (err) {
+            console.error("Failed to poll staff", err);
+        } finally {
+            setIsRefreshing(false);
+        }
+    };
+
+    useEffect(() => {
+        // Poll for active staff every 30 seconds, but only if page is visible
+        const interval = setInterval(() => {
+            if (!document.hidden) {
+                fetchStaff();
+            }
+        }, 30000);
+
+        // Update durations display every minute without fetching data
+        const timerInterval = setInterval(() => {
+            setTick(t => t + 1);
+        }, 60000);
+
+        return () => {
+            clearInterval(interval);
+            clearInterval(timerInterval);
+        };
+    }, []);
+
+    return (
+        <div className="flex flex-col h-full min-h-0 relative">
+            <div className="absolute top-[-3.5rem] right-0 mr-8"> {/* Positioning button in header area hackily or we can move it up via props if we refactor parent. But actually we can just put it inside the card content if we change structure. For now, let's put it top right of this container which is inside the card content */}
+            </div>
+            {/* We want the refresh button to be accessible. 
+                 The parent renders the title. Let's add a small refresh icon absolute positioned or just inside the list area top right. 
+                 Actually, the parent component renders the CardHeader. I cannot easily put the button IN the header from here without lifting state.
+                 I will lift the refresh button to the list top right within the ScrollArea or just above it.
+             */}
+            <div className="flex justify-end mb-2 px-2">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 opacity-50 hover:opacity-100"
+                    onClick={fetchStaff}
+                    disabled={isRefreshing}
+                    title="Refresh List"
+                >
+                    <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+                </Button>
+            </div>
+
+            <ScrollArea className="flex-1 pr-4">
+                {staffList.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-32 text-muted-foreground opacity-50">
+                        <Users className="w-10 h-10 mb-2" />
+                        <p>No active staff</p>
+                    </div>
+                ) : (
+                    <div className="space-y-3 pb-2">
+                        {staffList.map((staff: any) => (
+                            <div key={staff.userId} className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                                    <div className="flex flex-col">
+                                        <span className="font-medium truncate max-w-[100px] text-sm">{staff.displayName || staff.username}</span>
+                                        <span className="text-[10px] text-accent opacity-80">{staff.rank}</span>
+                                    </div>
+                                </div>
+                                <span className="text-xs text-muted-foreground font-mono bg-black/20 px-2 py-1 rounded">
+                                    {formatDuration(staff.startTime)}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </ScrollArea>
+        </div>
+    );
 }
 
 function formatDuration(startTime: string | number) {
