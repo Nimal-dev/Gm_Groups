@@ -205,14 +205,17 @@ export async function getLiveActiveStaff() {
 
         // Combine data
         const activeStaffWithDetails = activeStaff.map((session: any) => {
-            const employeeRecord = employees.find((e: any) => e.userId === session.userId);
+            // Robust comparison: convert to string and trim
+            const sessionUserId = String(session.userId).trim();
+            const employeeRecord = employees.find((e: any) => String(e.userId).trim() === sessionUserId);
+
             return {
                 _id: session._id.toString(),
                 userId: session.userId,
                 username: session.username,
                 startTime: session.startTime ? new Date(session.startTime).toISOString() : null,
                 displayName: employeeRecord ? employeeRecord.username : session.username,
-                rank: employeeRecord ? employeeRecord.rank : 'Staff'
+                rank: employeeRecord ? employeeRecord.rank : 'Staff' // Default if no match found
             };
         });
 

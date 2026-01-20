@@ -12,6 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Users, Clock, ShoppingCart, DollarSign, Activity, RefreshCw, X, Loader2 } from 'lucide-react';
+import { DutyControl } from '@/components/dashboard/DutyControl';
 
 // Lazy Load heavy tab components (Client-side only)
 const EmployeeManagement = dynamic(() => import('@/components/dashboard/EmployeeManagement').then(mod => mod.EmployeeManagement), {
@@ -264,7 +265,8 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                                 )}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="flex-1 min-h-0">
+                        <CardContent className="flex-1 min-h-0 flex flex-col">
+                            <DutyControl />
                             <ActiveStaffList initialStaff={activeStaff} />
                         </CardContent>
                     </Card>
@@ -494,6 +496,8 @@ function OrderRow({ order, detailed }: { order: any, detailed?: boolean }) {
     )
 }
 
+
+
 function getStatusStyles(status: string) {
     if (['Ready', 'Completed'].includes(status)) {
         return { badge: 'border-green-500 text-green-400 bg-green-500/10' };
@@ -531,12 +535,12 @@ function ActiveStaffList({ initialStaff }: { initialStaff: any[] }) {
     };
 
     useEffect(() => {
-        // Poll for active staff every 30 seconds, but only if page is visible
+        // Poll for active staff every 60 seconds, but only if page is visible
         const interval = setInterval(() => {
             if (!document.hidden) {
                 fetchStaff();
             }
-        }, 30000);
+        }, 60000);
 
         // Update durations display every minute without fetching data
         const timerInterval = setInterval(() => {
@@ -550,7 +554,7 @@ function ActiveStaffList({ initialStaff }: { initialStaff: any[] }) {
     }, []);
 
     return (
-        <div className="flex flex-col h-full min-h-0 relative">
+        <div className="flex flex-col flex-1 min-h-0 relative">
             <div className="absolute top-[-3.5rem] right-0 mr-8"> {/* Positioning button in header area hackily or we can move it up via props if we refactor parent. But actually we can just put it inside the card content if we change structure. For now, let's put it top right of this container which is inside the card content */}
             </div>
             {/* We want the refresh button to be accessible. 
@@ -585,10 +589,10 @@ function ActiveStaffList({ initialStaff }: { initialStaff: any[] }) {
                                     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
                                     <div className="flex flex-col">
                                         <span className="font-medium truncate max-w-[100px] text-sm">{staff.displayName || staff.username}</span>
-                                        <span className="text-[10px] text-accent opacity-80">{staff.rank}</span>
+                                        <span className="text-xs text-muted-foreground font-mono opacity-80">{staff.rank}</span>
                                     </div>
                                 </div>
-                                <span className="text-xs text-muted-foreground font-mono bg-black/20 px-2 py-1 rounded">
+                                <span suppressHydrationWarning className="text-[10px] text-muted-foreground font-mono bg-black/20 px-2 py-1 rounded">
                                     {formatDuration(staff.startTime)}
                                 </span>
                             </div>

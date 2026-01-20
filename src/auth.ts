@@ -26,7 +26,9 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         async jwt({ token, user, profile }) {
             if (user) {
                 token.role = user.role;
-                token.id = user.id;
+                // CRITICAL FIX: Force use of Discord ID (profile.id) if available. 
+                // NextAuth sometimes generates a UUID for user.id if no adapter is present.
+                token.id = (profile?.id as string) || user.id;
                 token.name = user.name; // Explicitly update token name from DB
             }
             return token;
