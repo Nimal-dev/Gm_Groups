@@ -99,6 +99,26 @@
   .carousel-slide {
     transition: transform 0.3s ease-in-out;
   }
+
+  .animate-gradient-xy {
+    animation: gradient-xy 15s ease infinite;
+    background-size: 400% 400%;
+    will-change: background-position;
+  }
+}
+
+@keyframes gradient-xy {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Force Calendar Icon to be White in Dark Mode */
