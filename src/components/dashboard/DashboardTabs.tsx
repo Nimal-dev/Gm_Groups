@@ -39,6 +39,10 @@ const PayrollManagement = dynamic(() => import('@/components/dashboard/SalaryMan
     loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Payroll...</div>,
     ssr: false
 });
+const FoodLogForm = dynamic(() => import('@/components/dashboard/FoodLogForm').then(mod => mod.FoodLogForm), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Food Log...</div>,
+    ssr: false
+});
 
 import { LeaveManagementCard } from '@/components/dashboard/LeaveManagementCard';
 
@@ -135,6 +139,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                     )}
 
                     <TabsTrigger value="recurring" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Recurring Orders</TabsTrigger>
+                    <TabsTrigger value="foodlog" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Food Log</TabsTrigger>
                     <TabsTrigger value="reports" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Reports</TabsTrigger>
                 </TabsList>
             </div>
@@ -416,6 +421,11 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                         <BulkOrderManager activeOrders={activeOrders} userRole={userRole} />
                     </TabsContent>)
             }
+
+            {/* FOOD LOG TAB */}
+            <TabsContent value="foodlog" className="space-y-6">
+                <FoodLogForm />
+            </TabsContent>
 
             {/* REPORTS TAB - For everyone now (restricted inside) */}
             <TabsContent value="reports" className="space-y-6">
