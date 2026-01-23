@@ -5,14 +5,13 @@ import { getDutyLogs } from '@/actions/logs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-// import { DatePickerWithRange } from '@/components/ui/date-picker-with-range'; 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2, Filter, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'; // For simple date picking if customized one doesn't exist
-import { Calendar } from '@/components/ui/calendar'; // Shadcn calendar
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -126,14 +125,31 @@ export function LogsExplorer({ employees }: LogsExplorerProps) {
                                             </TableCell>
                                         </TableRow>
                                     ) : (
-                                        logs.map((log: any) => (
-                                            <TableRow key={log._id} className="border-white/5 hover:bg-white/5">
-                                                <TableCell className="font-medium">{log.username}</TableCell>
-                                                <TableCell>{new Date(log.startTime).toLocaleString()}</TableCell>
-                                                <TableCell>{new Date(log.endTime).toLocaleString()}</TableCell>
-                                                <TableCell className="font-mono text-accent">{formatDuration(log.durationMs)}</TableCell>
+                                        <>
+                                            {logs.map((log: any) => (
+                                                <TableRow key={log._id} className={cn("border-white/5 hover:bg-white/5", log.isValid === false && "opacity-50 bg-destructive/10")}>
+                                                    <TableCell className="font-medium">
+                                                        {log.username}
+                                                        {log.isValid === false && <span className="ml-2 text-xs text-destructive font-bold">(Invalid)</span>}
+                                                    </TableCell>
+                                                    <TableCell>{new Date(log.startTime).toLocaleString()}</TableCell>
+                                                    <TableCell>{new Date(log.endTime).toLocaleString()}</TableCell>
+                                                    <TableCell className={cn("font-mono", log.isValid === false ? "text-destructive" : "text-accent")}>
+                                                        {formatDuration(log.durationMs)}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                            {/* Total Duration Footer */}
+                                            <TableRow className="bg-accent/10 border-t border-accent/20 font-bold hover:bg-accent/10">
+                                                <TableCell colSpan={3} className="text-right text-accent">Total Duration (Valid Only):</TableCell>
+                                                <TableCell className="font-mono text-accent text-lg">
+                                                    {formatDuration(logs
+                                                        .filter((log: any) => log.isValid !== false) // Filter out invalid
+                                                        .reduce((acc, log) => acc + (log.durationMs || 0), 0)
+                                                    )}
+                                                </TableCell>
                                             </TableRow>
-                                        ))
+                                        </>
                                     )}
                                 </TableBody>
                             </Table>

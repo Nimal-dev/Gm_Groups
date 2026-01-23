@@ -6,6 +6,7 @@ export interface IDutyLog extends Document {
     startTime: number;
     endTime: number;
     durationMs: number;
+    isValid: boolean;
 }
 
 const DutyLogSchema: Schema = new Schema({
@@ -13,7 +14,8 @@ const DutyLogSchema: Schema = new Schema({
     username: { type: String, required: true },
     startTime: { type: Number, required: true },
     endTime: { type: Number, required: true },
-    durationMs: { type: Number, required: true }
+    durationMs: { type: Number, required: true },
+    isValid: { type: Boolean, default: true }
 });
 
 // Indexes for optimization

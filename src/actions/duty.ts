@@ -91,12 +91,16 @@ export async function clockOut() {
         const startTime = existingSession.startTime;
         const durationMs = endTime - startTime;
 
+        const MAX_DUTY_MS = 8 * 60 * 60 * 1000; // 8 hours
+        const isValid = durationMs <= MAX_DUTY_MS;
+
         await DutyLog.create({
             userId: session.user.id,
             username: existingSession.username,
             startTime: startTime,
             endTime: endTime,
-            durationMs: durationMs
+            durationMs: durationMs,
+            isValid: isValid
         });
 
         // --- Notify Discord via Bot API ---
@@ -113,7 +117,8 @@ export async function clockOut() {
                     username: existingSession.username,
                     startTime,
                     endTime,
-                    durationMs
+                    durationMs,
+                    isValid // Send validity
                 }),
                 cache: 'no-store'
             }).catch(err => console.error("Failed to send Duty Log to Discord Bot:", err));
