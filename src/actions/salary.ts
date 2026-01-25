@@ -36,6 +36,11 @@ export async function logPayment(userId: string, amount: number, notes?: string)
         await logActivity('Salary Payment', `Paid $${amount} to ${employee.username} (${userId}). Note: ${notes || 'None'}`);
         revalidatePath('/dashboard');
 
+        // LOG TO DISCORD
+        const { sendReportToDiscord } = await import('@/actions/discord');
+        const discordMessage = `**💰 Salary Payment Logged**\n\n**Employee**: ${employee.username}\n**Amount**: $${amount.toLocaleString()}\n**Note**: ${notes || 'N/A'}\n**Processed By**: ${session.user.name || session.user.email || 'Admin'}`;
+        await sendReportToDiscord(discordMessage, 'Salary Log');
+
         return { success: true };
     } catch (error: any) {
         console.error('Log Payment Error:', error);
