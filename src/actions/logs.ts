@@ -30,23 +30,22 @@ export async function getDutyLogs(userId: string | null, dateRange?: { from: Dat
             }
         }
 
-    }
-        }
 
-// Limit results to prevent massive payloads if no filters
-const limit = (userId || dateRange) ? 500 : 100;
 
-const logs = await DutyLog.find(query)
-    .sort({ startTime: -1 })
-    .limit(limit)
-    .lean();
+        // Limit results to prevent massive payloads if no filters
+        const limit = (userId || dateRange) ? 500 : 100;
 
-return { success: true, logs: JSON.parse(JSON.stringify(logs)) };
+        const logs = await DutyLog.find(query)
+            .sort({ startTime: -1 })
+            .limit(limit)
+            .lean();
+
+        return { success: true, logs: JSON.parse(JSON.stringify(logs)) };
 
     } catch (error: any) {
-    console.error('Fetch Logs Error:', error);
-    return { success: false, error: error.message, logs: [] };
-}
+        console.error('Fetch Logs Error:', error);
+        return { success: false, error: error.message, logs: [] };
+    }
 }
 
 // Function to send Duty Log Report
