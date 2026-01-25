@@ -1,25 +1,27 @@
 'use client';
 
 import { useState } from 'react';
-import { getDutyLogs } from '@/actions/logs';
+import { getDutyLogs, sendDutyLogReport } from '@/actions/logs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader2, Filter, Download } from 'lucide-react';
+import { Loader2, Filter, Download, Send } from 'lucide-react';
 import { format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 interface LogsExplorerProps {
     employees: any[];
 }
 
 export function LogsExplorer({ employees }: LogsExplorerProps) {
+    const { toast } = useToast();
     const [selectedUser, setSelectedUser] = useState<string>('all');
     const [dateRange, setDateRange] = useState<DateRange | undefined>({
         from: new Date(new Date().setDate(new Date().getDate() - 7)), // Last 7 days
@@ -27,6 +29,7 @@ export function LogsExplorer({ employees }: LogsExplorerProps) {
     });
     const [logs, setLogs] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isSending, setIsSending] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
 
     const handleSearch = async () => {
@@ -47,6 +50,29 @@ export function LogsExplorer({ employees }: LogsExplorerProps) {
         } finally {
             setIsLoading(false);
             setHasSearched(true);
+        }
+    };
+
+    const handleSendLog = async () => {
+        if (!dateRange?.from || !dateRange?.to) {
+            toast({ title: 'Invalid Range', description: 'Please select a date range first.', variant: 'destructive' });
+            return;
+        }
+
+        if (!confirm('Send Duty Log Report to Discord?')) return;
+
+        setIsSending(true);
+        try {
+            const res = await sendDutyLogReport({ from: dateRange.from, to: dateRange.to });
+            if (res.success) {
+                toast({ title: 'Report Sent', description: 'Duty log report sent to Discord successfully.', className: 'bg-green-600 border-none' });
+            } else {
+                toast({ title: 'Error', description: res.error, variant: 'destructive' });
+            }
+        } catch (err) {
+            toast({ title: 'Error', description: 'Failed to send report.', variant: 'destructive' });
+        } finally {
+            setIsSending(false);
         }
     };
 
@@ -86,7 +112,7 @@ export function LogsExplorer({ employees }: LogsExplorerProps) {
                         <DatePickerWithRange date={dateRange} setDate={setDateRange} />
                     </div>
 
-                    <div className="flex items-end">
+                    <div className="flex items-end gap-2">
                         <Button
                             onClick={handleSearch}
                             disabled={isLoading}
@@ -95,8 +121,22 @@ export function LogsExplorer({ employees }: LogsExplorerProps) {
                             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Filter className="w-4 h-4 mr-2" />}
                             Fetch Logs
                         </Button>
+
+                        {/* Send Log Button */}
+                        {selectedUser === 'all' && (
+                            <Button
+                                onClick={handleSendLog}
+                                disabled={isSending || !dateRange}
+                                variant="outline"
+                                className="border-accent text-accent hover:bg-accent hover:text-white w-full md:w-auto"
+                            >
+                                {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
+                                Send Report
+                            </Button>
+                        )}
                     </div>
                 </div>
+
 
                 {/* Results Table */}
                 <div className="rounded-md border border-white/10 flex-1 overflow-hidden relative">
