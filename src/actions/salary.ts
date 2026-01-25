@@ -57,8 +57,30 @@ export async function getSalaryHistory(userId?: string) {
             query = { userId };
         }
 
-        const history = await SalaryLog.find(query).sort({ date: -1 }).limit(50);
-        return { success: true, data: JSON.parse(JSON.stringify(history)) };
+        const history = await SalaryLog.find(query).sort({ date: -1 }).limit(50).lean();
+
+        // Enhance with usernames/nicknames
+        const userIds = new Set<string>();
+        history.forEach((log: any) => {
+            userIds.add(log.userId);
+            if (log.processedBy && !log.processedBy.includes('@')) { // Assume IDs don't have @
+                userIds.add(log.processedBy);
+            }
+        });
+
+        const employees = await Employee.find({ userId: { $in: Array.from(userIds) } }).lean();
+        const empMap = new Map();
+        employees.forEach((e: any) => {
+            empMap.set(e.userId, e.nickname || e.username);
+        });
+
+        const enhancedHistory = history.map((log: any) => ({
+            ...log,
+            username: empMap.get(log.userId) || log.userId,
+            processorName: empMap.get(log.processedBy) || log.processedBy
+        }));
+
+        return { success: true, data: JSON.parse(JSON.stringify(enhancedHistory)) };
     } catch (error: any) {
         console.error('Get Salary History Error:', error);
         return { success: false, error: 'Failed to fetch history' };

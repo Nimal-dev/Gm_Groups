@@ -396,11 +396,13 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                                                     </div>
                                                     <div>
                                                         <p className="font-mono font-medium">${log.amount.toLocaleString('en-US')}</p>
-                                                        <p className="text-xs text-muted-foreground">To ID: {log.userId}</p>
+                                                        <p className="text-sm font-semibold">{log.username || log.userId}</p>
+                                                        <p className="text-xs text-muted-foreground">ID: {log.userId}</p>
                                                     </div>
                                                 </div>
                                                 <div className="mt-2 md:mt-0 text-right">
-                                                    <p className="text-sm text-muted-foreground">Processed by {log.processedBy}</p>
+                                                    {log.notes && <p className="text-xs italic text-accent mb-1">Note: {log.notes}</p>}
+                                                    <p className="text-sm text-muted-foreground">Processed by {log.processorName || log.processedBy}</p>
                                                     <p className="text-xs opacity-50">{new Date(log.date).toLocaleString()}</p>
                                                 </div>
                                             </div>
