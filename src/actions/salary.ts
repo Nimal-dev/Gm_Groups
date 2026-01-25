@@ -24,11 +24,14 @@ export async function logPayment(userId: string, amount: number, notes?: string)
         if (!employee) throw new Error("Employee not found");
 
         const processorId = session.user.id || session.user.email || 'System';
+        const processorName = session.user.name || session.user.email || 'Admin'; // Capture name
 
         await SalaryLog.create({
             userId,
+            username: employee.nickname || employee.username, // Save recipient name
             amount,
             processedBy: processorId,
+            processorName, // Save processor name
             notes,
             date: new Date()
         });
@@ -76,8 +79,9 @@ export async function getSalaryHistory(userId?: string) {
 
         const enhancedHistory = history.map((log: any) => ({
             ...log,
-            username: empMap.get(log.userId) || log.userId,
-            processorName: empMap.get(log.processedBy) || log.processedBy
+            // Prefer stored snapshot, then lookup, then ID
+            username: log.username || empMap.get(log.userId) || log.userId,
+            processorName: log.processorName || empMap.get(log.processedBy) || log.processedBy
         }));
 
         return { success: true, data: JSON.parse(JSON.stringify(enhancedHistory)) };
