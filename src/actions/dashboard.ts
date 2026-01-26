@@ -6,6 +6,7 @@ import BulkOrder from '@/models/BulkOrder';
 import Employee from '@/models/Employee';
 import SalaryLog from '@/models/SalaryLog';
 import BankTransaction from '@/models/BankTransaction';
+import BankBalanceLog from '@/models/BankBalanceLog';
 import RecurringOrder from '@/models/RecurringOrder';
 import { unstable_cache } from 'next/cache';
 
@@ -144,9 +145,33 @@ const fetchDashboardData = unstable_cache(
                 }
             ]);
 
-            // Fetch Current Balance (Latest Transaction)
-            const latestTransaction = await BankTransaction.findOne().sort({ date: -1, _id: -1 }).select('newBalance').lean();
-            const currentBalance = latestTransaction?.newBalance || 0;
+            // Fetch Current Balance (Since data model change: Query dedicated BankBalanceLog first)
+            // Hardcoded Company Account Number for GM Burgershot
+            const COMPANY_ACCOUNT_NUMBER = '1509517987';
+
+            // 1. Try Dedicated Balance Log (New System)
+            const balanceLog = await BankBalanceLog.findOne({ accountNumber: COMPANY_ACCOUNT_NUMBER })
+                .sort({ date: -1, _id: -1 })
+                .lean();
+
+            let currentBalance = 0;
+
+            if (balanceLog) {
+                currentBalance = balanceLog.newBalance;
+            } else {
+                // 2. Fallback to Valid Bank Transactions (Legacy/Backup)
+                const latestTransaction = await BankTransaction.findOne({
+                    accountNumber: COMPANY_ACCOUNT_NUMBER,
+                    newBalance: { $gt: 0 }
+                })
+                    .sort({ date: -1, _id: -1 })
+                    .select('newBalance')
+                    .lean();
+
+                if (latestTransaction) {
+                    currentBalance = latestTransaction.newBalance;
+                }
+            }
 
             const stats = bankData[0] || { totalIncome: 0, totalExpense: 0 };
             const totalIncome = stats.totalIncome;

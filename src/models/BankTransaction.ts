@@ -4,11 +4,12 @@ export interface IBankTransaction extends Document {
     transactionId: string;
     accountName: string;
     accountNumber: string;
-    transactionType: 'TRANSFER' | 'DEPOSIT' | 'WITHDRAW' | 'Unknown';
+    transactionType: 'TRANSFER' | 'DEPOSIT' | 'WITHDRAW' | 'BALANCE_UPDATE' | 'Unknown';
     amount: number;
     memo?: string;
     date: Date;
     transferredTo?: string; // For transfers
+    transferredFrom?: string; // Added
     newBalance?: number; // Added
     createdAt: Date;
 }
@@ -23,6 +24,7 @@ const BankTransactionSchema = new Schema<IBankTransaction>({
     memo: { type: String },
     date: { type: Date, required: true },
     transferredTo: { type: String },
+    transferredFrom: { type: String },
     newBalance: { type: Number },
     createdAt: { type: Date, default: Date.now }
 });

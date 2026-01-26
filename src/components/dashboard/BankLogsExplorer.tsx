@@ -241,6 +241,12 @@ export function BankLogsExplorer() {
                                                                 To: {log.transferredTo || log.memo.split(/transfer to/i)[1]?.trim() || 'Unknown'}
                                                             </div>
                                                         )}
+                                                        {log.transferredFrom && (
+                                                            <div className="text-xs text-green-300 mt-1 flex items-center gap-1">
+                                                                <ArrowDownLeft className="w-3 h-3" />
+                                                                From: {log.transferredFrom}
+                                                            </div>
+                                                        )}
                                                     </TableCell>
                                                 </TableRow>
                                             ))
