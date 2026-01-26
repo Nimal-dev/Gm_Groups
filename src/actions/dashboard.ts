@@ -144,6 +144,10 @@ const fetchDashboardData = unstable_cache(
                 }
             ]);
 
+            // Fetch Current Balance (Latest Transaction)
+            const latestTransaction = await BankTransaction.findOne().sort({ date: -1, _id: -1 }).select('newBalance').lean();
+            const currentBalance = latestTransaction?.newBalance || 0;
+
             const stats = bankData[0] || { totalIncome: 0, totalExpense: 0 };
             const totalIncome = stats.totalIncome;
             const totalExpense = stats.totalExpense;
@@ -155,7 +159,7 @@ const fetchDashboardData = unstable_cache(
                 allEmployees: serializedEmployees,
                 recentSalaries: serializedSalaries,
                 activeLeaves: serializedLeaves,
-                bankStats: { totalIncome, totalExpense },
+                bankStats: { totalIncome, totalExpense, currentBalance }, // Added currentBalance
                 timestamp: new Date().toISOString(),
                 error: null
             };
@@ -180,7 +184,7 @@ export async function getDashboardData() {
             allEmployees: [],
             recentSalaries: [],
             activeLeaves: [],
-            bankStats: { totalIncome: 0, totalExpense: 0 },
+            bankStats: { totalIncome: 0, totalExpense: 0, currentBalance: 0 },
             timestamp: new Date().toISOString(),
             error: error.message
         };

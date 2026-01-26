@@ -9,6 +9,7 @@ export interface IBankTransaction extends Document {
     memo?: string;
     date: Date;
     transferredTo?: string; // For transfers
+    newBalance?: number; // Added
     createdAt: Date;
 }
 
@@ -22,6 +23,7 @@ const BankTransactionSchema = new Schema<IBankTransaction>({
     memo: { type: String },
     date: { type: Date, required: true },
     transferredTo: { type: String },
+    newBalance: { type: Number },
     createdAt: { type: Date, default: Date.now }
 });
 

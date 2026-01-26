@@ -30,6 +30,9 @@ async function connectToDatabase() {
         const opts = {
             bufferCommands: false,
             dbName: 'gmbot', // Explicitly connecting to the bot's DB
+            maxPoolSize: 10, // Optimization for Free Tier
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
         };
 
         cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {

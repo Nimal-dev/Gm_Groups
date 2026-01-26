@@ -70,11 +70,18 @@ export default async function DashboardPage() {
                 {role === 'admin' && (
                     <>
                         <StatsCard
+                            title="Company Balance"
+                            value={`$${(data.bankStats?.currentBalance || 0).toLocaleString('en-US')}`}
+                            subtitle="Live Available Funds"
+                            icon={<DollarSign className="w-5 h-5 text-yellow-400" />}
+                            glow
+                        />
+
+                        <StatsCard
                             title="Current Month Income"
                             value={`$${(data.bankStats?.totalIncome || 0).toLocaleString('en-US')}`}
                             subtitle="Total Deposits"
-                            icon={<DollarSign className="w-5 h-3 text-green-400" />}
-                            glow
+                            icon={<Activity className="w-5 h-5 text-green-400" />}
                         />
 
                         <StatsCard

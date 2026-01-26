@@ -2,21 +2,29 @@
 
 import { logActivity } from '@/actions/log';
 import { auth } from '@/auth';
+import connectToDatabase from '@/lib/db';
+import CateringRequest from '@/models/CateringRequest';
 
 export async function getCateringRequests() {
-    const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
     try {
-        const response = await fetch(`${BOT_URL}/api/catering-requests`, {
-            method: 'GET',
-            cache: 'no-store'
-        });
+        await connectToDatabase();
+        // Fetch Pending requests, sorted by newest first
+        // Use .lean() for performance since we just need JSON
+        const requests = await CateringRequest.find({ status: 'Pending' })
+            .sort({ createdAt: -1 })
+            .lean();
 
-        if (!response.ok) throw new Error('Failed to fetch requests');
-        const data = await response.json();
-        return { success: true, requests: data.requests || [] };
+        // Serialize _id and dates
+        const serializedRequests = requests.map((req: any) => ({
+            ...req,
+            _id: req._id.toString(),
+            createdAt: req.createdAt ? new Date(req.createdAt).toISOString() : new Date().toISOString()
+        }));
+
+        return { success: true, requests: serializedRequests };
     } catch (error: any) {
-        console.error('Fetch Requests Error:', error);
-        return { success: false, error: 'Failed to connect to Bot API', requests: [] };
+        console.error('Fetch Requests Error (DB):', error);
+        return { success: false, error: 'Failed to fetch requests from DB', requests: [] };
     }
 }
 
