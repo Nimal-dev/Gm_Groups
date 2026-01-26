@@ -211,7 +211,7 @@ export function BankLogsExplorer() {
                                             (data?.logs || []).map((log: any) => (
                                                 <TableRow key={log.transactionId} className="border-white/5 hover:bg-white/5 group h-14">
                                                     <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
-                                                        <ClientTime timestamp={log.date} />
+                                                        <ClientTime timestamp={log.createdAt || log.date} />
                                                     </TableCell>
                                                     <TableCell>
                                                         <Badge variant="outline" className={cn("text-[10px]", getTypeColor(log.transactionType))}>
