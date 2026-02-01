@@ -420,7 +420,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
             {
                 canManageBulk && (
                     <TabsContent value="bulk" className="space-y-6">
-                        <BulkOrderManager activeOrders={activeOrders} userRole={userRole} />
+                        <BulkOrderManager activeOrders={activeOrders} recurringOrders={recurringOrders} userRole={userRole} />
                     </TabsContent>)
             }
 

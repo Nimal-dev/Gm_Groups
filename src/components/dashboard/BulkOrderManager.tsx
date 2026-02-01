@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,19 +13,37 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
-import { CalendarIcon, Package, User, DollarSign, RefreshCw, Send, X, Check, Truck, Loader2, Info, ShieldCheck } from 'lucide-react';
+import { CalendarIcon, Package, User, DollarSign, RefreshCw, Send, X, Check, Truck, Loader2, Info, ShieldCheck, LayoutGrid, List } from 'lucide-react';
+// Import Kanban Board Component
+import { KanbanBoard } from '@/components/dashboard/KanbanBoard';
 import { useToast } from '@/hooks/use-toast';
 import { createCitizenOrder, createRecurringOrder, updateOrderStatus, endRecurringOrder } from '@/actions/bulk-orders';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { CateringRequestsManager } from '@/components/dashboard/CateringRequestsManager';
 import { getCateringRequests } from '@/actions/catering';
 
-export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole }: { activeOrders: any[], recurringOrders?: any[], userRole: string }) {
+export interface Order {
+    orderId: string;
+    messageId: string;
+    channelId: string;
+    status: string;
+    customer: string;
+    amount: string | number;
+    eventDate?: string;
+    deliveryDate?: string;
+    collectionDate?: string;
+    details?: string;
+    createdAt?: string;
+    // Add known fields to avoid any
+    [key: string]: any;
+}
+
+export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole }: { activeOrders: Order[], recurringOrders?: any[], userRole: string }) {
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
 
     // Manage State
-    const [selectedOrder, setSelectedOrder] = useState<any>(null);
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [cancelReason, setCancelReason] = useState('');
     const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -37,6 +55,7 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
     const [recurringForm, setRecurringForm] = useState({ customer: '', clientRep: '', items: '', amount: '', startDate: '', intervalDays: '7', deliveryDetails: '', securityDeposit: '' });
 
     const [pendingCount, setPendingCount] = useState(0);
+    const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
 
     useEffect(() => {
         getCateringRequests().then(res => {
@@ -46,7 +65,7 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
 
     // --- HANDLERS ---
 
-    const handleCitizenSubmit = async (e: React.FormEvent, overrideAmount?: string) => {
+    const handleCitizenSubmit = useCallback(async (e: React.FormEvent, overrideAmount?: string) => {
         setLoading(true);
         const res = await createCitizenOrder({
             ...citizenForm,
@@ -59,9 +78,9 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
         } else {
             toast({ variant: 'destructive', title: 'Error', description: res.error });
         }
-    };
+    }, [citizenForm, toast]);
 
-    const handleRecurringSubmit = async (e: React.FormEvent) => {
+    const handleRecurringSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         const res = await createRecurringOrder({
@@ -76,10 +95,10 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
         } else {
             toast({ variant: 'destructive', title: 'Error', description: res.error });
         }
-    };
+    }, [recurringForm, toast]);
 
 
-    const handleEndContract = async (contractId: string) => {
+    const handleEndContract = useCallback(async (contractId: string) => {
         setLoading(true);
         const res = await endRecurringOrder(contractId);
         setLoading(false);
@@ -88,9 +107,9 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
         } else {
             toast({ variant: 'destructive', title: 'Error', description: res.error });
         }
-    };
+    }, [toast]);
 
-    const handleStatusUpdate = async (order: any, newStatus: string, reason?: string) => {
+    const handleStatusUpdate = useCallback(async (order: Order, newStatus: string, reason?: string) => {
         setLoading(true);
         const res = await updateOrderStatus(order.orderId, order.messageId, order.channelId, newStatus, reason);
         setLoading(false);
@@ -100,18 +119,20 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
         } else {
             toast({ variant: 'destructive', title: 'Failed', description: res.error });
         }
-    };
+    }, [toast]);
 
-    const openCancelDialog = (order: any) => {
+    const openCancelDialog = useCallback((order: Order) => {
         setSelectedOrder(order);
         setCancelReason('');
         setIsCancelDialogOpen(true);
-    };
+    }, []);
 
-    const openDetails = (order: any) => {
+    const openDetails = useCallback((order: Order) => {
         setSelectedOrder(order);
         setIsDetailsOpen(true);
-    };
+    }, []);
+
+    const filteredActiveOrders = useMemo(() => activeOrders.filter(o => o.status !== 'Cancelled'), [activeOrders]);
 
     return (
         <Card className="glass-card">
@@ -147,81 +168,110 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
 
                     {/* MANAGE TAB */}
                     <TabsContent value="manage" className="space-y-4">
-                        <Tabs defaultValue="pending" className="w-full">
-                            <TabsList className="bg-black/40 w-full justify-start border-b border-white/5 rounded-none p-0 h-10">
-                                <TabsTrigger value="pending" className="rounded-none border-b-2 border-transparent data-[state=active]:border-orange-500 data-[state=active]:bg-transparent">Pending</TabsTrigger>
-                                <TabsTrigger value="progress" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent">On Progress</TabsTrigger>
-                                <TabsTrigger value="completed" className="rounded-none border-b-2 border-transparent data-[state=active]:border-green-500 data-[state=active]:bg-transparent">Completed</TabsTrigger>
-                                <TabsTrigger value="cancelled" className="rounded-none border-b-2 border-transparent data-[state=active]:border-red-500 data-[state=active]:bg-transparent">Cancelled</TabsTrigger>
-                            </TabsList>
+                        <div className="flex justify-end mb-2">
+                            <div className="flex items-center bg-black/40 rounded-lg p-1 border border-white/5">
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => setViewMode('list')}
+                                    className={`h-7 px-3 text-xs ${viewMode === 'list' ? 'bg-white/10 text-white' : 'text-muted-foreground'}`}
+                                >
+                                    <List className="w-3 h-3 mr-2" /> List
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => setViewMode('kanban')}
+                                    className={`h-7 px-3 text-xs ${viewMode === 'kanban' ? 'bg-white/10 text-white' : 'text-muted-foreground'}`}
+                                >
+                                    <LayoutGrid className="w-3 h-3 mr-2" /> Board
+                                </Button>
+                            </div>
+                        </div>
 
-                            {['pending', 'progress', 'completed', 'cancelled'].map(statusTab => (
-                                <TabsContent key={statusTab} value={statusTab} className="pt-4">
-                                    <ScrollArea className="h-[600px] pr-4">
-                                        <div className="space-y-3">
-                                            {activeOrders.filter(o =>
-                                                statusTab === 'pending' ? o.status === 'Pending' :
-                                                    statusTab === 'progress' ? (o.status === 'In Progress' || o.status === 'Ready') :
-                                                        statusTab === 'completed' ? o.status === 'Completed' :
-                                                            statusTab === 'cancelled' ? o.status === 'Cancelled' : false
-                                            ).map((order) => (
-                                                <div key={order.orderId} className="p-4 rounded-lg bg-white/5 border border-white/5 hover:border-white/10 transition-all">
-                                                    <div className="flex flex-col md:flex-row justify-between gap-4">
-                                                        <div className="flex-1 space-y-2">
-                                                            <div className="flex items-center gap-2">
-                                                                <Badge variant="outline" className={`${getStatusColor(order.status)}`}>{order.status}</Badge>
-                                                                <span className="font-mono text-sm text-muted-foreground">#{order.orderId}</span>
-                                                                <span className="font-bold">{order.customer}</span>
+                        {viewMode === 'kanban' ? (
+                            <KanbanBoard
+                                orders={filteredActiveOrders}
+                                onStatusUpdate={handleStatusUpdate}
+                                onViewDetails={openDetails}
+                            />
+                        ) : (
+                            <Tabs defaultValue="pending" className="w-full">
+                                <TabsList className="bg-black/40 w-full justify-start border-b border-white/5 rounded-none p-0 h-10">
+                                    <TabsTrigger value="pending" className="rounded-none border-b-2 border-transparent data-[state=active]:border-orange-500 data-[state=active]:bg-transparent">Pending</TabsTrigger>
+                                    <TabsTrigger value="progress" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent">On Progress</TabsTrigger>
+                                    <TabsTrigger value="completed" className="rounded-none border-b-2 border-transparent data-[state=active]:border-green-500 data-[state=active]:bg-transparent">Completed</TabsTrigger>
+                                    <TabsTrigger value="cancelled" className="rounded-none border-b-2 border-transparent data-[state=active]:border-red-500 data-[state=active]:bg-transparent">Cancelled</TabsTrigger>
+                                </TabsList>
+
+                                {['pending', 'progress', 'completed', 'cancelled'].map(statusTab => (
+                                    <TabsContent key={statusTab} value={statusTab} className="pt-4">
+                                        <ScrollArea className="h-[600px] pr-4">
+                                            <div className="space-y-3">
+                                                {activeOrders.filter(o =>
+                                                    statusTab === 'pending' ? o.status === 'Pending' :
+                                                        statusTab === 'progress' ? (o.status === 'In Progress' || o.status === 'Ready') :
+                                                            statusTab === 'completed' ? o.status === 'Completed' :
+                                                                statusTab === 'cancelled' ? o.status === 'Cancelled' : false
+                                                ).map((order) => (
+                                                    <div key={order.orderId} className="p-4 rounded-lg bg-white/5 border border-white/5 hover:border-white/10 transition-all">
+                                                        <div className="flex flex-col md:flex-row justify-between gap-4">
+                                                            <div className="flex-1 space-y-2">
+                                                                <div className="flex items-center gap-2">
+                                                                    <Badge variant="outline" className={`${getStatusColor(order.status)}`}>{order.status}</Badge>
+                                                                    <span className="font-mono text-sm text-muted-foreground">#{order.orderId}</span>
+                                                                    <span className="font-bold">{order.customer}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                                                    <span className="flex items-center gap-1"><CalendarIcon className="w-3 h-3" /> Event: {order.eventDate ? new Date(order.eventDate).toLocaleDateString() : (order.deliveryDate || 'N/A')}</span>
+                                                                    <span className="flex items-center gap-1"><DollarSign className="w-3 h-3" /> {order.amount}</span>
+                                                                    {order.collectionDate && <span className="flex items-center gap-1 text-orange-400">Collect: {order.collectionDate}</span>}
+                                                                </div>
                                                             </div>
-                                                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                                                <span className="flex items-center gap-1"><CalendarIcon className="w-3 h-3" /> Event: {order.eventDate ? new Date(order.eventDate).toLocaleDateString() : (order.deliveryDate || 'N/A')}</span>
-                                                                <span className="flex items-center gap-1"><DollarSign className="w-3 h-3" /> {order.amount}</span>
-                                                                {order.collectionDate && <span className="flex items-center gap-1 text-orange-400">Collect: {order.collectionDate}</span>}
+
+                                                            <div className="flex items-center gap-2 flex-wrap">
+                                                                <Button size="sm" variant="ghost" onClick={() => openDetails(order)}>
+                                                                    <Info className="w-4 h-4 mr-1" /> Details
+                                                                </Button>
+
+                                                                {order.status !== 'Completed' && order.status !== 'Cancelled' && (
+                                                                    <>
+                                                                        {order.status === 'Pending' && (
+                                                                            <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => handleStatusUpdate(order, 'In Progress')} disabled={loading}>
+                                                                                Start
+                                                                            </Button>
+                                                                        )}
+                                                                        {order.status === 'In Progress' && (
+                                                                            <Button size="sm" className="bg-orange-600 hover:bg-orange-700" onClick={() => handleStatusUpdate(order, 'Ready')} disabled={loading}>
+                                                                                Ready
+                                                                            </Button>
+                                                                        )}
+                                                                        {order.status === 'Ready' && (
+                                                                            <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => handleStatusUpdate(order, 'Completed')} disabled={loading}>
+                                                                                Complete
+                                                                            </Button>
+                                                                        )}
+                                                                        <Button size="sm" variant="destructive" onClick={() => openCancelDialog(order)} disabled={loading}>
+                                                                            <X className="w-4 h-4" />
+                                                                        </Button>
+                                                                    </>
+                                                                )}
                                                             </div>
-                                                        </div>
-
-                                                        <div className="flex items-center gap-2 flex-wrap">
-                                                            <Button size="sm" variant="ghost" onClick={() => openDetails(order)}>
-                                                                <Info className="w-4 h-4 mr-1" /> Details
-                                                            </Button>
-
-                                                            {order.status !== 'Completed' && order.status !== 'Cancelled' && (
-                                                                <>
-                                                                    {order.status === 'Pending' && (
-                                                                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => handleStatusUpdate(order, 'In Progress')} disabled={loading}>
-                                                                            Start
-                                                                        </Button>
-                                                                    )}
-                                                                    {order.status === 'In Progress' && (
-                                                                        <Button size="sm" className="bg-orange-600 hover:bg-orange-700" onClick={() => handleStatusUpdate(order, 'Ready')} disabled={loading}>
-                                                                            Ready
-                                                                        </Button>
-                                                                    )}
-                                                                    {order.status === 'Ready' && (
-                                                                        <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => handleStatusUpdate(order, 'Completed')} disabled={loading}>
-                                                                            Complete
-                                                                        </Button>
-                                                                    )}
-                                                                    <Button size="sm" variant="destructive" onClick={() => openCancelDialog(order)} disabled={loading}>
-                                                                        <X className="w-4 h-4" />
-                                                                    </Button>
-                                                                </>
-                                                            )}
                                                         </div>
                                                     </div>
-                                                </div>
-                                            ))}
-                                            {activeOrders.filter(o =>
-                                                statusTab === 'pending' ? o.status === 'Pending' :
-                                                    statusTab === 'progress' ? (o.status === 'In Progress' || o.status === 'Ready') :
-                                                        statusTab === 'completed' ? o.status === 'Completed' :
-                                                            statusTab === 'cancelled' ? o.status === 'Cancelled' : false
-                                            ).length === 0 && <p className="text-center py-10 text-muted-foreground">No orders in this category.</p>}
-                                        </div>
-                                    </ScrollArea>
-                                </TabsContent>
-                            ))}
-                        </Tabs>
+                                                ))}
+                                                {activeOrders.filter(o =>
+                                                    statusTab === 'pending' ? o.status === 'Pending' :
+                                                        statusTab === 'progress' ? (o.status === 'In Progress' || o.status === 'Ready') :
+                                                            statusTab === 'completed' ? o.status === 'Completed' :
+                                                                statusTab === 'cancelled' ? o.status === 'Cancelled' : false
+                                                ).length === 0 && <p className="text-center py-10 text-muted-foreground">No orders in this category.</p>}
+                                            </div>
+                                        </ScrollArea>
+                                    </TabsContent>
+                                ))}
+                            </Tabs>
+                        )}
                     </TabsContent>
 
                     {/* ACTIVE CONTRACTS TAB */}
