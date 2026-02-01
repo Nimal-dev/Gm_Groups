@@ -237,7 +237,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
     };
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[45fr_55fr] gap-6">
             <Card className="glass-card h-fit">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -453,7 +453,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                     </div>
                 </CardHeader>
                 <CardContent className="flex-1 p-0">
-                    <Textarea value={generatedText} readOnly className="w-full h-full min-h-[500px] resize-none border-0 bg-black/30 font-mono text-sm p-4" placeholder="Generated content..." />
+                    <Textarea value={generatedText} readOnly className="w-full h-full min-h-[500px] resize-none border-0 bg-black/30 font-mono text-base text-white/90 p-4" placeholder="Generated content..." />
                 </CardContent>
             </Card>
         </div >
@@ -499,7 +499,7 @@ function formatInvoice(items: { description: string; quantity: number; price: nu
         const padding = Math.max(0, Math.floor((width - str.length) / 2));
         return ' '.repeat(padding) + str;
     };
-    const generatedDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const generatedDate = new Date().toLocaleDateString('en-GB');
     const invoiceId = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
 
     let subtotal = 0;
@@ -558,9 +558,9 @@ function formatReport(type: string, data: any, to: string, from: string, members
         return ' '.repeat(padding) + str;
     };
 
-    const generatedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    const periodStart = new Date(data.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const periodEnd = new Date(data.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const generatedDate = new Date().toLocaleDateString('en-GB');
+    const periodStart = new Date(data.startDate).toLocaleDateString('en-GB');
+    const periodEnd = new Date(data.endDate).toLocaleDateString('en-GB');
 
     return `
 ${center('GM BURGERSHOT')}
