@@ -8,19 +8,49 @@ import { LogoutButton } from '@/components/dashboard/LogoutButton';
 
 export const dynamic = 'force-dynamic'; // Ensure real-time data
 
+// ... imports
+import connectToDatabase from '@/lib/db';
+// Fetch Full User Data (XP, Level, Achievements)
 import { auth } from '@/auth';
 
 export default async function DashboardPage() {
     const session = await auth();
-    const role = session?.user?.role || 'staff'; // Default to staff if role is missing but authorized
+    const role = session?.user?.role || 'staff';
 
-    // Safety check - although middleware handles this, good to have redundancy
     if (!session?.user) return null;
 
+    await connectToDatabase();
+
+    // We use the Employee model now, as it handles staff accounts
+    // session.user.id SHOULD correspond to Employee.userId (Discord ID)
+    let currentUser = await (await import('@/models/Employee')).default.findOne({
+        userId: session.user.id
+    }).lean();
+
+    // Fallback: If no ID match, try username (legacy/safety)
+    if (!currentUser) {
+        currentUser = await (await import('@/models/Employee')).default.findOne({
+            username: { $regex: new RegExp(`^${session.user.name}$`, 'i') }
+        }).lean();
+    }
+
+    // Fallback for debugging/if user still not found in DB
+    if (!currentUser) {
+        console.log(`User ${session.user.name} (${session.user.id}) not found in Employee DB, using fallback.`);
+        currentUser = {
+            username: session.user.name,
+            xp: 0,
+            level: 1,
+            achievements: [],
+            role: role
+        } as any;
+    }
+
     const data = await getDashboardData();
-    const { activeStaff, activeOrders, allEmployees, recentSalaries, recurringOrders, error } = data; // Added recurringOrders
+    const { activeStaff, activeOrders, allEmployees, recentSalaries, recurringOrders, error } = data;
 
     if (error) {
+        // ... existing error handling
         return (
             <div className="flex h-screen items-center justify-center p-4">
                 <Card className="glass-card border-destructive/50 w-full max-w-md">
@@ -45,8 +75,8 @@ export default async function DashboardPage() {
 
     return (
         <div className="min-h-screen p-4 md:p-8 space-y-8 pb-20">
-
             {/* Header */}
+            {/* ... existing header ... */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60 mb-2">
@@ -65,6 +95,7 @@ export default async function DashboardPage() {
             </div>
 
             {/* Top Stats Row */}
+            {/* ... existing stats row ... */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
 
                 {role === 'admin' && (
@@ -131,10 +162,12 @@ export default async function DashboardPage() {
                 recentSalaries={recentSalaries}
                 activeLeaves={activeLeaves || []}
                 userRole={role}
+                currentUser={JSON.parse(JSON.stringify(currentUser))}
             />
         </div>
     );
 }
+// ... helper components
 
 // --- Helper Components ---
 

@@ -43,8 +43,14 @@ const FoodLogForm = dynamic(() => import('@/components/dashboard/FoodLogForm').t
     loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Food Log...</div>,
     ssr: false
 });
+const AdminEmployeeTable = dynamic(() => import('@/components/dashboard/AdminEmployeeTable').then(mod => mod.AdminEmployeeTable), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Leaderboard...</div>,
+    ssr: false
+});
 
 import { LeaveManagementCard } from '@/components/dashboard/LeaveManagementCard';
+
+import { GamificationCard } from '@/components/dashboard/GamificationCard';
 
 interface DashboardTabsProps {
     activeStaff: any[];
@@ -54,9 +60,10 @@ interface DashboardTabsProps {
     recentSalaries: any[];
     activeLeaves: any[];
     userRole?: string;
+    currentUser?: any; // Added
 }
 
-export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allEmployees, recentSalaries, activeLeaves, userRole = 'staff' }: DashboardTabsProps) {
+export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allEmployees, recentSalaries, activeLeaves, userRole = 'staff', currentUser }: DashboardTabsProps) {
     const { toast } = useToast();
     const router = useRouter();
     const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
@@ -131,6 +138,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                     {isAdmin && (
                         <>
                             <TabsTrigger value="staff" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Staff Management</TabsTrigger>
+                            <TabsTrigger value="employees" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">All Employees (XP)</TabsTrigger>
                             <TabsTrigger value="logs" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Duty Logs</TabsTrigger>
                             <TabsTrigger value="bank" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Bank Logs</TabsTrigger>
                             <TabsTrigger value="payroll" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Payroll</TabsTrigger>
@@ -255,6 +263,9 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
 
             {/* OVERVIEW TAB */}
             <TabsContent value="overview" className="space-y-6">
+                {/* Gamification Card */}
+                {currentUser && <GamificationCard user={currentUser} />}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
                     {/* Active Duty List */}
@@ -280,6 +291,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                     <div className="md:col-span-1 lg:col-span-1">
                         <LeaveManagementCard leaves={activeLeaves} employees={allEmployees} userRole={userRole} />
                     </div>
+                    {/* ... Rest of overview ... */}
 
                     {/* Active Orders Quick View (Paginator) */}
                     <Card className="glass-card md:col-span-2 lg:col-span-2 h-[400px] flex flex-col">
@@ -363,6 +375,15 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                 isAdmin && (
                     <TabsContent value="staff" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
                         <EmployeeManagement employees={allEmployees} />
+                    </TabsContent>
+                )
+            }
+
+            {/* EMPLOYEES LEADERBOARD TAB - Admin Only */}
+            {
+                isAdmin && (
+                    <TabsContent value="employees" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
+                        <AdminEmployeeTable />
                     </TabsContent>
                 )
             }

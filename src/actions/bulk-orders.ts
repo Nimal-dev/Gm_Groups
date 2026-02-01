@@ -18,9 +18,9 @@ export async function createCitizenOrder(data: { to: string, amount: string, eve
             repName: user.name || 'Web User'
         };
 
-        const res = await fetch(`${BOT_URL}/api/bulk-order/citizen`, {
+        const { fetchBot } = await import('@/lib/bot-api');
+        const res = await fetchBot('/api/bulk-order/citizen', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
             cache: 'no-store'
         });
@@ -50,9 +50,9 @@ export async function createRecurringOrder(data: { customer: string, clientRep?:
             creatorName: user.name || 'Web User'
         };
 
-        const res = await fetch(`${BOT_URL}/api/bulk-order/recurring`, {
+        const { fetchBot } = await import('@/lib/bot-api');
+        const res = await fetchBot('/api/bulk-order/recurring', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
             cache: 'no-store'
         });
@@ -85,9 +85,9 @@ export async function updateOrderStatus(orderId: string | number, messageId: str
             updatedBy: user.name || 'Web User'
         };
 
-        const res = await fetch(`${BOT_URL}/api/bulk-order/status`, {
+        const { fetchBot } = await import('@/lib/bot-api');
+        const res = await fetchBot('/api/bulk-order/status', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
             cache: 'no-store'
         });
@@ -116,9 +116,9 @@ export async function endRecurringOrder(contractId: string) {
             endedBy: user.name || 'Web User'
         };
 
-        const res = await fetch(`${BOT_URL}/api/bulk-order/recurring/end`, {
+        const { fetchBot } = await import('@/lib/bot-api');
+        const res = await fetchBot('/api/bulk-order/recurring/end', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
             cache: 'no-store'
         });

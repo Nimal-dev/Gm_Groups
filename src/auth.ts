@@ -76,10 +76,9 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     user.name = employee.username; // Use DB Employee Name instead of Discord Username
 
                     // Log the login activity
-                    const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
-                    fetch(`${BOT_URL}/api/website-log`, {
+                    const { fetchBot } = await import('@/lib/bot-api');
+                    fetchBot('/api/website-log', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             action: 'Login',
                             user: employee.username,

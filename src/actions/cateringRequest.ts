@@ -10,14 +10,11 @@ export async function submitCateringRequest(data: {
     items: string;
     club: string;
 }) {
-    const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
+    const { fetchBot } = await import('@/lib/bot-api');
 
     try {
-        const response = await fetch(`${BOT_URL}/api/catering-request`, {
+        const response = await fetchBot('/api/catering-request', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
             body: JSON.stringify(data),
             cache: 'no-store'
         });
@@ -37,7 +34,7 @@ export async function submitCateringRequest(data: {
 }
 
 export async function getOrgMembers(orgName: string) {
-    const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
+    const { fetchBot } = await import('@/lib/bot-api');
     let roleParam = '';
 
     if (orgName === 'Scorp Events') roleParam = 'SCORP';
@@ -45,9 +42,8 @@ export async function getOrgMembers(orgName: string) {
     else return { members: [] };
 
     try {
-        const response = await fetch(`${BOT_URL}/api/members?role=${roleParam}`, {
+        const response = await fetchBot(`/api/members?role=${roleParam}`, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
             next: { revalidate: 300 } // Cache for 5 minutes
         });
 

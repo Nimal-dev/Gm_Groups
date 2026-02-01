@@ -10,9 +10,9 @@ export async function logActivity(action: string, details: string) {
         const user = session?.user?.name || 'Anonymous';
         const role = session?.user?.role || 'Guest';
 
-        const response = await fetch(`${BOT_URL}/api/website-log`, {
+        const { fetchBot } = await import('@/lib/bot-api');
+        const response = await fetchBot('/api/website-log', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action, user, details, role }),
             cache: 'no-store'
         });

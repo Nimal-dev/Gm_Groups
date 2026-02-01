@@ -106,12 +106,11 @@ export async function clockOut() {
         // --- Notify Discord via Bot API ---
         try {
             // Fallback to localhost if BOT_API_URL is missing, matching logActivity implementation
-            const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
+            const { fetchBot } = await import('@/lib/bot-api');
 
             // Fire and forget (don't block clock out if bot is down)
-            fetch(`${BOT_URL}/api/duty-log`, {
+            fetchBot('/api/duty-log', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userId: session.user.id,
                     username: existingSession.username,

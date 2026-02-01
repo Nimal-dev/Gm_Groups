@@ -1,99 +1,42 @@
+
 'use server';
 
 import connectToDatabase from '@/lib/db';
-import Employee, { IEmployee } from '@/models/Employee';
-import { revalidatePath } from 'next/cache';
-import { z } from 'zod';
+import Employee from '@/models/Employee';
 import { auth } from '@/auth';
-import { logActivity } from '@/actions/log';
 
-// Schema Validation
-const EmployeeSchema = z.object({
-    userId: z.string().min(1, "User ID is required"),
-    username: z.string().min(1, "Username is required"),
-    nickname: z.string().optional(),
-    rank: z.string().min(1, "Rank is required"),
-    status: z.enum(['Active', 'Inactive']).default('Active'),
-    joinedAt: z.date().optional(),
-    bankAccountNo: z.string().optional()
-});
-
-export async function addEmployee(formData: z.infer<typeof EmployeeSchema>) {
+export async function getAllEmployees() {
     try {
         const session = await auth();
-        if (!session?.user || session.user.role !== 'admin') {
-            throw new Error("Unauthorized: Admin access required");
-        }
-
-        const validated = EmployeeSchema.parse(formData);
-        await connectToDatabase();
-
-        const existing = await Employee.findOne({ userId: validated.userId });
-        if (existing) {
-            return { success: false, error: 'Employee with this User ID already exists.' };
-        }
-
-        await Employee.create({
-            ...validated,
-            joinedAt: new Date()
-        });
-
-        revalidatePath('/dashboard');
-        await logActivity('Add Employee', `Added new employee: ${validated.username} (${validated.nickname || 'No Nickname'}) (Rank: ${validated.rank})`);
-        return { success: true };
-    } catch (error: any) {
-        console.error('Add Employee Error:', error);
-        return { success: false, error: error.errors?.[0]?.message || error.message || 'Failed to add employee' };
-    }
-}
-
-export async function updateEmployee(userId: string, data: Partial<z.infer<typeof EmployeeSchema>>) {
-    try {
-        const session = await auth();
-        if (!session?.user || session.user.role !== 'admin') {
-            throw new Error("Unauthorized: Admin access required");
+        // Basic role check - allow staff/admin/bulkhead
+        if (!session?.user) {
+            return { success: false, error: 'Unauthorized' };
         }
 
         await connectToDatabase();
 
-        const result = await Employee.findOneAndUpdate(
-            { userId },
-            { $set: data },
-            { new: true }
-        );
+        // Fetch all employees, sorted by Level (desc) then XP (desc)
+        const employees = await Employee.find({})
+            .sort({ level: -1, xp: -1 })
+            .lean();
 
-        if (!result) {
-            return { success: false, error: 'Employee not found' };
-        }
+        // Serialize for client
+        const serialized = employees.map(emp => ({
+            id: emp._id.toString(),
+            userId: emp.userId,
+            username: emp.username,
+            rank: emp.rank,
+            status: emp.status,
+            xp: emp.xp || 0,
+            level: emp.level || 1,
+            achievementsCount: emp.achievements?.length || 0,
+            joinedAt: emp.joinedAt ? emp.joinedAt.toISOString() : null
+        }));
 
-        revalidatePath('/dashboard');
-        await logActivity('Update Employee', `Updated employee ${userId} fields: ${Object.keys(data).join(', ')}`);
-        return { success: true };
+        return { success: true, employees: serialized };
+
     } catch (error: any) {
-        console.error('Update Employee Error:', error);
-        return { success: false, error: error.message || 'Failed to update employee' };
-    }
-}
-
-export async function deleteEmployee(userId: string) {
-    try {
-        const session = await auth();
-        if (!session?.user || session.user.role !== 'admin') {
-            throw new Error("Unauthorized: Admin access required");
-        }
-
-        await connectToDatabase();
-        const result = await Employee.findOneAndDelete({ userId });
-
-        if (!result) {
-            return { success: false, error: 'Employee not found' };
-        }
-
-        revalidatePath('/dashboard');
-        await logActivity('Remove Employee', `Removed employee with UserID: ${userId}`);
-        return { success: true };
-    } catch (error: any) {
-        console.error('Delete Employee Error:', error);
-        return { success: false, error: error.message || 'Failed to delete employee' };
+        console.error('Fetch Employees Error:', error);
+        return { success: false, error: 'Failed to fetch employees' };
     }
 }

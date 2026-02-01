@@ -6,6 +6,14 @@ export interface IUser extends Document {
     role: string;
     createdAt: Date;
     updatedAt: Date;
+    xp: number;
+    level: number;
+    achievements: {
+        id: string;
+        title: string;
+        unlockedAt: Date;
+        icon?: string;
+    }[];
 }
 
 const UserSchema = new Schema<IUser>(
@@ -26,6 +34,14 @@ const UserSchema = new Schema<IUser>(
             default: 'staff',
             enum: ['admin', 'staff', 'user'],
         },
+        xp: { type: Number, default: 0 },
+        level: { type: Number, default: 1 },
+        achievements: [{
+            id: String,
+            title: String,
+            unlockedAt: Date,
+            icon: String
+        }]
     },
     {
         timestamps: true,
