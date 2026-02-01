@@ -40,3 +40,86 @@ export async function getAllEmployees() {
         return { success: false, error: 'Failed to fetch employees' };
     }
 }
+
+// --- CRUD Actions for Employee Management ---
+
+export async function addEmployee(data: any) {
+    try {
+        const session = await auth();
+        // Allow Admin/Bulkhead/Manager
+        if (!session?.user || (session.user.role !== 'admin' && session.user.role !== 'bulkhead')) {
+            return { success: false, error: 'Unauthorized' };
+        }
+
+        await connectToDatabase();
+
+        // Check for existing ID
+        const existing = await Employee.findOne({ userId: data.userId });
+        if (existing) {
+            return { success: false, error: 'User ID already exists' };
+        }
+
+        const newEmployee = new Employee({
+            ...data,
+            joinedAt: new Date(),
+            xp: 0,
+            level: 1,
+            achievements: []
+        });
+
+        await newEmployee.save();
+        return { success: true };
+    } catch (error: any) {
+        console.error('Add Employee Error:', error);
+        return { success: false, error: error.message || 'Failed to add employee' };
+    }
+}
+
+export async function updateEmployee(userId: string, data: any) {
+    try {
+        const session = await auth();
+        if (!session?.user || (session.user.role !== 'admin' && session.user.role !== 'bulkhead')) {
+            return { success: false, error: 'Unauthorized' };
+        }
+
+        await connectToDatabase();
+
+        const updated = await Employee.findOneAndUpdate(
+            { userId: userId },
+            {
+                $set: {
+                    username: data.username,
+                    nickname: data.nickname,
+                    rank: data.rank,
+                    status: data.status,
+                    bankAccountNo: data.bankAccountNo
+                }
+            },
+            { new: true }
+        );
+
+        if (!updated) return { success: false, error: 'Employee not found' };
+
+        return { success: true };
+    } catch (error: any) {
+        console.error('Update Employee Error:', error);
+        return { success: false, error: 'Failed to update employee' };
+    }
+}
+
+export async function deleteEmployee(userId: string) {
+    try {
+        const session = await auth();
+        if (!session?.user || session.user.role !== 'admin') {
+            return { success: false, error: 'Unauthorized' };
+        }
+
+        await connectToDatabase();
+        await Employee.deleteOne({ userId });
+
+        return { success: true };
+    } catch (error: any) {
+        console.error('Delete Employee Error:', error);
+        return { success: false, error: 'Failed to delete employee' };
+    }
+}
