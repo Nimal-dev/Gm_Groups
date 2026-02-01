@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, Search, Copy, Check } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Schema (matching server action)
@@ -25,6 +25,7 @@ const EmployeeSchema = z.object({
     nickname: z.string().optional(),
     rank: z.string().min(1, "Rank is required"),
     status: z.enum(['Active', 'Inactive']).default('Active'),
+    bankAccountNo: z.string().optional(),
 });
 
 type EmployeeFormValues = z.infer<typeof EmployeeSchema>;
@@ -39,6 +40,14 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState<any | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [copiedId, setCopiedId] = useState<string | null>(null);
+
+    const handleCopy = (text: string, id: string) => {
+        navigator.clipboard.writeText(text);
+        setCopiedId(id);
+        toast({ description: "Copied to clipboard" });
+        setTimeout(() => setCopiedId(null), 2000);
+    };
 
     const filteredEmployees = employees.filter(emp =>
         emp.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -66,7 +75,8 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
             username: '',
             nickname: '',
             rank: 'Employee',
-            status: 'Active'
+            status: 'Active',
+            bankAccountNo: ''
         });
         setIsDialogOpen(true);
     };
@@ -78,7 +88,8 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
             username: emp.username,
             nickname: emp.nickname || '',
             rank: emp.rank,
-            status: emp.status
+            status: emp.status,
+            bankAccountNo: emp.bankAccountNo || ''
         });
         setIsDialogOpen(true);
     };
@@ -156,6 +167,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                                         <TableHead>Username</TableHead>
                                         {/* <TableHead>Nickname</TableHead> */}
                                         <TableHead>Rank</TableHead>
+                                        <TableHead>Bank Account</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
@@ -174,6 +186,27 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                                                 <TableCell className="font-medium">{emp.username}</TableCell>
                                                 {/* <TableCell className="text-muted-foreground">{emp.nickname || '-'}</TableCell> */}
                                                 <TableCell>{emp.rank}</TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-medium text-sm">
+                                                            {emp.bankAccountNo || '-'}
+                                                        </span>
+                                                        {emp.bankAccountNo && (
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-6 w-6 text-muted-foreground hover:text-white"
+                                                                onClick={() => handleCopy(emp.bankAccountNo, emp.userId)}
+                                                            >
+                                                                {copiedId === emp.userId ? (
+                                                                    <Check className="h-3 w-3 text-green-500" />
+                                                                ) : (
+                                                                    <Copy className="h-3 w-3" />
+                                                                )}
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
                                                 <TableCell>
                                                     <Badge variant={emp.status === 'Active' ? 'secondary' : 'destructive'} className="text-xs">
                                                         {emp.status}
@@ -245,6 +278,14 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                                 className="bg-black/20 border-white/10"
                             />
                             {form.formState.errors.rank && <p className="text-xs text-destructive">{form.formState.errors.rank.message}</p>}
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Bank Account No.</Label>
+                            <Input
+                                {...form.register('bankAccountNo')}
+                                placeholder="Account Number"
+                                className="bg-black/20 border-white/10"
+                            />
                         </div>
                         <div className="space-y-2">
                             <Label>Status</Label>

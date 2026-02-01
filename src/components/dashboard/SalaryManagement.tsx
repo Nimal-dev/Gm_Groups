@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, DollarSign, Send } from 'lucide-react';
+import { Loader2, DollarSign, Send, Copy, Check } from 'lucide-react';
 import { logPayment } from '@/actions/salary';
 
 interface PayrollManagementProps {
@@ -18,9 +18,17 @@ export function PayrollManagement({ employees }: PayrollManagementProps) {
     const { toast } = useToast();
     const [loadingState, setLoadingState] = useState<{ [userId: string]: boolean }>({});
     const [inputs, setInputs] = useState<{ [userId: string]: { amount: string, note: string } }>({});
+    const [copiedId, setCopiedId] = useState<string | null>(null);
 
     // Filter only active employees
     const activeEmployees = employees.filter(e => e.status === 'Active');
+
+    const handleCopy = (text: string, id: string) => {
+        navigator.clipboard.writeText(text);
+        setCopiedId(id);
+        toast({ description: "Bank account copied to clipboard" });
+        setTimeout(() => setCopiedId(null), 2000);
+    };
 
     const handleInputChange = (userId: string, field: 'amount' | 'note', value: string) => {
         setInputs(prev => ({
@@ -81,8 +89,9 @@ export function PayrollManagement({ employees }: PayrollManagementProps) {
                             <Table>
                                 <TableHeader className="bg-black/20 sticky top-0 z-10">
                                     <TableRow className="hover:bg-transparent border-white/10">
-                                        <TableHead className="w-[30%]">Employee</TableHead>
-                                        <TableHead className="w-[20%]">Rank</TableHead>
+                                        <TableHead className="w-[20%]">Employee</TableHead>
+                                        <TableHead className="w-[15%]">Rank</TableHead>
+                                        <TableHead className="w-[20%]">Bank Account</TableHead>
                                         <TableHead className="w-[20%]">Amount ($)</TableHead>
                                         <TableHead className="w-[20%]">Note</TableHead>
                                         <TableHead className="w-[10%] text-right">Action</TableHead>
@@ -113,6 +122,27 @@ export function PayrollManagement({ employees }: PayrollManagementProps) {
                                                     <Badge variant="outline" className="text-xs border-white/20">
                                                         {emp.rank}
                                                     </Badge>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-medium text-sm">
+                                                            {emp.bankAccountNo || 'Not Set'}
+                                                        </span>
+                                                        {emp.bankAccountNo && (
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-6 w-6 text-muted-foreground hover:text-white"
+                                                                onClick={() => handleCopy(emp.bankAccountNo, emp.userId)}
+                                                            >
+                                                                {copiedId === emp.userId ? (
+                                                                    <Check className="h-3 w-3 text-green-500" />
+                                                                ) : (
+                                                                    <Copy className="h-3 w-3" />
+                                                                )}
+                                                            </Button>
+                                                        )}
+                                                    </div>
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="relative">

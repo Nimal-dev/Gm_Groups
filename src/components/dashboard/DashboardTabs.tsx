@@ -403,7 +403,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                                                 <div className="mt-2 md:mt-0 text-right">
                                                     {log.notes && <p className="text-xs italic text-accent mb-1">Note: {log.notes}</p>}
                                                     <p className="text-sm text-muted-foreground">Processed by {log.processorName || log.processedBy}</p>
-                                                    <p className="text-xs opacity-50">{new Date(log.date).toLocaleString()}</p>
+                                                    <p className="text-xs opacity-50">{new Date(log.date).toLocaleDateString('en-GB')}</p>
                                                 </div>
                                             </div>
                                         ))}

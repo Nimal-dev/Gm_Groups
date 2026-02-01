@@ -14,7 +14,8 @@ const EmployeeSchema = z.object({
     nickname: z.string().optional(),
     rank: z.string().min(1, "Rank is required"),
     status: z.enum(['Active', 'Inactive']).default('Active'),
-    joinedAt: z.date().optional()
+    joinedAt: z.date().optional(),
+    bankAccountNo: z.string().optional()
 });
 
 export async function addEmployee(formData: z.infer<typeof EmployeeSchema>) {

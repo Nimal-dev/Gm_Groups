@@ -7,6 +7,7 @@ export interface IEmployee extends Document {
     rank: string;
     joinedAt: Date;
     status: 'Active' | 'Inactive';
+    bankAccountNo?: string;
 }
 
 const EmployeeSchema: Schema = new Schema({
@@ -15,7 +16,8 @@ const EmployeeSchema: Schema = new Schema({
     nickname: { type: String },
     rank: { type: String, default: 'Employee' },
     joinedAt: { type: Date, default: Date.now },
-    status: { type: String, enum: ['Active', 'Inactive'], default: 'Active' }
+    status: { type: String, enum: ['Active', 'Inactive'], default: 'Active' },
+    bankAccountNo: { type: String }
 });
 
 // Index for optimization
