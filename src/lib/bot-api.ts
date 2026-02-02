@@ -1,5 +1,5 @@
 
-const BOT_URL = process.env.NEXT_PUBLIC_BOT_URL || 'http://localhost:3000';
+const BOT_URL = process.env.BOT_API_URL || process.env.NEXT_PUBLIC_BOT_URL || 'http://127.0.0.1:3000';
 const BOT_SECRET = process.env.BOT_API_SECRET || '';
 
 /**
@@ -23,7 +23,7 @@ export async function fetchBot(endpoint: string, options: RequestInit = {}) {
         });
         return response;
     } catch (error) {
-        console.error(`[Bot API] Error fetching ${path}:`, error);
+        console.error(`[Bot API] Error fetching ${BOT_URL}${path}:`, error);
         throw error;
     }
 }

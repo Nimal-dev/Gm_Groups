@@ -4,7 +4,7 @@ import { auth } from '@/auth';
 import { revalidateTag } from 'next/cache';
 import { logActivity } from '@/actions/log';
 
-const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
+
 
 export async function createCitizenOrder(data: { to: string, amount: string, eventDate: string, details: string }) {
     const session = await auth();
