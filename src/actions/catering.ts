@@ -32,11 +32,10 @@ export async function processCateringRequest(requestId: string, action: 'accept'
     const session = await auth();
     if (!session || !session.user) return { success: false, error: 'Unauthorized' };
 
-    const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
     try {
-        const response = await fetch(`${BOT_URL}/api/catering-request/action`, {
+        const { fetchBot } = await import('@/lib/bot-api');
+        const response = await fetchBot('/api/catering-request/action', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 requestId,
                 action,

@@ -1,6 +1,7 @@
 'use server';
 
 import { auth } from '@/auth';
+import { fetchBot } from '@/lib/bot-api';
 
 export type FoodLogItems = Record<string, number>;
 
@@ -11,8 +12,6 @@ export async function submitPreparedFoodLog(items: FoodLogItems) {
         return { success: false, error: 'Unauthorized' };
     }
 
-    const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
-
     try {
         const payload = {
             user: session.user.id,
@@ -20,13 +19,9 @@ export async function submitPreparedFoodLog(items: FoodLogItems) {
             items: items
         };
 
-        const response = await fetch(`${BOT_URL}/api/prepared-food-log`, {
+        const response = await fetchBot('/api/prepared-food-log', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-            cache: 'no-store'
+            body: JSON.stringify(payload)
         });
 
         const result = await response.json();

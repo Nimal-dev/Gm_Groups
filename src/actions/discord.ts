@@ -1,14 +1,10 @@
 'use server';
 
 export async function sendReportToDiscord(content: string, type?: string) {
-    const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
-
     try {
-        const response = await fetch(`${BOT_URL}/api/performancereport`, {
+        const { fetchBot } = await import('@/lib/bot-api');
+        const response = await fetchBot('/api/performancereport', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
             body: JSON.stringify({ content, type }),
             cache: 'no-store'
         });
