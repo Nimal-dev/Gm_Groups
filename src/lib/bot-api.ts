@@ -1,4 +1,5 @@
 
+
 const BOT_URL = process.env.BOT_API_URL || process.env.NEXT_PUBLIC_BOT_URL || 'http://127.0.0.1:3000';
 const BOT_SECRET = process.env.BOT_API_SECRET || '';
 

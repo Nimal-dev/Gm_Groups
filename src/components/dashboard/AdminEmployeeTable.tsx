@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Search, Loader2, Trophy, Shield, User } from 'lucide-react';
+import { LevelBadge } from '@/components/dashboard/LevelBadge';
 
 interface EmployeeType {
     id: string;
@@ -110,8 +111,10 @@ export function AdminEmployeeTable() {
                                                 {emp.rank}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="text-right font-bold text-accent">
-                                            {emp.level}
+                                        <TableCell className="text-center">
+                                            <div className="flex justify-center py-2">
+                                                <LevelBadge level={emp.level} size="sm" />
+                                            </div>
                                         </TableCell>
                                         <TableCell className="text-right font-mono">
                                             {emp.xp.toLocaleString('en-US')}
