@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Trophy, Star, Medal, Award } from 'lucide-react';
+import { getLevelConfig } from '@/lib/levelUtils';
+import { CrossedSwords, AngelWings, MasterWings } from './LevelDecorations';
 
 interface GamificationCardProps {
     user: {
@@ -26,6 +28,14 @@ export function GamificationCard({ user }: GamificationCardProps) {
     const currentLevel = user.level || 1;
     const currentXp = user.xp || 0;
 
+    const config = getLevelConfig(currentLevel);
+    const isClipShape = ['hexagon', 'octagon', 'shield', 'star'].includes(config.shape);
+
+    const dynamicStyle = {
+        '--level-glow-color': config.shadowColor,
+        '--level-intensity': `${20 + (currentLevel * 2)}px`,
+    } as React.CSSProperties;
+
     const getXpForLevel = (lvl: number) => Math.pow((lvl - 1) * 10, 2);
 
     const startXp = getXpForLevel(currentLevel);
@@ -34,6 +44,16 @@ export function GamificationCard({ user }: GamificationCardProps) {
     const xpNeeded = nextXp - startXp;
     const xpProgress = currentXp - startXp;
     const percentage = Math.min(100, Math.max(0, (xpProgress / xpNeeded) * 100));
+
+    const renderDecoration = () => {
+        const props = { className: 'scale-125', color: config.textColor.replace('text-', '') };
+        switch (config.decoration) {
+            case 'swords': return <CrossedSwords {...props} />;
+            case 'wings': return <AngelWings {...props} />;
+            case 'master_wings': return <MasterWings {...props} />;
+            default: return null;
+        }
+    };
 
     return (
         <Card className="glass-card mb-6 border-accent/20 relative overflow-hidden">
@@ -45,16 +65,33 @@ export function GamificationCard({ user }: GamificationCardProps) {
             <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-6 items-center">
                     {/* Level Badge */}
-                    <div className="relative group">
-                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 to-orange-600 flex items-center justify-center shadow-[0_0_15px_rgba(234,179,8,0.4)] animate-pulse-slow">
-                            <div className="w-20 h-20 rounded-full bg-black flex flex-col items-center justify-center border-4 border-yellow-500/50">
+                    <div className="relative group flex justify-center items-center w-32 h-32" style={dynamicStyle}>
+
+                        {renderDecoration()}
+
+                        <div className={`
+                            w-24 h-24 flex items-center justify-center 
+                            bg-black
+                            ${config.color}
+                            shape-${config.shape}
+                            ${isClipShape ? 'shadow-none drop-shadow-lg' : 'animate-level-fire rounded-full'}
+                        `}
+                            style={isClipShape ? { filter: `drop-shadow(0 0 ${10 + (currentLevel * 0.5)}px ${config.shadowColor})` } : {}}
+                        >
+                            <div className={`
+                                w-20 h-20 flex flex-col items-center justify-center 
+                                bg-black border-4 
+                                ${config.color.replace('bg-', 'border-')}/50
+                                shape-${config.shape}
+                                ${!isClipShape && 'rounded-full'}
+                            `}>
                                 <span className="text-[10px] uppercase text-muted-foreground font-bold tracking-widest">Level</span>
                                 <span className="text-4xl font-black text-white leading-none">{currentLevel}</span>
                             </div>
                         </div>
-                        <div className="absolute -bottom-2 w-full text-center">
-                            <Badge className="bg-yellow-500 text-black hover:bg-yellow-400 border-0 font-bold px-2 py-0.5 text-[10px]">
-                                STAFF ELITE
+                        <div className="absolute -bottom-2 w-full text-center z-20">
+                            <Badge className={`${config.color} text-black hover:brightness-110 border-0 font-bold px-2 py-0.5 text-[10px]`}>
+                                {config.title}
                             </Badge>
                         </div>
                     </div>

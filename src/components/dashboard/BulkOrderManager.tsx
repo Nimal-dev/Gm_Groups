@@ -197,7 +197,7 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                             />
                         ) : (
                             <Tabs defaultValue="pending" className="w-full">
-                                <TabsList className="bg-black/40 w-full justify-start border-b border-white/5 rounded-none p-0 h-10">
+                                <TabsList className="bg-black/40 w-full justify-start border-b border-white/5 rounded-none p-0 h-10 overflow-x-auto flex-nowrap">
                                     <TabsTrigger value="pending" className="rounded-none border-b-2 border-transparent data-[state=active]:border-orange-500 data-[state=active]:bg-transparent">Pending</TabsTrigger>
                                     <TabsTrigger value="progress" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent">On Progress</TabsTrigger>
                                     <TabsTrigger value="completed" className="rounded-none border-b-2 border-transparent data-[state=active]:border-green-500 data-[state=active]:bg-transparent">Completed</TabsTrigger>

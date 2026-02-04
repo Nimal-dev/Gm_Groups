@@ -149,3 +149,57 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(255, 255, 255, 0.4);
 }
+
+/* Level Fire Glow Animation */
+@keyframes level-fire {
+  0% {
+    box-shadow:
+      0 0 calc(var(--level-intensity) * 0.8) var(--level-glow-color),
+      0 0 calc(var(--level-intensity) * 0.4) inset var(--level-glow-color);
+  }
+
+  50% {
+    box-shadow:
+      0 0 calc(var(--level-intensity) * 1.2) var(--level-glow-color),
+      0 0 calc(var(--level-intensity) * 0.6) inset var(--level-glow-color);
+  }
+
+  100% {
+    box-shadow:
+      0 0 calc(var(--level-intensity) * 0.8) var(--level-glow-color),
+      0 0 calc(var(--level-intensity) * 0.4) inset var(--level-glow-color);
+  }
+}
+
+.animate-level-fire {
+  animation: level-fire 2s infinite ease-in-out;
+}
+
+/* Dynamic Level Shapes */
+.shape-circle {
+  border-radius: 50%;
+}
+
+.shape-square {
+  border-radius: 12px;
+}
+
+.shape-hexagon {
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  border-radius: 0;
+}
+
+.shape-octagon {
+  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+  border-radius: 0;
+}
+
+.shape-shield {
+  clip-path: polygon(50% 0, 100% 15%, 100% 65%, 50% 100%, 0 65%, 0 15%);
+  border-radius: 0;
+}
+
+.shape-star {
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  border-radius: 0;
+}
