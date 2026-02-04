@@ -66,10 +66,10 @@ export function getLevelConfig(level: number): LevelConfig {
     }
     return {
         title: "MASTER",
-        color: "bg-amber-400",
-        textColor: "text-amber-400",
-        glowColor: "shadow-amber-400/50",
-        shadowColor: "rgba(251, 191, 36, 1)",
+        color: "bg-yellow-400",
+        textColor: "text-white",
+        glowColor: "shadow-yellow-400/50",
+        shadowColor: "rgba(250, 204, 21, 1)",
         shape: 'star',
         decoration: 'master_wings'
     };

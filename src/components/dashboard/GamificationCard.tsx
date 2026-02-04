@@ -70,28 +70,30 @@ export function GamificationCard({ user }: GamificationCardProps) {
                         {renderDecoration()}
 
                         <div className={`
-                            w-24 h-24 flex items-center justify-center 
+                            flex items-center justify-center 
                             bg-black
                             ${config.color}
                             shape-${config.shape}
                             ${isClipShape ? 'shadow-none drop-shadow-lg' : 'animate-level-fire rounded-full'}
+                            ${config.shape === 'star' ? 'w-32 h-32 scale-110' : 'w-24 h-24'}
                         `}
                             style={isClipShape ? { filter: `drop-shadow(0 0 ${10 + (currentLevel * 0.5)}px ${config.shadowColor})` } : {}}
                         >
                             <div className={`
-                                w-20 h-20 flex flex-col items-center justify-center 
-                                bg-black border-4 
-                                ${config.color.replace('bg-', 'border-')}/50
+                                flex flex-col items-center justify-center 
+                                border-4 
                                 shape-${config.shape}
-                                ${!isClipShape && 'rounded-full'}
-                                ${config.shape === 'star' ? 'pt-2 pb-1' : ''} 
+                                ${!isClipShape ? 'rounded-full' : ''}
+                                ${config.shape === 'star' ? 'w-24 h-24 pt-3 pb-1' : 'w-20 h-20'}
+                                ${config.shape === 'star' ? 'bg-gradient-to-br from-yellow-300 via-yellow-500 to-amber-600 border-yellow-200/50' : 'bg-black'}
+                                ${config.shape !== 'star' ? `${config.color.replace('bg-', 'border-')}/50` : ''}
                             `}>
-                                <span className={`text-[10px] uppercase text-muted-foreground font-bold tracking-widest ${config.shape === 'star' ? 'text-[8px] -mt-1' : ''}`}>Level</span>
-                                <span className={`font-black text-white leading-none ${config.shape === 'star' ? 'text-2xl' : 'text-4xl'}`}>{currentLevel}</span>
+                                <span className={`text-[10px] uppercase font-bold tracking-widest ${config.shape === 'star' ? 'text-black/60 text-[8px] -mt-1' : 'text-muted-foreground'}`}>Level</span>
+                                <span className={`font-black leading-none ${config.shape === 'star' ? 'text-black text-2xl drop-shadow-sm' : 'text-white text-4xl'}`}>{currentLevel}</span>
                             </div>
                         </div>
                         <div className="absolute -bottom-2 w-full text-center z-20">
-                            <Badge className={`${config.color} text-black hover:brightness-110 border-0 font-bold px-2 py-0.5 text-[10px]`}>
+                            <Badge className={`${config.color} ${config.title === 'MASTER' ? 'text-white' : 'text-black'} hover:brightness-110 border-0 font-bold px-2 py-0.5 text-[10px]`}>
                                 {config.title}
                             </Badge>
                         </div>

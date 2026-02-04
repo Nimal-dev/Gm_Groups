@@ -60,24 +60,28 @@ export function LevelBadge({ level, size = 'md' }: LevelBadgeProps) {
 
             {/* Main Badge */}
             <div className={`
-                flex items-center justify-center bg-black 
-                font-bold text-white font-mono z-10
+                flex items-center justify-center 
+                font-bold font-mono z-10
                 ${s.circle} 
-                ${config.color.replace('bg-', 'border-')}
                 shape-${config.shape}
                 ${isClipShape ? 'shadow-none drop-shadow-md' : 'animate-level-fire'}
+                ${config.shape === 'star'
+                    ? 'scale-125 bg-gradient-to-br from-yellow-300 via-yellow-500 to-amber-600 border-yellow-200/50 text-black'
+                    : `bg-black text-white ${config.color.replace('bg-', 'border-')}`
+                }
             `}
                 style={isClipShape ? { filter: `drop-shadow(0 0 ${10 + (level * 0.5)}px ${config.shadowColor})` } : {}}
             >
-                <div className="flex flex-col items-center leading-none">
-                    {size !== 'sm' && <span className="text-[8px] uppercase opacity-60 mb-0.5">Level</span>}
+                <div className={`flex flex-col items-center leading-none ${config.shape === 'star' ? 'scale-75 mt-1' : ''}`}>
+                    {size !== 'sm' && <span className={`text-[8px] uppercase mb-0.5 ${config.shape === 'star' ? 'text-black/60' : 'opacity-60'}`}>Level</span>}
                     <span>{level}</span>
                 </div>
             </div>
 
             {/* Bottom Banner */}
             <div className={`
-                absolute z-20 rounded-full font-bold uppercase tracking-wider text-black
+                absolute z-20 rounded-full font-bold uppercase tracking-wider
+                ${config.title === 'MASTER' ? 'text-white' : 'text-black'}
                 ${s.banner}
                 ${config.color}
                 shadow-lg
