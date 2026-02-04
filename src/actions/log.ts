@@ -3,7 +3,7 @@
 import { auth } from '@/auth';
 
 export async function logActivity(action: string, details: string) {
-    const BOT_URL = process.env.BOT_API_URL || 'http://localhost:3000';
+
 
     try {
         const session = await auth();
