@@ -84,9 +84,10 @@ export function GamificationCard({ user }: GamificationCardProps) {
                                 ${config.color.replace('bg-', 'border-')}/50
                                 shape-${config.shape}
                                 ${!isClipShape && 'rounded-full'}
+                                ${config.shape === 'star' ? 'pt-2 pb-1' : ''} 
                             `}>
-                                <span className="text-[10px] uppercase text-muted-foreground font-bold tracking-widest">Level</span>
-                                <span className="text-4xl font-black text-white leading-none">{currentLevel}</span>
+                                <span className={`text-[10px] uppercase text-muted-foreground font-bold tracking-widest ${config.shape === 'star' ? 'text-[8px] -mt-1' : ''}`}>Level</span>
+                                <span className={`font-black text-white leading-none ${config.shape === 'star' ? 'text-2xl' : 'text-4xl'}`}>{currentLevel}</span>
                             </div>
                         </div>
                         <div className="absolute -bottom-2 w-full text-center z-20">
