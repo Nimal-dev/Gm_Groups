@@ -18,30 +18,60 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     ...authConfig,
     secret: process.env.AUTH_SECRET,
     trustHost: true,
+    session: {
+        strategy: "jwt",
+        maxAge: 7 * 24 * 60 * 60, // 7 Days
+    },
     callbacks: {
         /**
          * JWT Callback
          * Persists user role and name into the JWT token.
+         * Handles Token Rotation.
          */
-        async jwt({ token, user, profile }) {
-            if (user) {
-                token.role = user.role;
-                // CRITICAL FIX: Force use of Discord ID (profile.id) if available. 
-                // NextAuth sometimes generates a UUID for user.id if no adapter is present.
-                token.id = (profile?.id as string) || user.id;
-                token.name = user.name; // Explicitly update token name from DB
+        async jwt({ token, user, account, profile }) {
+            // Initial Sign In
+            if (account && user) {
+                return {
+                    accessToken: account.access_token,
+                    refreshToken: account.refresh_token,
+                    expiresAt: Date.now() + (account.expires_in as number * 1000),
+                    user: {
+                        ...user,
+                        id: (profile?.id as string) || user.id, // CRITICAL FIX: Force use of Discord ID
+                        name: user.name, // Explicitly update token name from DB
+                        role: user.role,
+                    }
+                };
             }
-            return token;
+
+            // Return previous token if the access token has not expired yet
+            if (Date.now() < (token.expiresAt as number)) {
+                return token;
+            }
+
+            // Access token has expired, try to update it
+            return await refreshAccessToken(token);
         },
         /**
          * Session Callback
          * Populates the client-side session object with role and name from the token.
          */
         async session({ session, token }) {
-            if (session.user && token) {
-                session.user.role = token.role as string;
-                session.user.id = token.id as string;
-                session.user.name = token.name; // Explicitly set session name
+            // Check if rotation failed
+            if (token.error) {
+                // @ts-ignore
+                session.error = token.error;
+            }
+
+            if (session.user && token.user) {
+                // @ts-ignore
+                session.user = {
+                    ...session.user,
+                    ...token.user as any
+                };
+                // Ensure ID is set correctly
+                // @ts-ignore
+                session.user.id = (token.user as any).id;
             }
             return session;
         },
@@ -57,7 +87,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     const employee = await Employee.findOne({ userId: profile.id, status: 'Active' });
 
                     if (!employee) {
-                        console.log(`Access Denied: User ${profile.username} (${profile.id}) is not an active employee.`);
+                        console.warn(`Access Denied: User ${profile.username} (${profile.id}) is not an active employee.`);
                         return false; // Valid Discord user, but not an employee -> Deny Access
                     }
 
@@ -100,6 +130,52 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         Discord({
             clientId: process.env.AUTH_DISCORD_ID,
             clientSecret: process.env.AUTH_DISCORD_SECRET,
+            authorization: { params: { scope: 'identify email guilds guilds.join' } }, // Use standard scopes + guilds.join if needed
         }),
     ],
 });
+
+/**
+ * Takes a token, and returns a new token with updated
+ * `accessToken` and `expiresAt`. If an error occurs,
+ * returns the old token and an error property
+ */
+async function refreshAccessToken(token: any) {
+    try {
+        const url = 'https://discord.com/api/oauth2/token';
+        const body = new URLSearchParams({
+            client_id: process.env.AUTH_DISCORD_ID!,
+            client_secret: process.env.AUTH_DISCORD_SECRET!,
+            grant_type: 'refresh_token',
+            refresh_token: token.refreshToken,
+        });
+
+        const response = await fetch(url, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            method: 'POST',
+            body: body,
+        });
+
+        const refreshedTokens = await response.json();
+
+        if (!response.ok) {
+            throw refreshedTokens;
+        }
+
+        return {
+            ...token,
+            accessToken: refreshedTokens.access_token,
+            expiresAt: Date.now() + refreshedTokens.expires_in * 1000,
+            refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
+        };
+    } catch (error) {
+        console.error('RefreshAccessTokenError', error);
+
+        return {
+            ...token,
+            error: 'RefreshAccessTokenError',
+        };
+    }
+}

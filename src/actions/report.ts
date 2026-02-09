@@ -76,6 +76,6 @@ export async function generateReportData(startDate: Date, endDate: Date): Promis
         };
     } catch (error: any) {
         console.error('Report Generation Error:', error);
-        return { success: false, error: error.message || 'Failed to generate report data' };
+        return { success: false, error: 'Failed to generate report data.' };
     }
 }

@@ -19,6 +19,25 @@ export const authConfig = {
             }
             return true;
         },
+        async redirect({ url, baseUrl }) {
+            const allowedOrigins = [
+                'https://gmgroups.site',
+                'https://gmgroups.netlify.app',
+                'http://localhost:3000',
+                'http://localhost:3001'
+            ];
+
+            // Allows relative callback URLs
+            if (url.startsWith("/")) return `${baseUrl}${url}`;
+
+            // Allows callback URLs on the same origin
+            if (new URL(url).origin === baseUrl) return url;
+
+            // Allows callback URLs on allowed origins
+            if (allowedOrigins.includes(new URL(url).origin)) return url;
+
+            return baseUrl;
+        },
     },
     providers: [], // Configured in auth.ts
 } satisfies NextAuthConfig;

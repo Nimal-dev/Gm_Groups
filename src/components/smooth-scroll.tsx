@@ -36,7 +36,7 @@ export default function SmoothScroll() {
 
             rafId = requestAnimationFrame(raf)
         } catch (error) {
-            // Silently fail or use a proper logger
+            console.error("SmoothScroll Init Error:", error);
         }
 
         return () => {

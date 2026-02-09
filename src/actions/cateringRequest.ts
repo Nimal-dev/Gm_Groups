@@ -29,7 +29,7 @@ export async function submitCateringRequest(data: {
         return { success: true, message: result.message };
     } catch (error: any) {
         console.error('Catering Request Error:', error);
-        return { success: false, error: error.message || 'Connection to bot failed.' };
+        return { success: false, error: 'Something went wrong. Please try again later.' };
     }
 }
 

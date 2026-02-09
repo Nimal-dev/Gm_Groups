@@ -18,6 +18,6 @@ export async function sendReportToDiscord(content: string, type?: string) {
         return { success: true, message: result.message };
     } catch (error: any) {
         console.error('Send Report Error:', error);
-        return { success: false, error: error.message || 'Connection to bot failed.' };
+        return { success: false, error: 'Failed to send report to Discord.' };
     }
 }
