@@ -25,6 +25,10 @@
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
     --radius: 0.5rem;
+
+    /* Level Animation Variables */
+    --level-intensity: 10px;
+    --level-glow-color: rgba(255, 215, 0, 0.5);
   }
 
   .dark {
@@ -49,10 +53,12 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
-  }
-}
 
-@layer base {
+    /* Level Animation Variables Dark Mode */
+    --level-intensity: 12px;
+    --level-glow-color: rgba(255, 215, 0, 0.6);
+  }
+
   * {
     @apply border-border;
   }
@@ -126,7 +132,6 @@
   filter: invert(1);
 }
 
-/* Custom Glass Scrollbar */
 /* Custom Glass Scrollbar - Global Application */
 ::-webkit-scrollbar {
   width: 10px;

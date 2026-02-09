@@ -4,7 +4,7 @@ import { AboutSection } from '@/components/sections/about-section';
 import { HeroSection } from '@/components/sections/hero-section';
 import { Footer } from '@/components/footer';
 // import { BurgershotCTA } from '@/components/sections/burgershot-cta';
-import { ClosureModal } from '@/components/closure-modal';
+
 
 const PillarsSection = dynamic(() => import('@/components/sections/pillars-section').then(mod => mod.PillarsSection));
 const BusinessSection = dynamic(() => import('@/components/sections/business-section').then(mod => mod.BusinessSection));
@@ -20,7 +20,6 @@ export default function Home() {
         <PillarsSection />
         <BusinessSection />
         <JoinUsSection />
-        <ClosureModal />
       </main>
       <Footer />
     </div>
