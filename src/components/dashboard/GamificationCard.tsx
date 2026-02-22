@@ -93,7 +93,7 @@ export function GamificationCard({ user }: GamificationCardProps) {
                             </div>
                         </div>
                         <div className="absolute -bottom-2 w-full text-center z-20">
-                            <Badge className={`${config.color} ${config.title === 'MASTER' ? 'text-white' : 'text-black'} hover:brightness-110 border-0 font-bold px-2 py-0.5 text-[10px]`}>
+                            <Badge className={`${config.color} ${config.title === 'MASTER' ? 'text-white' : 'text-black'} hover:brightness-110 border-0 font-bold px-2 py-0.5 text-[10px] whitespace-nowrap`}>
                                 {config.title}
                             </Badge>
                         </div>

@@ -64,7 +64,7 @@ export function LevelBadge({ level, size = 'md' }: LevelBadgeProps) {
                 font-bold font-mono z-10
                 ${s.circle} 
                 shape-${config.shape}
-                ${isClipShape ? 'shadow-none drop-shadow-md' : 'animate-level-fire'}
+                ${isClipShape ? 'shadow-none drop-shadow-md' : 'animate-level-fire rounded-full'}
                 ${config.shape === 'star'
                     ? 'scale-125 bg-gradient-to-br from-yellow-300 via-yellow-500 to-amber-600 border-yellow-200/50 text-black'
                     : `bg-black text-white ${config.color.replace('bg-', 'border-')}`
@@ -80,7 +80,7 @@ export function LevelBadge({ level, size = 'md' }: LevelBadgeProps) {
 
             {/* Bottom Banner */}
             <div className={`
-                absolute z-20 rounded-full font-bold uppercase tracking-wider
+                absolute z-20 rounded-full font-bold uppercase tracking-wider whitespace-nowrap
                 ${config.title === 'MASTER' ? 'text-white' : 'text-black'}
                 ${s.banner}
                 ${config.color}
