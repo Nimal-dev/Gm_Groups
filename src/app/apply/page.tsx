@@ -18,14 +18,31 @@ export default async function ApplyPage() {
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-background">
-            <Header />
-            <main className="flex-grow flex items-center justify-center py-20">
+        <div className="flex flex-col min-h-screen relative overflow-hidden">
+            {/* Immersive Background */}
+            <div
+                className="absolute inset-0 bg-[url('/gm_wallpaper.jpg')] bg-cover bg-center bg-no-repeat fixed"
+                style={{ transform: "translateZ(0)" }}
+            />
+            {/* Cinematic Gradient Overlays to ensure text remains readable */}
+            <div className="absolute inset-0 bg-black/60 z-0" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-black/40 to-transparent z-0" />
+
+            {/* Navigation */}
+            <div className="relative z-10">
+                <Header />
+            </div>
+
+            {/* Main Content */}
+            <main className="flex-grow flex items-center justify-center py-24 relative z-10">
                 <div className="container px-4 mx-auto max-w-3xl">
                     <ApplicationForm />
                 </div>
             </main>
-            <Footer />
+
+            <div className="relative z-10 mt-auto">
+                <Footer />
+            </div>
         </div>
     );
 }
