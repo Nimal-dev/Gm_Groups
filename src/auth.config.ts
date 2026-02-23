@@ -18,6 +18,12 @@ export const authConfig = {
             } else if (isLoggedIn && nextUrl.pathname === '/login') {
                 if (isApplicant) return Response.redirect(new URL('/apply', nextUrl));
                 return Response.redirect(new URL('/dashboard', nextUrl));
+            } else if (isLoggedIn && isApplicant && !nextUrl.pathname.startsWith('/apply')) {
+                // If they are logged in as an applicant, heavily bias them towards the /apply page
+                // Only allow them on /apply or root /
+                if (nextUrl.pathname !== '/') {
+                    return Response.redirect(new URL('/apply', nextUrl));
+                }
             }
             return true;
         },
