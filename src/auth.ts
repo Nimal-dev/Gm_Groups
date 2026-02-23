@@ -73,6 +73,10 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                 // @ts-ignore
                 session.user.id = (token.user as any).id;
             }
+            // Pass accessToken to session for API use
+            // @ts-ignore
+            session.accessToken = token.accessToken;
+
             return session;
         },
         /**
@@ -87,8 +91,10 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     const employee = await Employee.findOne({ userId: profile.id, status: 'Active' });
 
                     if (!employee) {
-                        console.warn(`Access Denied: User ${profile.username} (${profile.id}) is not an active employee.`);
-                        return false; // Valid Discord user, but not an employee -> Deny Access
+                        console.info(`New applicant login: ${profile.username} (${profile.id}). They are not an active employee.`);
+                        user.role = 'applicant';
+                        user.name = profile.username as string; // Use Discord username for applicants
+                        return true; // Allow them in but uniquely identified as applicant
                     }
 
                     // Map Rank to Website Role

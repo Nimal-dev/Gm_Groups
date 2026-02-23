@@ -10,11 +10,13 @@ export const authConfig = {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
             const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
+            const isApplicant = auth?.user?.role === 'applicant';
 
             if (isOnDashboard) {
-                if (isLoggedIn) return true;
-                return false; // Redirect unauthenticated users to login page
+                if (isLoggedIn && !isApplicant) return true;
+                return false; // Redirect unauthenticated users or applicants to login page
             } else if (isLoggedIn && nextUrl.pathname === '/login') {
+                if (isApplicant) return Response.redirect(new URL('/apply', nextUrl));
                 return Response.redirect(new URL('/dashboard', nextUrl));
             }
             return true;
