@@ -19,6 +19,11 @@ export default async function DashboardPage() {
 
     if (!session?.user) return null;
 
+    if (role === 'applicant') {
+        const { redirect } = await import('next/navigation');
+        redirect('/apply');
+    }
+
     await connectToDatabase();
 
     // We use the Employee model now, as it handles staff accounts
