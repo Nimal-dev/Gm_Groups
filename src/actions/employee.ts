@@ -4,6 +4,7 @@
 import connectToDatabase from '@/lib/db';
 import Employee from '@/models/Employee';
 import { auth } from '@/auth';
+import { revalidatePath } from 'next/cache';
 
 export async function getAllEmployees() {
     try {
@@ -68,6 +69,7 @@ export async function addEmployee(data: any) {
         });
 
         await newEmployee.save();
+        revalidatePath('/dashboard');
         return { success: true };
     } catch (error: any) {
         console.error('Add Employee Error:', error);
@@ -100,6 +102,7 @@ export async function updateEmployee(userId: string, data: any) {
 
         if (!updated) return { success: false, error: 'Employee not found' };
 
+        revalidatePath('/dashboard');
         return { success: true };
     } catch (error: any) {
         console.error('Update Employee Error:', error);
@@ -117,6 +120,7 @@ export async function deleteEmployee(userId: string) {
         await connectToDatabase();
         await Employee.deleteOne({ userId });
 
+        revalidatePath('/dashboard');
         return { success: true };
     } catch (error: any) {
         console.error('Delete Employee Error:', error);

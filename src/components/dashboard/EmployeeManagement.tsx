@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -36,6 +37,7 @@ interface EmployeeManagementProps {
 
 export function EmployeeManagement({ employees }: EmployeeManagementProps) {
     const { toast } = useToast();
+    const router = useRouter();
     const [searchTerm, setSearchTerm] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState<any | null>(null);
@@ -107,6 +109,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
             if (result.success) {
                 toast({ title: "Success", description: editingEmployee ? "Employee updated" : "Employee added" });
                 setIsDialogOpen(false);
+                router.refresh();
             } else {
                 toast({ title: "Error", description: result.error, variant: "destructive" });
                 if (result.error.includes('Unauthorized')) {
@@ -127,6 +130,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
             const result = await deleteEmployee(userId);
             if (result.success) {
                 toast({ title: "Success", description: "Employee deleted" });
+                router.refresh();
             } else {
                 toast({ title: "Error", description: result.error, variant: "destructive" });
             }
