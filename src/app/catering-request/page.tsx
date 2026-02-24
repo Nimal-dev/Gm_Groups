@@ -332,7 +332,6 @@ export default function CateringRequestPage() {
                                                         <ul className="list-disc pl-4 space-y-1">
                                                             <li><strong>Booking Lead Time:</strong> Min. 5 Business Days prior to Collection Date.</li>
                                                             <li><strong>Confirmation:</strong> Order is confirmed ONLY AFTER the catering agreement is signed. Verbal/Text agreements are not binding.</li>
-                                                            <li><strong>"Day-Prior" Rule:</strong> Collections must be scheduled one (1) day prior to the event.</li>
                                                             <li><strong>Cool-Down:</strong> X-Club limited to one (1) bulk order every 72 hours.</li>
                                                         </ul>
                                                     </div>
@@ -350,7 +349,7 @@ export default function CateringRequestPage() {
                                                         <h5 className="font-semibold text-white/90">4. LATE BOOKINGS & SURCHARGES</h5>
                                                         <ul className="list-disc pl-4 space-y-1">
                                                             <li><strong>Tier 1 (3-4 Days Prior):</strong> 15% Surcharge.</li>
-                                                            <li><strong>Tier 2 (24-48 Hours):</strong> 35% Rush Fee.</li>
+                                                            <li><strong>Tier 2 (24-48 Hours):</strong> 30% Rush Fee.</li>
                                                             <li><strong>Tier 3 (&lt;24 Hours):</strong> 3x Total Invoice</li>
                                                         </ul>
                                                     </div>

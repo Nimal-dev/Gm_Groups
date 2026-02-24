@@ -623,9 +623,8 @@ function formatCitizenContract(data: { items: any[], eventDate: string }, client
     const eventDateObj = new Date(data.eventDate);
     const eventDateStr = eventDateObj.toLocaleDateString('en-GB');
 
-    // Collection Date is 1 day prior
+    // Collection Date is the event date
     const colDateObj = new Date(eventDateObj);
-    colDateObj.setDate(colDateObj.getDate() - 1);
     const collectionDateStr = colDateObj.toLocaleDateString('en-GB');
 
     // Calculate Notice Days (Collection Date - Today)
@@ -689,7 +688,6 @@ Date of Booking: ${bookingDate}
       Representative: ${(clientName || 'OLANGA KUTTAN').toUpperCase()}
 
 2. EVENT & COLLECTION SCHEDULE
-Per company policy, orders must be collected one (1) day prior to the event.
 * Target Event Date: ${eventDateStr}
 * Mandatory Collection Date: ${collectionDateStr}
 * Days Notice: ${daysNotice} Days (${feeType})
@@ -754,7 +752,6 @@ function formatEventContract(data: { items: any[], eventDate: string, collection
     const eventDateStr = eventDateObj.toLocaleDateString('en-GB');
 
     const colDateObj = new Date(eventDateObj);
-    colDateObj.setDate(colDateObj.getDate() - 1);
     const collectionDateStr = colDateObj.toLocaleDateString('en-GB');
 
     const diffTime = colDateObj.getTime() - today.getTime();
