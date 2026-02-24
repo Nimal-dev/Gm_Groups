@@ -651,21 +651,21 @@ function formatCitizenContract(data: { items: any[], eventDate: string }, client
         return `${idx.padEnd(3)} ${name} ${qty} ${price} ${lineTotal}`;
     }).join('\n');
 
-    if (daysNotice < 1) {
+    if (daysNotice <= 1) {
         feeName = "SuperFine Fee (3x)";
-        feeType = "SuperFine (<1 Day Notice)";
+        feeType = "SuperFine (< 24 Hours)";
         feeAmount = subtotal * 2; // Adding 2x makes total 3x
     } else if (daysNotice <= 2) {
         feeName = "Superfast Fee (30%)";
-        feeType = "Superfast (1-2 Days Notice)";
+        feeType = "Superfast (24-48 Hours)";
         feeAmount = Math.round(subtotal * 0.30);
     } else if (daysNotice <= 4) {
         feeName = "Late Fee (15%)";
-        feeType = "Late (3-4 Days Notice)";
+        feeType = "Late (3-4 Days)";
         feeAmount = Math.round(subtotal * 0.15);
     } else {
         feeName = "Standard (No Fee)";
-        feeType = "Standard (5+ Days Notice)";
+        feeType = "Standard (5+ Days)";
         feeAmount = 0;
     }
 
@@ -771,7 +771,7 @@ function formatEventContract(data: { items: any[], eventDate: string, collection
     }).join('\n');
 
     // Fee Logic based on NEW Policy
-    if (daysNotice < 1) { // < 24 Hours
+    if (daysNotice <= 1) { // < 24 Hours
         feeName = "Tier 3: Superfine (< 24h)";
         feeType = "Tier 3 (3x)";
         feeAmount = subtotal * 2; // Total becomes 3x
