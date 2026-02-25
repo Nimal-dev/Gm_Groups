@@ -1,3 +1,5 @@
+import { calculateBulkOrderSurcharge } from './pricing-utils';
+
 export function formatInvoice(items: { description: string; quantity: number; price: number }[], discountStr: string, to: string, from: string) {
     const fmt = (n: number) => `$ ${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     const center = (str: string, width: number = 80) => {
@@ -150,23 +152,10 @@ export function formatCitizenContract(data: { items: any[], eventDate: string },
         return `${idx.padEnd(3)} ${name} ${qty} ${price} ${lineTotal}`;
     }).join('\n');
 
-    if (daysNotice <= 1) {
-        feeName = "SuperFine Fee (3x)";
-        feeType = "SuperFine (< 24 Hours)";
-        feeAmount = subtotal * 2;
-    } else if (daysNotice <= 2) {
-        feeName = "Superfast Fee (30%)";
-        feeType = "Superfast (24-48 Hours)";
-        feeAmount = Math.round(subtotal * 0.30);
-    } else if (daysNotice <= 4) {
-        feeName = "Late Fee (15%)";
-        feeType = "Late (3-4 Days)";
-        feeAmount = Math.round(subtotal * 0.15);
-    } else {
-        feeName = "Standard (No Fee)";
-        feeType = "Standard (5+ Days)";
-        feeAmount = 0;
-    }
+    const pricing = calculateBulkOrderSurcharge(subtotal, data.eventDate);
+    feeName = pricing.msg;
+    feeType = pricing.type;
+    feeAmount = pricing.surcharge;
 
     const grandTotal = subtotal + feeAmount;
     const advance = Math.round(grandTotal * 0.50);
@@ -268,23 +257,10 @@ export function formatEventContract(data: { items: any[], eventDate: string, col
         return `${(i + 1).toString().padEnd(3)} ${(item.description.substring(0, 30)).padEnd(30)} ${(item.quantity.toString()).padEnd(15)} ${fmt(item.price).padEnd(12)} ${fmt(total)}`;
     }).join('\n');
 
-    if (daysNotice <= 1) { // < 24 Hours
-        feeName = "Tier 3: Superfine (< 24h)";
-        feeType = "Tier 3 (3x)";
-        feeAmount = subtotal * 2;
-    } else if (daysNotice <= 2) { // 24-48 Hours
-        feeName = "Tier 2: Rush Fee (24-48h)";
-        feeType = "Tier 2 (30%)";
-        feeAmount = Math.round(subtotal * 0.30);
-    } else if (daysNotice <= 4) { // 3-4 Days
-        feeName = "Tier 1: Surcharge (3-4 Days)";
-        feeType = "Tier 1 (15%)";
-        feeAmount = Math.round(subtotal * 0.15);
-    } else {
-        feeName = "Standard";
-        feeType = "Standard";
-        feeAmount = 0;
-    }
+    const pricing = calculateBulkOrderSurcharge(subtotal, data.eventDate);
+    feeName = pricing.msg;
+    feeType = pricing.type;
+    feeAmount = pricing.surcharge;
 
     const grandTotal = subtotal + feeAmount;
     const advance = Math.round(grandTotal * 0.50);

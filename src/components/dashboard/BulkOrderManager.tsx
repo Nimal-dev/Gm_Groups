@@ -21,6 +21,7 @@ import { createCitizenOrder, createRecurringOrder, updateOrderStatus, endRecurri
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { CateringRequestsManager } from '@/components/dashboard/CateringRequestsManager';
 import { getCateringRequests } from '@/actions/catering';
+import { calculateBulkOrderSurcharge } from '@/lib/pricing-utils';
 
 export interface Order {
     orderId: string;
@@ -336,7 +337,8 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                             <div className="lg:col-span-2">
                                 <form onSubmit={(e) => {
                                     e.preventDefault();
-                                    const calc = calculateTotal(citizenForm.amount, citizenForm.eventDate);
+                                    const base = parseFloat(citizenForm.amount) || 0;
+                                    const calc = calculateBulkOrderSurcharge(base, citizenForm.eventDate);
                                     handleCitizenSubmit(e, calc.total.toString());
                                 }} className="space-y-4 p-4 bg-black/20 rounded-lg border border-white/5">
                                     <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
@@ -361,7 +363,8 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                     </div>
                                     <div className="p-3 bg-white/5 rounded border border-white/10 text-sm space-y-1">
                                         {(() => {
-                                            const calc = calculateTotal(citizenForm.amount, citizenForm.eventDate);
+                                            const base = parseFloat(citizenForm.amount) || 0;
+                                            const calc = calculateBulkOrderSurcharge(base, citizenForm.eventDate);
                                             return (
                                                 <>
                                                     <div className="flex justify-between text-muted-foreground">
@@ -604,44 +607,5 @@ function getStatusColor(status: string) {
         case 'Cancelled': return 'border-red-500 text-red-400 bg-red-500/10';
         default: return 'border-gray-500 text-gray-400 bg-gray-500/10';
     }
-}
 
-function calculateTotal(baseAmount: string, eventDate: string) {
-    if (!baseAmount || !eventDate) return { base: 0, surcharge: 0, total: 0, msg: "Pending Info" };
-
-    const base = parseFloat(baseAmount);
-    if (isNaN(base)) return { base: 0, surcharge: 0, total: 0, msg: "Invalid Amount" };
-
-    // Same Logic as Bot
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const event = new Date(eventDate);
-    // Collection date is 1 day before event
-    const collection = new Date(event);
-    collection.setDate(event.getDate() - 1);
-
-    const diffTime = collection.getTime() - today.getTime();
-    const daysNotice = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    let surcharge = 0;
-    let msg = "Standard";
-
-    if (daysNotice < 1) { // 3x
-        surcharge = base * 2; // +200% = 3x total
-        msg = "SuperFine (3x)";
-    } else if (daysNotice <= 2) {
-        surcharge = base * 0.30;
-        msg = "SuperFast (+30%)";
-    } else if (daysNotice <= 4) {
-        surcharge = base * 0.15;
-        msg = "Late (+15%)";
-    }
-
-    return {
-        base: base,
-        surcharge: Math.round(surcharge),
-        total: Math.round(base + surcharge),
-        msg
-    };
 }
