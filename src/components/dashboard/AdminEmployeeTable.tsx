@@ -82,64 +82,107 @@ export function AdminEmployeeTable() {
                         <Loader2 className="w-8 h-8 animate-spin text-accent" />
                     </div>
                 ) : (
-                    <div className="rounded-md border border-white/10 overflow-hidden">
-                        <Table>
-                            <TableHeader className="bg-white/5">
-                                <TableRow>
-                                    <TableHead className="w-[80px]">Rank</TableHead>
-                                    <TableHead>Employee</TableHead>
-                                    <TableHead>Role</TableHead>
-                                    <TableHead className="text-right">Level</TableHead>
-                                    <TableHead className="text-right">Total XP</TableHead>
-                                    <TableHead className="text-center">Achievements</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {filtered.map((emp, index) => (
-                                    <TableRow key={emp.id} className="hover:bg-white/5">
-                                        <TableCell className="font-mono text-muted-foreground">
-                                            #{index + 1}
-                                        </TableCell>
-                                        <TableCell className="font-medium flex items-center gap-2">
-                                            <User className="w-4 h-4 opacity-50" /> {emp.username}
-                                            {index === 0 && <Trophy className="w-4 h-4 text-yellow-400 fill-yellow-400" />}
-                                            {index === 1 && <Trophy className="w-4 h-4 text-gray-400 fill-gray-400" />}
-                                            {index === 2 && <Trophy className="w-4 h-4 text-orange-400 fill-orange-400" />}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge className={`uppercase text-[10px] ${getRankBadgeColor(emp.rank)}`}>
-                                                {emp.rank}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            <div className="flex justify-center py-2">
-                                                <LevelBadge level={emp.level} size="sm" />
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-right font-mono">
-                                            {emp.xp.toLocaleString('en-US')}
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            {emp.achievementsCount > 0 ? (
-                                                <Badge variant="outline" className="border-yellow-500/50 text-yellow-500">
-                                                    {emp.achievementsCount} 🏆
-                                                </Badge>
-                                            ) : (
-                                                <span className="text-muted-foreground text-xs">-</span>
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                {filtered.length === 0 && (
+                    <>
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block rounded-md border border-white/10 overflow-hidden">
+                            <Table>
+                                <TableHeader className="bg-white/5">
                                     <TableRow>
-                                        <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
-                                            No employees found.
-                                        </TableCell>
+                                        <TableHead className="w-[80px]">Rank</TableHead>
+                                        <TableHead>Employee</TableHead>
+                                        <TableHead>Role</TableHead>
+                                        <TableHead className="text-right">Level</TableHead>
+                                        <TableHead className="text-right">Total XP</TableHead>
+                                        <TableHead className="text-center">Achievements</TableHead>
                                     </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
+                                </TableHeader>
+                                <TableBody>
+                                    {filtered.map((emp, index) => (
+                                        <TableRow key={emp.id} className="hover:bg-white/5">
+                                            <TableCell className="font-mono text-muted-foreground">
+                                                #{index + 1}
+                                            </TableCell>
+                                            <TableCell className="font-medium flex items-center gap-2">
+                                                <User className="w-4 h-4 opacity-50" /> {emp.username}
+                                                {index === 0 && <Trophy className="w-4 h-4 text-yellow-400 fill-yellow-400" />}
+                                                {index === 1 && <Trophy className="w-4 h-4 text-gray-400 fill-gray-400" />}
+                                                {index === 2 && <Trophy className="w-4 h-4 text-orange-400 fill-orange-400" />}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge className={`uppercase text-[10px] ${getRankBadgeColor(emp.rank)}`}>
+                                                    {emp.rank}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                <div className="flex justify-center py-2">
+                                                    <LevelBadge level={emp.level} size="sm" />
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-right font-mono">
+                                                {emp.xp.toLocaleString('en-US')}
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                {emp.achievementsCount > 0 ? (
+                                                    <Badge variant="outline" className="border-yellow-500/50 text-yellow-500">
+                                                        {emp.achievementsCount} 🏆
+                                                    </Badge>
+                                                ) : (
+                                                    <span className="text-muted-foreground text-xs">-</span>
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                    {filtered.length === 0 && (
+                                        <TableRow>
+                                            <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
+                                                No employees found.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+
+                        {/* Mobile Card View */}
+                        <div className="grid grid-cols-1 gap-4 md:hidden">
+                            {filtered.map((emp, index) => (
+                                <div key={emp.id} className="p-4 rounded-xl border border-white/10 bg-white/5 space-y-3 relative overflow-hidden">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-2">
+                                            <div className="font-mono text-muted-foreground text-sm flex items-center gap-1">
+                                                #{index + 1}
+                                                {index === 0 && <Trophy className="w-4 h-4 text-yellow-400 fill-yellow-400" />}
+                                                {index === 1 && <Trophy className="w-4 h-4 text-gray-400 fill-gray-400" />}
+                                                {index === 2 && <Trophy className="w-4 h-4 text-orange-400 fill-orange-400" />}
+                                            </div>
+                                        </div>
+                                        <Badge className={`uppercase text-[10px] ${getRankBadgeColor(emp.rank)}`}>
+                                            {emp.rank}
+                                        </Badge>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <div className="font-bold text-lg flex items-center gap-2">
+                                            <User className="w-4 h-4 opacity-50" /> {emp.username}
+                                        </div>
+                                        <LevelBadge level={emp.level} size="sm" />
+                                    </div>
+                                    <div className="flex items-center justify-between pt-2 border-t border-white/10 text-sm">
+                                        <span className="text-muted-foreground font-mono">XP: <span className="text-white">{emp.xp.toLocaleString('en-US')}</span></span>
+                                        {emp.achievementsCount > 0 && (
+                                            <Badge variant="outline" className="border-yellow-500/50 text-yellow-500 scale-90 origin-right">
+                                                {emp.achievementsCount} 🏆
+                                            </Badge>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                            {filtered.length === 0 && (
+                                <div className="text-center p-8 text-muted-foreground border border-white/10 rounded-xl bg-white/5">
+                                    No employees found.
+                                </div>
+                            )}
+                        </div>
+                    </>
                 )}
             </CardContent>
         </Card>

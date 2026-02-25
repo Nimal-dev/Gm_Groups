@@ -3,7 +3,7 @@ import { ClientTime } from '@/components/dashboard/ClientTime';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Users, ShoppingCart, DollarSign, Activity, FileText } from 'lucide-react';
-import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
+import { DashboardV2 } from '@/components/dashboard/DashboardV2';
 import { LogoutButton } from '@/components/dashboard/LogoutButton';
 
 export const dynamic = 'force-dynamic'; // Ensure real-time data
@@ -78,13 +78,13 @@ export default async function DashboardPage() {
     // Destructure activeLeaves
     const { activeLeaves } = data;
 
+    // Main Content Tabs (Client Side)
     return (
         <div className="min-h-screen p-4 md:p-8 space-y-8 pb-20">
             {/* Header */}
-            {/* ... existing header ... */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-7xl mx-auto w-full">
                 <div>
-                    <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60 mb-2">
+                    <h1 className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60 mb-2">
                         Command Center
                     </h1>
                     <p className="text-muted-foreground">
@@ -93,15 +93,14 @@ export default async function DashboardPage() {
                 </div>
                 <div className="flex items-center gap-2">
                     <LogoutButton />
-                    <Badge variant="outline" className="glass-card px-4 py-1 text-xs font-mono">
-                        Role: {role.toUpperCase()}
+                    <Badge variant="outline" className="glass-card px-4 py-1.5 text-xs font-mono border-accent/30 text-accent bg-accent/10">
+                        {role.toUpperCase()}
                     </Badge>
                 </div>
             </div>
 
             {/* Top Stats Row */}
-            {/* ... existing stats row ... */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 max-w-7xl mx-auto w-full">
 
                 {role === 'admin' && (
                     <>
@@ -158,8 +157,8 @@ export default async function DashboardPage() {
                 />
             </div>
 
-            {/* Main Content Tabs (Client Side) */}
-            <DashboardTabs
+            {/* Main Content Layout (Client Side) */}
+            <DashboardV2
                 activeStaff={activeStaff}
                 activeOrders={activeOrders}
                 recurringOrders={recurringOrders || []}

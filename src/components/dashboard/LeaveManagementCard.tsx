@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -22,6 +22,15 @@ export function LeaveManagementCard({ leaves, employees, userRole }: { leaves: a
     const { toast } = useToast();
     const isAdmin = userRole === 'admin';
     const [isLoading, setIsLoading] = useState(false);
+
+    // Optimistic UI State
+    const [localLeaves, setLocalLeaves] = useState(leaves);
+
+    // Keep in sync with server state
+    useEffect(() => {
+        setLocalLeaves(leaves);
+    }, [leaves]);
+
     const [open, setOpen] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState('');
     const [reason, setReason] = useState('');
@@ -39,13 +48,19 @@ export function LeaveManagementCard({ leaves, employees, userRole }: { leaves: a
         setIsLoading(true);
         const employee = employees.find(e => e.userId === selectedEmployee);
 
-        const res = await createLeave({
+        const newLeaveData = {
             userId: selectedEmployee,
             username: employee ? employee.username : 'Unknown',
             startDate: dateRange.from,
             endDate: dateRange.to,
             reason
-        });
+        };
+
+        // Optimistic add with temporary ID
+        const previousLeaves = [...localLeaves];
+        setLocalLeaves(prev => [...prev, { ...newLeaveData, _id: `temp-${Date.now()}` }]);
+
+        const res = await createLeave(newLeaveData);
 
         if (res.success) {
             toast({ title: 'Success', description: 'Leave request added.' });
@@ -53,6 +68,8 @@ export function LeaveManagementCard({ leaves, employees, userRole }: { leaves: a
             setReason('');
             setSelectedEmployee('');
         } else {
+            // Revert on failure
+            setLocalLeaves(previousLeaves);
             toast({ title: 'Error', description: res.error, variant: 'destructive' });
         }
         setIsLoading(false);
@@ -60,27 +77,34 @@ export function LeaveManagementCard({ leaves, employees, userRole }: { leaves: a
 
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to remove this leave entry?')) return;
+
+        // Optimistic delete
+        const previousLeaves = [...localLeaves];
+        setLocalLeaves(prev => prev.filter(l => l._id !== id));
+
         const res = await deleteLeave(id);
         if (res.success) {
             toast({ title: 'Deleted', description: 'Leave entry removed.' });
         } else {
+            // Revert on failure
+            setLocalLeaves(previousLeaves);
             toast({ title: 'Error', description: res.error, variant: 'destructive' });
         }
     };
 
     return (
         <Card className="glass-card flex flex-col h-[400px]">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <div>
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                        <Plane className="w-5 h-5 text-blue-400 transform -rotate-45" /> Staff on Leave
+            <CardHeader className="flex flex-row items-start justify-between pb-3 gap-2">
+                <div className="min-w-0 flex-1">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg truncate">
+                        <Plane className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 transform -rotate-45 shrink-0" /> <span className="truncate">Staff on Leave</span>
                     </CardTitle>
-                    <CardDescription>Track active planned absences</CardDescription>
+                    <CardDescription className="text-xs sm:text-sm truncate">Track active planned absences</CardDescription>
                 </div>
                 {isAdmin && (
                     <Dialog open={open} onOpenChange={setOpen}>
                         <DialogTrigger asChild>
-                            <Button size="sm" variant="outline" className="h-8 border-white/10 hover:bg-white/5">
+                            <Button size="sm" variant="outline" className="h-8 border-white/10 hover:bg-white/5 shrink-0 mt-0.5">
                                 <Plus className="w-4 h-4 mr-1" /> Add
                             </Button>
                         </DialogTrigger>
@@ -130,14 +154,14 @@ export function LeaveManagementCard({ leaves, employees, userRole }: { leaves: a
             </CardHeader>
             <CardContent className="flex-1 min-h-0">
                 <ScrollArea className="h-full pr-4">
-                    {leaves.length === 0 ? (
+                    {localLeaves.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full text-muted-foreground opacity-50">
                             <CalendarOff className="w-10 h-10 mb-2" />
                             <p>No staff currently on leave</p>
                         </div>
                     ) : (
                         <div className="space-y-3">
-                            {leaves.map((leave) => (
+                            {localLeaves.map((leave) => (
                                 <div key={leave._id} className="relative group flex flex-col p-3 rounded-lg bg-white/5 border border-white/5 hover:border-blue-500/30 transition-colors">
                                     <div className="flex items-center justify-between mb-1">
                                         <span className="font-medium text-blue-200">{leave.username}</span>

@@ -43,6 +43,13 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
 
+    // Optimistic UI State
+    const [localOrders, setLocalOrders] = useState<Order[]>(activeOrders);
+
+    useEffect(() => {
+        setLocalOrders(activeOrders);
+    }, [activeOrders]);
+
     // Manage State
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [cancelReason, setCancelReason] = useState('');
@@ -111,13 +118,17 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
     }, [toast]);
 
     const handleStatusUpdate = useCallback(async (order: Order, newStatus: string, reason?: string) => {
-        setLoading(true);
+        // Optimistic Update
+        setLocalOrders(prev => prev.map(o => o.orderId === order.orderId ? { ...o, status: newStatus } : o));
+
         const res = await updateOrderStatus(order.orderId, order.messageId, order.channelId, newStatus, reason);
-        setLoading(false);
+
         if (res.success) {
             toast({ title: 'Updated', description: `Order marked as ${newStatus}` });
             if (newStatus === 'Cancelled') setIsCancelDialogOpen(false);
         } else {
+            // Revert on failure
+            setLocalOrders(prev => prev.map(o => o.orderId === order.orderId ? { ...o, status: order.status } : o));
             toast({ variant: 'destructive', title: 'Failed', description: res.error });
         }
     }, [toast]);
@@ -133,7 +144,7 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
         setIsDetailsOpen(true);
     }, []);
 
-    const filteredActiveOrders = useMemo(() => activeOrders.filter(o => o.status !== 'Cancelled'), [activeOrders]);
+    const filteredActiveOrders = useMemo(() => localOrders.filter(o => o.status !== 'Cancelled'), [localOrders]);
 
     return (
         <Card className="glass-card">
@@ -209,7 +220,7 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                     <TabsContent key={statusTab} value={statusTab} className="pt-4">
                                         <ScrollArea className="h-[600px] pr-4">
                                             <div className="space-y-3">
-                                                {activeOrders.filter(o =>
+                                                {localOrders.filter(o =>
                                                     statusTab === 'pending' ? o.status === 'Pending' :
                                                         statusTab === 'progress' ? (o.status === 'In Progress' || o.status === 'Ready') :
                                                             statusTab === 'completed' ? o.status === 'Completed' :

@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Trophy, Star, Medal, Award } from 'lucide-react';
 import { getLevelConfig } from '@/lib/levelUtils';
 import { CrossedSwords, AngelWings, MasterWings } from './LevelDecorations';
+import { motion, useAnimation, useInView } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
 
 interface GamificationCardProps {
     user: {
@@ -55,21 +57,40 @@ export function GamificationCard({ user }: GamificationCardProps) {
         }
     };
 
+    const progressRef = useRef(null);
+    const isInView = useInView(progressRef, { once: true, margin: "-50px" });
+
     return (
-        <Card className="glass-card mb-6 border-accent/20 relative overflow-hidden">
-            {/* Background Decoration */}
-            <div className="absolute top-0 right-0 p-8 opacity-5">
-                <Trophy className="w-32 h-32" />
-            </div>
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+        >
+            <Card className="glass-card mb-6 border-accent/20 relative overflow-hidden hover:border-accent/40 transition-colors duration-500">
+                {/* Background Decoration */}
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
+                    className="absolute -top-10 -right-10 p-8 opacity-5"
+                >
+                    <Trophy className="w-48 h-48" />
+                </motion.div>
 
-            <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row gap-6 items-center">
-                    {/* Level Badge */}
-                    <div className="relative group flex justify-center items-center w-32 h-32" style={dynamicStyle}>
+                <CardContent className="p-6">
+                    <div className="flex flex-col md:flex-row gap-6 items-center">
+                        {/* Level Badge */}
+                        <div className="relative group flex justify-center items-center w-32 h-32" style={dynamicStyle}>
+                            {/* Animated Aura */}
+                            <motion.div
+                                className="absolute inset-0 rounded-full opacity-30"
+                                animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
+                                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                                style={{ backgroundColor: config.shadowColor, filter: 'blur(15px)' }}
+                            />
 
-                        {renderDecoration()}
+                            {renderDecoration()}
 
-                        <div className={`
+                            <div className={`
                             flex items-center justify-center 
                             bg-black
                             ${config.color}
@@ -77,9 +98,9 @@ export function GamificationCard({ user }: GamificationCardProps) {
                             ${isClipShape ? 'shadow-none drop-shadow-lg' : 'animate-level-fire rounded-full'}
                             ${config.shape === 'star' ? 'w-32 h-32 scale-110' : 'w-24 h-24'}
                         `}
-                            style={isClipShape ? { filter: `drop-shadow(0 0 ${10 + (currentLevel * 0.5)}px ${config.shadowColor})` } : {}}
-                        >
-                            <div className={`
+                                style={isClipShape ? { filter: `drop-shadow(0 0 ${10 + (currentLevel * 0.5)}px ${config.shadowColor})` } : {}}
+                            >
+                                <div className={`
                                 flex flex-col items-center justify-center 
                                 border-4 
                                 shape-${config.shape}
@@ -88,56 +109,65 @@ export function GamificationCard({ user }: GamificationCardProps) {
                                 ${config.shape === 'star' ? 'bg-gradient-to-br from-yellow-300 via-yellow-500 to-amber-600 border-yellow-200/50' : 'bg-black'}
                                 ${config.shape !== 'star' ? `${config.color.replace('bg-', 'border-')}/50` : ''}
                             `}>
-                                <span className={`text-[10px] uppercase font-bold tracking-widest ${config.shape === 'star' ? 'text-black/60 text-[8px] -mt-1' : 'text-muted-foreground'}`}>Level</span>
-                                <span className={`font-black leading-none ${config.shape === 'star' ? 'text-black text-2xl drop-shadow-sm' : 'text-white text-4xl'}`}>{currentLevel}</span>
-                            </div>
-                        </div>
-                        <div className="absolute -bottom-2 w-full text-center z-20">
-                            <Badge className={`${config.color} ${config.title === 'MASTER' ? 'text-white' : 'text-black'} hover:brightness-110 border-0 font-bold px-2 py-0.5 text-[10px] whitespace-nowrap`}>
-                                {config.title}
-                            </Badge>
-                        </div>
-                    </div>
-
-                    {/* Stats & Progress */}
-                    <div className="flex-1 w-full space-y-4">
-                        <div className="flex justify-between items-end">
-                            <div>
-                                <h3 className="text-2xl font-bold">{user.username}</h3>
-                                <p className="text-sm text-accent flex items-center gap-1">
-                                    <Star className="w-3 h-3 fill-accent" /> Total XP: {currentXp.toLocaleString('en-US')}
-                                </p>
-                            </div>
-                            <div className="text-right text-xs font-mono text-muted-foreground">
-                                {Math.floor(xpProgress)} / {xpNeeded} XP to Level {currentLevel + 1}
-                            </div>
-                        </div>
-
-                        <div className="relative h-4 w-full bg-secondary/50 rounded-full overflow-hidden border border-white/5">
-                            <div
-                                className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-1000 ease-out"
-                                style={{ width: `${percentage}%` }}
-                            />
-                        </div>
-
-                        {/* Recent Achievements Preview */}
-                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                            {user.achievements && user.achievements.length > 0 ? (
-                                user.achievements.slice(-5).map((ach) => (
-                                    <div key={ach.id} className="flex items-center gap-2 px-3 py-1.5 rounded bg-white/5 border border-white/10 shrink-0" title={new Date(ach.unlockedAt).toLocaleDateString('en-GB')}>
-                                        <Medal className="w-4 h-4 text-yellow-400" />
-                                        <span className="text-xs font-medium">{ach.title}</span>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="text-xs text-muted-foreground italic flex items-center gap-2">
-                                    <Award className="w-4 h-4 opacity-50" /> No achievements yet. Keep working!
+                                    <span className={`text-[10px] uppercase font-bold tracking-widest ${config.shape === 'star' ? 'text-black/60 text-[8px] -mt-1' : 'text-muted-foreground'}`}>Level</span>
+                                    <span className={`font-black leading-none ${config.shape === 'star' ? 'text-black text-2xl drop-shadow-sm' : 'text-white text-4xl'}`}>{currentLevel}</span>
                                 </div>
-                            )}
+                            </div>
+                            <div className="absolute -bottom-2 w-full text-center z-20">
+                                <Badge className={`${config.color} ${config.title === 'MASTER' ? 'text-white' : 'text-black'} hover:brightness-110 border-0 font-bold px-2 py-0.5 text-[10px] whitespace-nowrap`}>
+                                    {config.title}
+                                </Badge>
+                            </div>
+                        </div>
+
+                        {/* Stats & Progress */}
+                        <div className="flex-1 w-full space-y-4">
+                            <div className="flex justify-between items-end">
+                                <div>
+                                    <h3 className="text-2xl font-bold">{user.username}</h3>
+                                    <p className="text-sm text-accent flex items-center gap-1">
+                                        <Star className="w-3 h-3 fill-accent" /> Total XP: {currentXp.toLocaleString('en-US')}
+                                    </p>
+                                </div>
+                                <div className="text-right text-xs font-mono text-muted-foreground">
+                                    {Math.floor(xpProgress)} / {xpNeeded} XP to Level {currentLevel + 1}
+                                </div>
+                            </div>
+
+                            <div ref={progressRef} className="relative h-4 w-full bg-secondary/50 rounded-full overflow-hidden border border-white/5 shadow-inner">
+                                <motion.div
+                                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+                                    initial={{ width: "0%" }}
+                                    animate={isInView ? { width: `${percentage}%` } : { width: "0%" }}
+                                    transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
+                                />
+                                {/* Shine effect on progress bar */}
+                                <motion.div
+                                    className="absolute top-0 bottom-0 w-10 bg-white/20 blur-md skew-x-[-20deg]"
+                                    animate={{ left: ["-10%", "110%"] }}
+                                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                                />
+                            </div>
+
+                            {/* Recent Achievements Preview */}
+                            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                                {user.achievements && user.achievements.length > 0 ? (
+                                    user.achievements.slice(-5).map((ach) => (
+                                        <div key={ach.id} className="flex items-center gap-2 px-3 py-1.5 rounded bg-white/5 border border-white/10 shrink-0" title={new Date(ach.unlockedAt).toLocaleDateString('en-GB')}>
+                                            <Medal className="w-4 h-4 text-yellow-400" />
+                                            <span className="text-xs font-medium">{ach.title}</span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-xs text-muted-foreground italic flex items-center gap-2">
+                                        <Award className="w-4 h-4 opacity-50" /> No achievements yet. Keep working!
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+        </motion.div>
     );
 }

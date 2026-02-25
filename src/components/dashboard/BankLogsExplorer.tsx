@@ -180,8 +180,8 @@ export function BankLogsExplorer() {
                         </div>
                     </div>
 
-                    {/* Table */}
-                    <div className="rounded-md border border-white/10 flex-1 overflow-hidden relative flex flex-col">
+                    {/* Table (Desktop) */}
+                    <div className="hidden md:flex rounded-md border border-white/10 flex-1 overflow-hidden relative flex-col">
                         <div className="flex-1 overflow-auto">
                             <div className="min-w-[800px]">
                                 <Table>
@@ -255,36 +255,96 @@ export function BankLogsExplorer() {
                                 </Table>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Pagination Controls */}
-                        {data && data.pagination && (
-                            <div className="flex items-center justify-between p-4 border-t border-white/10 bg-black/20">
-                                <div className="text-xs text-muted-foreground">
-                                    Page {currentPage} of {Math.max(1, data.pagination.totalPages)} | Total: {data.pagination.total}
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleSearch(currentPage - 1)}
-                                        disabled={currentPage <= 1 || isLoading}
-                                        className="h-8 w-8 p-0"
-                                    >
-                                        &lt;
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleSearch(currentPage + 1)}
-                                        disabled={currentPage >= data.pagination.totalPages || isLoading}
-                                        className="h-8 w-8 p-0"
-                                    >
-                                        &gt;
-                                    </Button>
-                                </div>
+                    {/* Mobile Card View */}
+                    <div className="flex flex-col gap-4 md:hidden overflow-auto flex-1 h-full">
+                        {!hasSearched && !data ? (
+                            <div className="text-center p-8 text-muted-foreground border border-white/10 rounded-xl bg-white/5">
+                                Select filters and click "Search Logs" to view records.
+                            </div>
+                        ) : (data?.logs || []).length === 0 ? (
+                            <div className="text-center p-8 text-muted-foreground border border-white/10 rounded-xl bg-white/5">
+                                No transactions found matching criteria.
+                            </div>
+                        ) : (
+                            <div className="space-y-4 pb-4">
+                                {(data?.logs || []).map((log: any) => {
+                                    const isExpense = log.transactionType === 'WITHDRAW' ||
+                                        (log.transactionType === 'TRANSFER' &&
+                                            (log.memo && log.memo.toLowerCase().includes('transfer to'))
+                                        );
+                                    return (
+                                        <div key={log.transactionId} className="p-4 rounded-xl border border-white/10 bg-white/5 space-y-3">
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <div className="font-bold text-lg truncate max-w-[200px]">{log.accountName}</div>
+                                                    <div className="text-xs text-muted-foreground font-mono">{log.accountNumber}</div>
+                                                </div>
+                                                <Badge variant="outline" className={cn("text-[10px]", getTypeColor(log.transactionType))}>
+                                                    {log.transactionType}
+                                                </Badge>
+                                            </div>
+
+                                            <div className="mt-2 text-sm text-muted-foreground">
+                                                <div className="truncate opacity-80 mb-1">{log.memo}</div>
+                                                {(log.transferredTo || (log.memo && log.memo.toLowerCase().includes('transfer to'))) && (
+                                                    <div className="text-xs text-blue-300 flex items-center gap-1">
+                                                        <ArrowUpRight className="w-3 h-3" />
+                                                        To: {log.transferredTo || log.memo.split(/transfer to/i)[1]?.trim() || 'Unknown'}
+                                                    </div>
+                                                )}
+                                                {log.transferredFrom && (
+                                                    <div className="text-xs text-green-300 flex items-center gap-1">
+                                                        <ArrowDownLeft className="w-3 h-3" />
+                                                        From: {log.transferredFrom}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="flex justify-between items-center pt-3 border-t border-white/10">
+                                                <span className="font-mono text-xs text-muted-foreground whitespace-nowrap">
+                                                    <ClientTime timestamp={log.createdAt || log.date} />
+                                                </span>
+                                                <span className={cn("font-bold font-mono text-lg", isExpense ? 'text-red-400' : 'text-green-400')}>
+                                                    {isExpense ? '-' : '+'}${log.amount.toLocaleString('en-US')}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
                             </div>
                         )}
                     </div>
+
+                    {/* Pagination Controls */}
+                    {data && data.pagination && (
+                        <div className="flex items-center justify-between p-4 border-t border-white/10 bg-black/20">
+                            <div className="text-xs text-muted-foreground">
+                                Page {currentPage} of {Math.max(1, data.pagination.totalPages)} | Total: {data.pagination.total}
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleSearch(currentPage - 1)}
+                                    disabled={currentPage <= 1 || isLoading}
+                                    className="h-8 w-8 p-0"
+                                >
+                                    &lt;
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleSearch(currentPage + 1)}
+                                    disabled={currentPage >= data.pagination.totalPages || isLoading}
+                                    className="h-8 w-8 p-0"
+                                >
+                                    &gt;
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </div>

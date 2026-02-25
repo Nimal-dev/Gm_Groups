@@ -96,7 +96,7 @@ export function DutyControl() {
             }}
             transition={{ duration: 0.5 }}
             className={cn(
-                "flex items-center justify-between p-4 rounded-xl border bg-black/40 backdrop-blur-md mb-4 relative overflow-hidden group transition-colors",
+                "flex items-center justify-between p-3 rounded-xl border bg-black/40 backdrop-blur-md mb-4 relative overflow-hidden group transition-colors",
                 status === 'ON_DUTY' && "bg-green-950/20"
             )}
         >
@@ -110,8 +110,8 @@ export function DutyControl() {
                 />
             )}
 
-            <div className="flex items-center gap-4 relative z-10">
-                <div className="relative">
+            <div className="flex items-center gap-2 sm:gap-3 relative z-10 min-w-0">
+                <div className="relative shrink-0">
                     <motion.div
                         animate={status === 'ON_DUTY' ? { rotate: 360 } : { rotate: 0 }}
                         transition={status === 'ON_DUTY' ? { duration: 8, ease: "linear", repeat: Infinity } : {}}
@@ -121,8 +121,8 @@ export function DutyControl() {
                     </motion.div>
                 </div>
 
-                <div className="flex flex-col">
-                    <h4 className="font-extrabold text-sm uppercase tracking-wider">
+                <div className="flex flex-col min-w-0">
+                    <h4 className="font-extrabold text-xs sm:text-sm uppercase tracking-wider truncate">
                         {status === 'ON_DUTY' ? (
                             <span className="text-green-400 drop-shadow-[0_0_5px_rgba(34,197,94,0.8)]">Active Shift</span>
                         ) : (
@@ -134,8 +134,8 @@ export function DutyControl() {
                         initial={{ opacity: 0, y: 5 }}
                         animate={{ opacity: 1, y: 0 }}
                         className={cn(
-                            "text-xs font-mono mt-0.5",
-                            status === 'ON_DUTY' ? "text-white font-bold text-sm tracking-widest" : "text-muted-foreground"
+                            "text-xs font-mono mt-0.5 truncate",
+                            status === 'ON_DUTY' ? "text-white font-bold tracking-widest" : "text-muted-foreground"
                         )}
                     >
                         {status === 'ON_DUTY' ? elapsed : 'Ready to work?'}
@@ -143,7 +143,7 @@ export function DutyControl() {
                 </div>
             </div>
 
-            <div className="relative z-10">
+            <div className="relative z-10 shrink-0 ml-2">
                 <AnimatePresence mode="wait">
                     {status === 'OFF_DUTY' ? (
                         <motion.div
@@ -157,9 +157,9 @@ export function DutyControl() {
                                 size="sm"
                                 onClick={handleClockIn}
                                 disabled={loading}
-                                className="bg-green-600 hover:bg-green-500 text-white font-bold border-0 shadow-[0_0_10px_rgba(34,197,94,0.3)] hover:shadow-[0_0_20px_rgba(34,197,94,0.6)] transition-all h-9 px-4"
+                                className="bg-green-600 hover:bg-green-500 text-white font-bold border-0 shadow-[0_0_10px_rgba(34,197,94,0.3)] hover:shadow-[0_0_20px_rgba(34,197,94,0.6)] transition-all h-8 px-3 text-xs"
                             >
-                                <Play className="w-4 h-4 mr-2" /> Clock In
+                                <Play className="w-3 h-3 mr-1" /> Clock In
                             </Button>
                         </motion.div>
                     ) : (
@@ -176,9 +176,9 @@ export function DutyControl() {
                                         size="sm"
                                         disabled={loading}
                                         variant="destructive"
-                                        className="font-bold h-9 px-4 hover:bg-red-600 shadow-[0_0_10px_rgba(239,68,68,0.2)] hover:shadow-[0_0_20px_rgba(239,68,68,0.5)] transition-all"
+                                        className="font-bold h-8 px-3 text-xs hover:bg-red-600 shadow-[0_0_10px_rgba(239,68,68,0.2)] hover:shadow-[0_0_20px_rgba(239,68,68,0.5)] transition-all"
                                     >
-                                        <Square className="w-3 h-3 mr-2 fill-current" /> Clock Out
+                                        <Square className="w-3 h-3 mr-1 fill-current" /> Clock Out
                                     </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent className="glass-card border border-white/10 bg-black/95 text-white shadow-2xl shadow-red-900/20">

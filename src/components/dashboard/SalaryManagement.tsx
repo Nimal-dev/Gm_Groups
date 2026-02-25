@@ -83,7 +83,8 @@ export function PayrollManagement({ employees }: PayrollManagementProps) {
                 <CardDescription>Process salary payments for active GM Staff.</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden flex flex-col min-h-0">
-                <div className="rounded-md border border-white/10 flex-1 overflow-hidden relative">
+                {/* Desktop Table View */}
+                <div className="hidden lg:block rounded-md border border-white/10 flex-1 overflow-hidden relative">
                     <div className="h-full overflow-auto">
                         <div className="min-w-[800px]">
                             <Table>
@@ -187,6 +188,86 @@ export function PayrollManagement({ employees }: PayrollManagementProps) {
                             </Table>
                         </div>
                     </div>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="flex flex-col gap-4 lg:hidden overflow-auto flex-1 h-full pb-4">
+                    {activeEmployees.length === 0 ? (
+                        <div className="text-center p-8 text-muted-foreground border border-white/10 rounded-xl bg-white/5">
+                            No active staff found.
+                        </div>
+                    ) : (
+                        activeEmployees.map((emp) => (
+                            <div key={emp.userId} className="p-4 rounded-xl border border-white/10 bg-white/5 space-y-4">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <div className="font-bold text-lg flex items-center gap-2">
+                                            {emp.nickname ? emp.nickname : emp.username}
+                                            {emp.nickname && <span className="text-xs text-muted-foreground font-normal">({emp.username})</span>}
+                                        </div>
+                                        <div className="text-xs text-muted-foreground font-mono">{emp.userId}</div>
+                                    </div>
+                                    <Badge variant="outline" className="text-xs border-white/20 uppercase">
+                                        {emp.rank}
+                                    </Badge>
+                                </div>
+
+                                <div className="flex items-center justify-between bg-black/20 p-2 rounded-lg border border-white/5">
+                                    <div className="text-sm font-medium flex items-center gap-2">
+                                        <span className="text-muted-foreground">Bank:</span>
+                                        {emp.bankAccountNo || 'Not Set'}
+                                    </div>
+                                    {emp.bankAccountNo && (
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 text-muted-foreground hover:text-white"
+                                            onClick={() => handleCopy(emp.bankAccountNo, emp.userId)}
+                                        >
+                                            {copiedId === emp.userId ? (
+                                                <Check className="h-4 w-4 text-green-500" />
+                                            ) : (
+                                                <Copy className="h-4 w-4" />
+                                            )}
+                                        </Button>
+                                    )}
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div className="relative">
+                                        <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                                        <Input
+                                            type="number"
+                                            placeholder="0"
+                                            className="pl-8 bg-black/20 border-white/10"
+                                            value={inputs[emp.userId]?.amount || ''}
+                                            onChange={(e) => handleInputChange(emp.userId, 'amount', e.target.value)}
+                                        />
+                                    </div>
+                                    <Input
+                                        placeholder="Note (e.g. Salary)"
+                                        className="bg-black/20 border-white/10"
+                                        value={inputs[emp.userId]?.note || ''}
+                                        onChange={(e) => handleInputChange(emp.userId, 'note', e.target.value)}
+                                    />
+                                </div>
+
+                                <Button
+                                    className="bg-green-600 hover:bg-green-700 text-white w-full h-10"
+                                    onClick={() => handlePay(emp)}
+                                    disabled={loadingState[emp.userId]}
+                                >
+                                    {loadingState[emp.userId] ? (
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                    ) : (
+                                        <>
+                                            Process Payment <Send className="w-4 h-4 ml-2" />
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+                        ))
+                    )}
                 </div>
             </CardContent>
         </Card>

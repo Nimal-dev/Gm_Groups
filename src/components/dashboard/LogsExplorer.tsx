@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
 import { Loader2, Filter, Download, Send } from 'lucide-react';
 import { format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
@@ -138,8 +139,8 @@ export function LogsExplorer({ employees }: LogsExplorerProps) {
                 </div>
 
 
-                {/* Results Table */}
-                <div className="rounded-md border border-white/10 flex-1 overflow-hidden relative">
+                {/* Results Table (Desktop) */}
+                <div className="hidden md:block rounded-md border border-white/10 flex-1 overflow-hidden relative">
                     <div className="h-full overflow-auto">
                         <div className="min-w-[600px]">
                             <Table>
@@ -195,6 +196,55 @@ export function LogsExplorer({ employees }: LogsExplorerProps) {
                             </Table>
                         </div>
                     </div>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="grid grid-cols-1 gap-4 md:hidden overflow-auto flex-1">
+                    {!hasSearched ? (
+                        <div className="text-center p-8 text-muted-foreground border border-white/10 rounded-xl bg-white/5">
+                            Select filters and click "Fetch Logs" to view history.
+                        </div>
+                    ) : logs.length === 0 ? (
+                        <div className="text-center p-8 text-muted-foreground border border-white/10 rounded-xl bg-white/5">
+                            No logs found for the selected criteria.
+                        </div>
+                    ) : (
+                        <div className="space-y-4 pb-4">
+                            {logs.map((log: any) => (
+                                <div key={log._id} className={cn("p-4 rounded-xl border border-white/10 bg-white/5 space-y-2", log.isValid === false && "opacity-50 border-destructive/50")}>
+                                    <div className="flex justify-between items-center bg-black/20 p-2 rounded-md">
+                                        <div className="font-bold flex items-center gap-2">
+                                            {log.username}
+                                            {log.isValid === false && <Badge variant="destructive" className="scale-75">Invalid</Badge>}
+                                        </div>
+                                        <Badge className={cn("font-mono", log.isValid === false ? "bg-destructive/20 text-destructive" : "bg-accent/20 text-accent")}>
+                                            {formatDuration(log.durationMs)}
+                                        </Badge>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2 text-xs pt-2">
+                                        <div>
+                                            <span className="text-muted-foreground block text-[10px] uppercase">Start</span>
+                                            <span className="font-mono">{new Date(log.startTime).toLocaleString()}</span>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className="text-muted-foreground block text-[10px] uppercase">End</span>
+                                            <span className="font-mono">{new Date(log.endTime).toLocaleString()}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            {/* Total Duration Footer Mobile */}
+                            <div className="p-4 rounded-xl bg-accent/10 border border-accent/20 flex justify-between items-center mt-2">
+                                <span className="font-bold text-accent text-sm">Valid Duration</span>
+                                <span className="font-mono text-accent text-lg font-bold">
+                                    {formatDuration(logs
+                                        .filter((log: any) => log.isValid !== false)
+                                        .reduce((acc, log) => acc + (log.durationMs || 0), 0)
+                                    )}
+                                </span>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </CardContent>
         </Card>
