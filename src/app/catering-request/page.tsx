@@ -14,7 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { submitCateringRequest, getOrgMembers } from '@/actions/cateringRequest';
-import { Receipt, Calendar as CalendarIcon, Clock, User, Building2, UtensilsCrossed, CheckCircle2, Loader2 } from 'lucide-react';
+import { Receipt, Calendar as CalendarIcon, Clock, User, Building2, UtensilsCrossed, CheckCircle2, Loader2, ChevronRight, ChevronLeft, MapPin } from 'lucide-react';
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -46,6 +46,7 @@ export default function CateringRequestPage() {
     const { toast } = useToast();
     const [success, setSuccess] = useState(false);
     const [members, setMembers] = useState<{ id: string, name: string }[]>([]);
+    const [step, setStep] = useState(1);
 
     const form = useForm<CateringFormValues>({
         resolver: zodResolver(CateringSchema),
@@ -63,8 +64,7 @@ export default function CateringRequestPage() {
 
     const handleOrgChange = async (value: string) => {
         let clubVal = '';
-        if (value === 'Scorp Events') clubVal = 'SCORP';
-        else if (value === 'BM Events') clubVal = 'BM';
+        if (value === 'BM Events') clubVal = 'BM';
 
         form.setValue('orgName', value);
         form.setValue('club', clubVal);
@@ -73,6 +73,16 @@ export default function CateringRequestPage() {
         // Fetch members
         const result = await getOrgMembers(value);
         setMembers(result.members);
+    };
+
+    const nextStep = async () => {
+        if (step === 1) {
+            const valid = await form.trigger(['orgName', 'repName', 'eventDate', 'eventTime']);
+            if (valid) setStep(2);
+        } else if (step === 2) {
+            const valid = await form.trigger(['items']);
+            if (valid) setStep(3);
+        }
     };
 
     const onSubmit = async (data: CateringFormValues) => {
@@ -162,249 +172,287 @@ export default function CateringRequestPage() {
                                 </motion.div>
                             ) : (
                                 <Form {...form}>
+                                    <div className="mb-8 flex items-center justify-between relative max-w-md mx-auto">
+                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-white/10 rounded-full z-0" />
+                                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full z-0 transition-all duration-500`} style={{ width: step === 1 ? '0%' : step === 2 ? '50%' : '100%' }} />
+
+                                        {[1, 2, 3].map((num) => (
+                                            <div key={num} className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${step >= num ? 'bg-gradient-to-br from-orange-500 to-pink-500 text-white shadow-neon' : 'bg-black text-white/50 border border-white/20'}`}>
+                                                {step > num ? <CheckCircle2 className="w-5 h-5" /> : num}
+                                            </div>
+                                        ))}
+                                    </div>
+
                                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <FormField
-                                                control={form.control}
-                                                name="orgName"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel className="flex items-center gap-2 text-white/80">
-                                                            <Building2 className="w-4 h-4 text-orange-400" /> Organization Name
-                                                        </FormLabel>
-                                                        <Select onValueChange={(val) => handleOrgChange(val)} value={field.value}>
-                                                            <FormControl>
-                                                                <SelectTrigger className="bg-black/20 border-white/10 focus:ring-orange-500/20 h-12 text-white">
-                                                                    <SelectValue placeholder="Select Organization" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent className="bg-black/90 border-white/10 text-white">
-                                                                <SelectItem value="Scorp Events">Scorp Events</SelectItem>
-                                                                <SelectItem value="BM Events">BM Events</SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
+                                        {step === 1 && (
+                                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="orgName"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel className="flex items-center gap-2 text-white/80">
+                                                                    <Building2 className="w-4 h-4 text-orange-400" /> Organization Name
+                                                                </FormLabel>
+                                                                <Select onValueChange={(val) => handleOrgChange(val)} value={field.value}>
+                                                                    <FormControl>
+                                                                        <SelectTrigger className="bg-black/20 border-white/10 focus:ring-orange-500/20 h-12 text-white">
+                                                                            <SelectValue placeholder="Select Organization" />
+                                                                        </SelectTrigger>
+                                                                    </FormControl>
+                                                                    <SelectContent className="bg-black/90 border-white/10 text-white">
+                                                                        <SelectItem value="BM Events">BM Events</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
 
-                                            <FormField
-                                                control={form.control}
-                                                name="repName"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel className="flex items-center gap-2 text-white/80">
-                                                            <User className="w-4 h-4 text-yellow-400" /> Representative Name
-                                                        </FormLabel>
-                                                        <Select onValueChange={field.onChange} value={field.value} disabled={!form.getValues('orgName')}>
-                                                            <FormControl>
-                                                                <SelectTrigger className="bg-black/20 border-white/10 focus:ring-yellow-500/20 h-12 text-white disabled:opacity-50">
-                                                                    <SelectValue placeholder={form.getValues('orgName') ? "Select Representative" : "Select Organization First"} />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent className="bg-black/90 border-white/10 text-white max-h-[200px]">
-                                                                {members.length > 0 ? (
-                                                                    members.map(member => (
-                                                                        <SelectItem key={member.id} value={`${member.name} (<@${member.id}>)`}>
-                                                                            {member.name}
-                                                                        </SelectItem>
-                                                                    ))
-                                                                ) : (
-                                                                    <SelectItem value="none" disabled>No members found</SelectItem>
-                                                                )}
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <FormField
-                                                control={form.control}
-                                                name="eventDate"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex flex-col">
-                                                        <FormLabel className="flex items-center gap-2 text-white/80">
-                                                            <CalendarIcon className="w-4 h-4 text-blue-400" /> Event Date
-                                                        </FormLabel>
-                                                        <Popover>
-                                                            <PopoverTrigger asChild>
-                                                                <FormControl>
-                                                                    <Button
-                                                                        variant={"outline"}
-                                                                        className={cn(
-                                                                            "w-full h-12 bg-black/20 border-white/10 text-left font-normal text-white hover:bg-black/30 hover:text-white border-white/10",
-                                                                            !field.value && "text-muted-foreground"
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="repName"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel className="flex items-center gap-2 text-white/80">
+                                                                    <User className="w-4 h-4 text-yellow-400" /> Representative Name
+                                                                </FormLabel>
+                                                                <Select onValueChange={field.onChange} value={field.value} disabled={!form.getValues('orgName')}>
+                                                                    <FormControl>
+                                                                        <SelectTrigger className="bg-black/20 border-white/10 focus:ring-yellow-500/20 h-12 text-white disabled:opacity-50">
+                                                                            <SelectValue placeholder={form.getValues('orgName') ? "Select Representative" : "Select Organization First"} />
+                                                                        </SelectTrigger>
+                                                                    </FormControl>
+                                                                    <SelectContent className="bg-black/90 border-white/10 text-white max-h-[200px]">
+                                                                        {members.length > 0 ? (
+                                                                            members.map(member => (
+                                                                                <SelectItem key={member.id} value={`${member.name} (<@${member.id}>)`}>
+                                                                                    {member.name}
+                                                                                </SelectItem>
+                                                                            ))
+                                                                        ) : (
+                                                                            <SelectItem value="none" disabled>No members found</SelectItem>
                                                                         )}
-                                                                    >
-                                                                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                                    </Button>
-                                                                </FormControl>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent className="w-auto p-0 bg-black/90 border-white/20 text-white backdrop-blur-xl" align="start">
-                                                                <Calendar
-                                                                    mode="single"
-                                                                    selected={field.value}
-                                                                    onSelect={field.onChange}
-                                                                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                                                                    initialFocus
-                                                                    className="bg-transparent"
-                                                                    classNames={{
-                                                                        day_selected: "bg-blue-600 text-white hover:bg-blue-600 focus:bg-blue-600",
-                                                                        day_today: "bg-white/10 text-white",
-                                                                        day: "text-white hover:bg-white/20 rounded-md transition-colors",
-                                                                        caption_label: "text-white",
-                                                                        nav_button: "text-white hover:bg-white/20",
-                                                                    }}
-                                                                />
-                                                            </PopoverContent>
-                                                        </Popover>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-
-                                            <FormField
-                                                control={form.control}
-                                                name="eventTime"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel className="flex items-center gap-2 text-white/80">
-                                                            <Clock className="w-4 h-4 text-purple-400" /> Event Time
-                                                        </FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                placeholder="e.g. 18:00 or 6 PM"
-                                                                {...field}
-                                                                className="bg-black/20 border-white/10 focus:border-purple-500/50 focus:ring-purple-500/20 text-white placeholder:text-white/20 h-12"
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-
-                                        <FormField
-                                            control={form.control}
-                                            name="items"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="flex items-center gap-2 text-white/80">
-                                                        <Receipt className="w-4 h-4 text-pink-400" /> Items & Quantity
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Textarea
-                                                            placeholder="List the items you need..."
-                                                            {...field}
-                                                            className="bg-black/20 border-white/10 focus:border-pink-500/50 focus:ring-pink-500/20 text-white placeholder:text-white/20 min-h-[150px] resize-none"
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <div className="space-y-4 pt-4 border-t border-white/10">
-                                            <Label className="flex items-center gap-2 text-white/80">
-                                                <Receipt className="w-4 h-4 text-purple-400" /> Bulk Order Policy
-                                            </Label>
-                                            <ScrollArea className="h-[300px] w-full rounded-md border border-white/10 bg-black/40 p-4 text-sm text-white/70">
-                                                <div className="space-y-4">
-                                                    <h4 className="font-bold text-white">GM BURGERSHOT: BULK ORDER POLICY</h4>
-                                                    <p>To ensure operational efficiency and the highest standard of service, the following protocols apply to all bulk procurements.</p>
-
-                                                    {/* ... (Policy content remains the same, just rendering static text) ... */}
-                                                    <div>
-                                                        <h5 className="font-semibold text-white/90">1. QUANTITY & VALUE THRESHOLDS</h5>
-                                                        <ul className="list-disc pl-4 space-y-1">
-                                                            <li><strong>Definition of Unit:</strong> A "Unit" is defined as a Main Entrée (Burger/Sandwich) or Premium Side.</li>
-                                                            <li><strong>Minimum Order:</strong> 100 Qualifying Units OR a Minimum Order Value (MOV) of $5,000,000.</li>
-                                                            <li><strong>Maximum Order:</strong> 500 Qualifying Units per batch. Orders exceeding 500 units require distinct negotiation with GM Management (10-day lead time).</li>
-                                                        </ul>
-                                                    </div>
-
-                                                    <div>
-                                                        <h5 className="font-semibold text-white/90">2. SCHEDULING & LEAD TIMES</h5>
-                                                        <ul className="list-disc pl-4 space-y-1">
-                                                            <li><strong>Booking Lead Time:</strong> Min. 5 Business Days prior to Collection Date.</li>
-                                                            <li><strong>Confirmation:</strong> Order is confirmed ONLY AFTER the catering agreement is signed. Verbal/Text agreements are not binding.</li>
-                                                            <li><strong>Cool-Down:</strong> X-Club limited to one (1) bulk order every 72 hours.</li>
-                                                        </ul>
-                                                    </div>
-
-                                                    <div>
-                                                        <h5 className="font-semibold text-white/90">3. FINANCIAL OBLIGATIONS</h5>
-                                                        <ul className="list-disc pl-4 space-y-1">
-                                                            <li><strong>Deposit:</strong> 50% Non-Refundable Deposit upon signing.</li>
-                                                            <li><strong>Final Settlement:</strong> Remaining 50% due 24 hours prior to collection. Goods released only after full payment.</li>
-                                                            <li><strong>Cancellations:</strong> &lt;4 Days Notice = Deposit forfeited. &lt;48 Hours Notice = 100% Invoice due.</li>
-                                                        </ul>
-                                                    </div>
-
-                                                    <div>
-                                                        <h5 className="font-semibold text-white/90">4. LATE BOOKINGS & SURCHARGES</h5>
-                                                        <ul className="list-disc pl-4 space-y-1">
-                                                            <li><strong>Tier 1 (3-4 Days Prior):</strong> 15% Surcharge.</li>
-                                                            <li><strong>Tier 2 (24-48 Hours):</strong> 30% Rush Fee.</li>
-                                                            <li><strong>Tier 3 (&lt;24 Hours):</strong> 3x Total Invoice</li>
-                                                        </ul>
-                                                    </div>
-
-                                                    <div>
-                                                        <h5 className="font-semibold text-white/90">5. LIABILITY & WAIVER</h5>
-                                                        <p>Liability transfers to X-Club upon handover. X-Club assumes responsibility for cold chain storage (&lt;5°C) and safe reheating (&gt;75°C). X-Club indemnifies GM Burgershot against health claims for food consumed &gt;32 hours after handover or improperly stored. The foods can be consumed till 1% durability. Any foods consumed &lt;1% is strictly forbidden and will not come under burgershot’s responsibility.</p>
-                                                    </div>
-                                                    <div>
-                                                        <h5 className="font-semibold text-white/90">6.POLICY GOVERNANCE & AMENDMENTS</h5>
-                                                        <ul className="list-disc pl-4 space-y-1">
-                                                            <li><strong>Right to Modify:</strong> GM Burgershot reserves the right to review, amend, or update this policy at any time, specifically in the event that operational flaws, loopholes, or financial discrepancies are identified.
-                                                            </li>
-                                                            <li><strong>Notification:</strong> Any such amendments will be effective immediately upon written notification to the Client. Continued use of GM Burgershot’s catering services constitutes acceptance of the revised terms.
-                                                            </li>
-                                                        </ul>
-                                                    </div>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
                                                 </div>
-                                            </ScrollArea>
 
-                                            <FormField
-                                                control={form.control}
-                                                name="policyAccepted"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-white/10 p-4">
-                                                        <FormControl>
-                                                            <Checkbox
-                                                                checked={field.value}
-                                                                onCheckedChange={field.onChange}
-                                                                className="border-white/20 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                                                            />
-                                                        </FormControl>
-                                                        <div className="space-y-1 leading-none">
-                                                            <FormLabel className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-white/80">
-                                                                I confirm I have read and accept the Bulk Order Policy.
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="eventDate"
+                                                        render={({ field }) => (
+                                                            <FormItem className="flex flex-col">
+                                                                <FormLabel className="flex items-center gap-2 text-white/80">
+                                                                    <CalendarIcon className="w-4 h-4 text-blue-400" /> Event Date
+                                                                </FormLabel>
+                                                                <Popover>
+                                                                    <PopoverTrigger asChild>
+                                                                        <FormControl>
+                                                                            <Button
+                                                                                variant={"outline"}
+                                                                                className={cn(
+                                                                                    "w-full h-12 bg-black/20 border-white/10 text-left font-normal text-white hover:bg-black/30 hover:text-white border-white/10",
+                                                                                    !field.value && "text-muted-foreground"
+                                                                                )}
+                                                                            >
+                                                                                {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                                            </Button>
+                                                                        </FormControl>
+                                                                    </PopoverTrigger>
+                                                                    <PopoverContent className="w-auto p-0 bg-black/90 border-white/20 text-white backdrop-blur-xl" align="start">
+                                                                        <Calendar
+                                                                            mode="single"
+                                                                            selected={field.value}
+                                                                            onSelect={field.onChange}
+                                                                            disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                                                                            initialFocus
+                                                                            className="bg-transparent"
+                                                                            classNames={{
+                                                                                day_selected: "bg-blue-600 text-white hover:bg-blue-600 focus:bg-blue-600",
+                                                                                day_today: "bg-white/10 text-white",
+                                                                                day: "text-white hover:bg-white/20 rounded-md transition-colors",
+                                                                                caption_label: "text-white",
+                                                                                nav_button: "text-white hover:bg-white/20",
+                                                                            }}
+                                                                        />
+                                                                    </PopoverContent>
+                                                                </Popover>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="eventTime"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel className="flex items-center gap-2 text-white/80">
+                                                                    <Clock className="w-4 h-4 text-purple-400" /> Event Time
+                                                                </FormLabel>
+                                                                <FormControl>
+                                                                    <Input
+                                                                        placeholder="e.g. 18:00 or 6 PM"
+                                                                        {...field}
+                                                                        className="bg-black/20 border-white/10 focus:border-purple-500/50 focus:ring-purple-500/20 text-white placeholder:text-white/20 h-12"
+                                                                    />
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                </div>
+                                                <Button type="button" onClick={nextStep} className="w-full h-14 text-lg font-semibold bg-white/10 hover:bg-white/20 text-white border-0 transition-all duration-300 mt-4">
+                                                    Next Step <ChevronRight className="w-5 h-5 ml-2" />
+                                                </Button>
+                                            </motion.div>
+                                        )}
+
+                                        {step === 2 && (
+                                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                                                <FormField
+                                                    control={form.control}
+                                                    name="items"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel className="flex items-center gap-2 text-white/80">
+                                                                <Receipt className="w-4 h-4 text-pink-400" /> Items & Quantity
                                                             </FormLabel>
+                                                            <FormControl>
+                                                                <Textarea
+                                                                    placeholder="List the items you need..."
+                                                                    {...field}
+                                                                    className="bg-black/20 border-white/10 focus:border-pink-500/50 focus:ring-pink-500/20 text-white placeholder:text-white/20 min-h-[150px] resize-none"
+                                                                />
+                                                            </FormControl>
                                                             <FormMessage />
-                                                        </div>
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <div className="flex gap-4 mt-4">
+                                                    <Button type="button" onClick={() => setStep(1)} variant="outline" className="w-1/3 h-14 text-lg font-semibold bg-black/20 text-white border-white/20 hover:bg-white/10">
+                                                        <ChevronLeft className="w-5 h-5 mr-2" /> Back
+                                                    </Button>
+                                                    <Button type="button" onClick={nextStep} className="w-2/3 h-14 text-lg font-semibold bg-white/10 hover:bg-white/20 text-white border-0 transition-all duration-300">
+                                                        Review Policy <ChevronRight className="w-5 h-5 ml-2" />
+                                                    </Button>
+                                                </div>
+                                            </motion.div>
+                                        )}
 
-                                        <Button
-                                            type="submit"
-                                            disabled={isSubmitting}
-                                            className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 hover:from-orange-700 hover:via-red-700 hover:to-pink-700 text-white border-0 shadow-neon transition-all duration-300 mt-4"
-                                        >
-                                            {isSubmitting ? (
-                                                <>
-                                                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                                    Calculating Estimate...
-                                                </>
-                                            ) : 'Submit Quote Request'}
-                                        </Button>
+                                        {step === 3 && (
+                                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                                                <div className="space-y-4 pt-4 border-t border-white/10">
+                                                    <Label className="flex items-center gap-2 text-white/80">
+                                                        <Receipt className="w-4 h-4 text-purple-400" /> Bulk Order Policy
+                                                    </Label>
+                                                    <ScrollArea className="h-[300px] w-full rounded-md border border-white/10 bg-black/40 p-4 text-sm text-white/70">
+                                                        <div className="space-y-4">
+                                                            <h4 className="font-bold text-white">GM BURGERSHOT: BULK ORDER POLICY</h4>
+                                                            <p>To ensure operational efficiency and the highest standard of service, the following protocols apply to all bulk procurements.</p>
+
+                                                            {/* ... (Policy content remains the same, just rendering static text) ... */}
+                                                            <div>
+                                                                <h5 className="font-semibold text-white/90">1. QUANTITY & VALUE THRESHOLDS</h5>
+                                                                <ul className="list-disc pl-4 space-y-1">
+                                                                    <li><strong>Definition of Unit:</strong> A "Unit" is defined as a Main Entrée (Burger/Sandwich) or Premium Side.</li>
+                                                                    <li><strong>Minimum Order:</strong> 100 Qualifying Units OR a Minimum Order Value (MOV) of $5,000,000.</li>
+                                                                    <li><strong>Maximum Order:</strong> 500 Qualifying Units per batch. Orders exceeding 500 units require distinct negotiation with GM Management (10-day lead time).</li>
+                                                                </ul>
+                                                            </div>
+
+                                                            <div>
+                                                                <h5 className="font-semibold text-white/90">2. SCHEDULING & LEAD TIMES</h5>
+                                                                <ul className="list-disc pl-4 space-y-1">
+                                                                    <li><strong>Booking Lead Time:</strong> Min. 5 Business Days prior to Collection Date.</li>
+                                                                    <li><strong>Confirmation:</strong> Order is confirmed ONLY AFTER the catering agreement is signed. Verbal/Text agreements are not binding.</li>
+                                                                    <li><strong>Cool-Down:</strong> X-Club limited to one (1) bulk order every 72 hours.</li>
+                                                                </ul>
+                                                            </div>
+
+                                                            <div>
+                                                                <h5 className="font-semibold text-white/90">3. FINANCIAL OBLIGATIONS</h5>
+                                                                <ul className="list-disc pl-4 space-y-1">
+                                                                    <li><strong>Deposit:</strong> 50% Non-Refundable Deposit upon signing.</li>
+                                                                    <li><strong>Final Settlement:</strong> Remaining 50% due 24 hours prior to collection. Goods released only after full payment.</li>
+                                                                    <li><strong>Cancellations:</strong> &lt;4 Days Notice = Deposit forfeited. &lt;48 Hours Notice = 100% Invoice due.</li>
+                                                                </ul>
+                                                            </div>
+
+                                                            <div>
+                                                                <h5 className="font-semibold text-white/90">4. LATE BOOKINGS & SURCHARGES</h5>
+                                                                <ul className="list-disc pl-4 space-y-1">
+                                                                    <li><strong>Tier 1 (3-4 Days Prior):</strong> 15% Surcharge.</li>
+                                                                    <li><strong>Tier 2 (24-48 Hours):</strong> 30% Rush Fee.</li>
+                                                                    <li><strong>Tier 3 (&lt;24 Hours):</strong> 3x Total Invoice</li>
+                                                                </ul>
+                                                            </div>
+
+                                                            <div>
+                                                                <h5 className="font-semibold text-white/90">5. LIABILITY & WAIVER</h5>
+                                                                <p>Liability transfers to X-Club upon handover. X-Club assumes responsibility for cold chain storage (&lt;5°C) and safe reheating (&gt;75°C). X-Club indemnifies GM Burgershot against health claims for food consumed &gt;32 hours after handover or improperly stored. The foods can be consumed till 1% durability. Any foods consumed &lt;1% is strictly forbidden and will not come under burgershot’s responsibility.</p>
+                                                            </div>
+                                                            <div>
+                                                                <h5 className="font-semibold text-white/90">6.POLICY GOVERNANCE & AMENDMENTS</h5>
+                                                                <ul className="list-disc pl-4 space-y-1">
+                                                                    <li><strong>Right to Modify:</strong> GM Burgershot reserves the right to review, amend, or update this policy at any time, specifically in the event that operational flaws, loopholes, or financial discrepancies are identified.
+                                                                    </li>
+                                                                    <li><strong>Notification:</strong> Any such amendments will be effective immediately upon written notification to the Client. Continued use of GM Burgershot’s catering services constitutes acceptance of the revised terms.
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </ScrollArea>
+
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="policyAccepted"
+                                                        render={({ field }) => (
+                                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-white/10 p-4">
+                                                                <FormControl>
+                                                                    <Checkbox
+                                                                        checked={field.value}
+                                                                        onCheckedChange={field.onChange}
+                                                                        className="border-white/20 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                                                                    />
+                                                                </FormControl>
+                                                                <div className="space-y-1 leading-none">
+                                                                    <FormLabel className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-white/80">
+                                                                        I confirm I have read and accept the Bulk Order Policy.
+                                                                    </FormLabel>
+                                                                    <FormMessage />
+                                                                </div>
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                </div>
+
+                                                <div className="flex gap-4 mt-4">
+                                                    <Button type="button" onClick={() => setStep(2)} variant="outline" className="w-1/3 h-14 text-lg font-semibold bg-black/20 text-white border-white/20 hover:bg-white/10">
+                                                        <ChevronLeft className="w-5 h-5 mr-2" /> Back
+                                                    </Button>
+                                                    <Button
+                                                        type="submit"
+                                                        disabled={isSubmitting}
+                                                        className="w-2/3 h-14 text-lg font-semibold bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 hover:from-orange-700 hover:via-red-700 hover:to-pink-700 text-white border-0 shadow-neon transition-all duration-300"
+                                                    >
+                                                        {isSubmitting ? (
+                                                            <>
+                                                                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                                                Processing...
+                                                            </>
+                                                        ) : 'Submit Quote Request'}
+                                                    </Button>
+                                                </div>
+                                            </motion.div>
+                                        )}
                                     </form>
                                 </Form>
                             )}
