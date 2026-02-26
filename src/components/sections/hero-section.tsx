@@ -69,7 +69,7 @@ export function HeroSection() {
           className="flex flex-col sm:flex-row gap-6"
         >
           <Button asChild size="lg" className="px-8 py-6 text-lg font-bold bg-[#ffd700] hover:bg-[#ffe033] text-black shadow-[0_0_20px_rgba(255,215,0,0.4)] hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] rounded-full transition-all">
-            <Link href="/apply">Enlist Now</Link>
+            <Link href="/apply">Apply Now</Link>
           </Button>
           <Button asChild variant="outline" size="lg" className="px-8 py-6 text-lg border-[#ffd700]/30 hover:border-[#ffd700] hover:bg-black/60 bg-black/40 backdrop-blur-md text-[#ffd700] rounded-full transition-all shadow-[0_0_15px_rgba(0,0,0,0.5)]">
             <Link href="#about">Learn More</Link>
