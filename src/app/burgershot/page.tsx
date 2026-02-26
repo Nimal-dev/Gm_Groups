@@ -86,7 +86,7 @@ export default function BurgershotPage() {
               viewport={{ once: true }}
               className="max-w-3xl mx-auto mt-6 text-2xl italic text-accent font-headline"
             >
-              &ldquo;The Taste of Freedom and Profit.&rdquo;
+              &ldquo;The Taste of Love and Peace.&rdquo;
             </motion.p>
           </div>
         </section>
