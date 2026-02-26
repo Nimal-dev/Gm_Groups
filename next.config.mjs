@@ -16,11 +16,11 @@ const nextConfig = {
         optimizePackageImports: [
             'lucide-react',
             'recharts',
-            'framer-motion',
             '@radix-ui/react-icons',
             '@radix-ui/react-avatar',
             '@radix-ui/react-dialog',
-            // Add other large UI libraries here
+            // framer-motion intentionally excluded — causes MIME-type errors on Netlify
+            // with Next.js 15 chunk splitting (chunks served as text/plain instead of JS)
         ],
     },
     async headers() {
