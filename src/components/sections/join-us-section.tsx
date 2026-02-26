@@ -29,7 +29,8 @@ export function JoinUsSection() {
         className="absolute inset-0 bg-center bg-cover bg-fixed transform scale-105 blur-[2px]"
         style={{ backgroundImage: `url(${gmxdc.src})` }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-black/90 to-black/80" />
+      <div className="absolute inset-0 bg-[#ffd700]/5 backdrop-blur-xl" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/80 mix-blend-multiply" />
 
       <div className="container relative z-10 px-4 mx-auto text-center">
         <motion.div
@@ -37,10 +38,10 @@ export function JoinUsSection() {
           whileInView="visible"
           viewport={{ once: true }}
           variants={scaleIn}
-          className="max-w-3xl mx-auto"
+          className="max-w-4xl mx-auto p-10 md:p-14 bg-black/40 backdrop-blur-xl border border-[#ffd700]/20 rounded-3xl shadow-[0_0_50px_rgba(255,215,0,0.1)]"
         >
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight uppercase text-white mb-6">
-            Ready to Join The <span className="text-accent">Elite</span>?
+          <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-6">
+            <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400">Ready to Join The</span> <span className="text-transparent bg-clip-text bg-gradient-to-b from-[#ffd700] to-[#ccaa00] drop-shadow-[0_0_15px_rgba(255,215,0,0.5)]">Elite</span>?
           </h2>
           <p className="max-w-xl mx-auto text-xl text-muted-foreground mb-10 leading-relaxed">
             Loyalty is our currency and respect is our language. If you have what it takes to thrive in the high-stakes world of Xlantis, we are waiting for you.

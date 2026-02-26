@@ -8,7 +8,7 @@ import x from "../../public/xlantis.png";
 export function Footer() {
   const currentYear = new Date().getFullYear();
   return (
-    <footer className="w-full py-12 bg-background border-t border-white/5 relative z-10">
+    <footer className="w-full py-12 bg-black/40 backdrop-blur-xl border-t border-[#ffd700]/20 shadow-[0_-10px_30px_rgba(0,0,0,0.2)] relative z-10">
       <div className="container flex flex-col items-center justify-between gap-8 px-4 mx-auto md:flex-row">
 
         <div className="flex flex-col items-center md:items-start gap-4">
@@ -34,12 +34,12 @@ export function Footer() {
           </p>
         </div>
 
-        <div className="flex flex-col items-center md:items-end gap-2 text-sm text-muted-foreground">
+        <div className="flex flex-col items-center md:items-end gap-2 text-sm text-gray-400">
           <p>&copy; {currentYear} GM Groups Pvt Ltd.</p>
           <p>All Rights Reserved.</p>
           <div className="flex gap-4 mt-2">
-            <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
-            <Link href="#" className="hover:text-white transition-colors">Terms</Link>
+            <Link href="#" className="hover:text-[#ffd700] hover:drop-shadow-[0_0_8px_rgba(255,215,0,0.5)] transition-all">Privacy</Link>
+            <Link href="#" className="hover:text-[#ffd700] hover:drop-shadow-[0_0_8px_rgba(255,215,0,0.5)] transition-all">Terms</Link>
           </div>
         </div>
       </div>

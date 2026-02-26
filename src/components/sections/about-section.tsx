@@ -20,8 +20,8 @@ export function AboutSection() {
             variants={slideUp}
             className="space-y-8"
           >
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight uppercase">
-              About <span className="text-accent drop-shadow-neon">GM Groups</span>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase">
+              <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400">About</span> <span className="text-transparent bg-clip-text bg-gradient-to-b from-[#ffd700] to-[#ccaa00] drop-shadow-[0_0_15px_rgba(255,215,0,0.5)]">GM Groups</span>
             </h2>
             <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
               <p>
@@ -33,9 +33,9 @@ export function AboutSection() {
             </div>
 
             <div className="flex gap-4 pt-4">
-              <div className="h-1 w-20 bg-accent rounded-full" />
-              <div className="h-1 w-10 bg-accent/50 rounded-full" />
-              <div className="h-1 w-4 bg-accent/20 rounded-full" />
+              <div className="h-1 w-20 bg-[#ffd700] rounded-full drop-shadow-[0_0_8px_rgba(255,215,0,0.8)]" />
+              <div className="h-1 w-10 bg-[#ffd700]/50 rounded-full" />
+              <div className="h-1 w-4 bg-[#ffd700]/20 rounded-full" />
             </div>
           </motion.div>
 
@@ -47,8 +47,8 @@ export function AboutSection() {
             className="w-full flex justify-center lg:justify-end"
           >
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-accent to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200" />
-              <Card className="relative overflow-hidden border-none bg-black/40 backdrop-blur-xl ring-1 ring-white/10 rounded-2xl">
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#ffd700]/40 to-[#e69b00]/20 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200" />
+              <Card className="relative overflow-hidden border-none bg-black/40 backdrop-blur-xl ring-1 ring-[#ffd700]/10 rounded-2xl shadow-[0_0_30px_rgba(255,215,0,0.05)] group-hover:shadow-[0_0_40px_rgba(255,215,0,0.15)] transition-all">
                 <CardContent className="p-0">
                   <Image
                     src={gm_logo}
