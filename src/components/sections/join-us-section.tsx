@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { scaleIn } from "@/lib/animation-utils";
 import gmxdc from "../../../public/gm_dc.png"
 
 const DiscordIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -18,50 +17,70 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-
 export function JoinUsSection() {
   return (
-    <section
-      id="join"
-      className="relative py-32 sm:py-48 flex items-center justify-center overflow-hidden"
-    >
+    <section id="join" className="relative py-48 overflow-hidden bg-black">
+      {/* Background with subtle blur and scale */}
       <div
-        className="absolute inset-0 bg-center bg-cover bg-fixed transform scale-105 blur-[2px]"
+        className="absolute inset-0 bg-center bg-cover bg-fixed opacity-40 grayscale"
         style={{ backgroundImage: `url(${gmxdc.src})` }}
       />
-      <div className="absolute inset-0 bg-[#ffd700]/5 backdrop-blur-xl" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/80 mix-blend-multiply" />
 
-      <div className="container relative z-10 px-4 mx-auto text-center">
+      {/* Heavy overlays for cinematic feel */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+      <div className="absolute inset-0 bg-primary/5 mix-blend-overlay" />
+
+      <div className="container relative z-10 px-4 mx-auto">
         <motion.div
-          initial="hidden"
-          whileInView="visible"
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          variants={scaleIn}
-          className="max-w-4xl mx-auto p-10 md:p-14 bg-black/40 backdrop-blur-xl border border-[#ffd700]/20 rounded-3xl shadow-[0_0_50px_rgba(255,215,0,0.1)]"
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="max-w-5xl mx-auto glass-pane p-12 md:p-20 text-center relative"
         >
-          <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-6">
-            <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400">Ready to Join The</span> <span className="text-transparent bg-clip-text bg-gradient-to-b from-[#ffd700] to-[#ccaa00] drop-shadow-[0_0_15px_rgba(255,215,0,0.5)]">Elite</span>?
-          </h2>
-          <p className="max-w-xl mx-auto text-xl text-muted-foreground mb-10 leading-relaxed">
-            Loyalty is our currency and respect is our language. If you have what it takes to thrive in the high-stakes world of Xlantis, we are waiting for you.
-          </p>
+          {/* Decorative Corner Accents */}
+          <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-primary/40 -translate-x-4 -translate-y-4" />
+          <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-primary/40 translate-x-4 translate-y-4" />
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button asChild size="lg" className="flex items-center px-8 py-6 text-lg font-bold bg-[#5865F2] hover:bg-[#4752C4] text-white shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
-              <Link href="https://discord.gg/jfgTHBnVYD" target="_blank" rel="noopener noreferrer">
-                <DiscordIcon className="w-6 h-6 mr-2" />
-                Join our Discord
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-5xl md:text-8xl font-black tracking-tighter uppercase mb-8 leading-none"
+          >
+            <span className="text-white">ENLIST IN THE</span><br />
+            <span className="text-primary drop-shadow-[0_0_20px_rgba(250,204,21,0.3)]">INNER CIRCLE</span>
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="max-w-2xl mx-auto text-xl text-zinc-400 mb-12 font-light leading-relaxed"
+          >
+            Loyalty is our currency. Respect is earned. If you possess the ambition to dominate the high-stakes world of Xlantis, your seat is waiting.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="flex flex-col sm:flex-row gap-6 justify-center"
+          >
+            <Button asChild size="lg" className="h-16 px-10 text-lg font-black bg-[#5865F2] hover:bg-white text-white hover:text-black rounded-none skew-x-[-12deg] transition-all duration-300">
+              <Link href="https://discord.gg/jfgTHBnVYD" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
+                <DiscordIcon className="w-6 h-6 skew-x-[12deg]" />
+                <span className="skew-x-[12deg]">DISCORD OPS</span>
               </Link>
             </Button>
 
-            <Button asChild size="lg" className="flex items-center px-8 py-6 text-lg font-bold bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:brightness-110 text-white shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
-              <Link href="https://www.instagram.com/ig.gmgroups/" target="_blank" rel="noopener noreferrer">
-                <InstagramIcon className="w-6 h-6 mr-2" />
-                Follow on Instagram
+            <Button asChild variant="outline" size="lg" className="h-16 px-10 text-lg font-black border-white/10 hover:border-primary bg-white/5 backdrop-blur-md text-white hover:text-primary rounded-none skew-x-[-12deg] transition-all duration-300">
+              <Link href="https://www.instagram.com/ig.gmgroups/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
+                <InstagramIcon className="w-6 h-6 skew-x-[12deg]" />
+                <span className="skew-x-[12deg]">INSTAGRAM LEGACY</span>
               </Link>
             </Button>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>

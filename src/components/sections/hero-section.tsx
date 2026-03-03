@@ -3,89 +3,118 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowDown } from "lucide-react";
-import { motion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import gm_wp from "../../../public/gm_wallpaper.jpg";
 
 export function HeroSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
+
+  const y1 = useTransform(scrollY, [0, 500], [0, 200]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
+  const scale = useTransform(scrollY, [0, 500], [1, 1.1]);
+
   return (
     <section
+      ref={containerRef}
       id="hero"
-      className="relative flex items-center justify-center w-full min-h-screen overflow-hidden text-white"
+      className="relative flex items-center justify-center w-full min-h-screen overflow-hidden bg-black"
     >
-      {/* Background Image with Parallax Effect could be added here, for now static fixed */}
-      {/* Background Image with Parallax Effect */}
-      <div className="absolute inset-0">
+      {/* Cinematic Background with Parallax */}
+      <motion.div
+        style={{ y: y1, scale }}
+        className="absolute inset-0 z-0"
+      >
         <Image
           src={gm_wp}
-          alt="GM Groups Wallpaper"
+          alt="GM Groups Cinematic Background"
           fill
           priority
-          className="object-cover object-center transform scale-105"
+          className="object-cover object-center opacity-60 brightness-[0.4] contrast-[1.2]"
           sizes="100vw"
         />
-      </div>
+      </motion.div>
 
-      {/* Cinematic Gradient Overlays with Golden Glassmorphism */}
-      <div className="absolute inset-0 bg-[#ffd700]/10 backdrop-blur-md" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent mix-blend-multiply" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/60" />
+      {/* Layered Overlays for Depth */}
+      <div className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-black/20 to-[#0a0a0a]" />
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-black/80 via-transparent to-black/80" />
 
-      <div className="relative z-10 container mx-auto px-4 flex flex-col items-center text-center">
+      {/* Radial Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full z-[1]" />
+
+      <div className="relative z-10 container mx-auto px-4 flex flex-col items-center pt-32 md:pt-20">
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="mb-8"
         >
-          <div className="text-xl md:text-2xl font-bold tracking-[0.5em] text-[#ffd700] uppercase drop-shadow-[0_0_10px_rgba(255,215,0,0.8)] px-6 py-2 border border-[#ffd700]/30 rounded-full bg-black/40 backdrop-blur-md">
-            Welcome to
-          </div>
+          <span className="text-[10px] md:text-xs font-bold tracking-[0.4em] text-primary uppercase bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20 backdrop-blur-md">
+            EST. 2024 • THE LEGACY
+          </span>
         </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase mb-6 drop-shadow-2xl"
-        >
-          <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400">GM</span> <span className="text-transparent bg-clip-text bg-gradient-to-b from-[#ffd700] to-[#b38f00]">GROUPS</span>
-        </motion.h1>
+        <div className="overflow-hidden mb-6">
+          <motion.h1
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+            className="text-5xl md:text-8xl lg:text-[10rem] font-black tracking-tighter uppercase leading-[0.8] text-center"
+          >
+            <span className="block text-white">THE EMPIRE OF</span>
+            <span className="block text-primary drop-shadow-[0_0_30px_rgba(250,204,21,0.4)]">GM GROUPS</span>
+          </motion.h1>
+        </div>
 
         <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className="max-w-2xl text-xl md:text-2xl text-gray-300 mb-10 leading-relaxed font-light backdrop-blur-sm bg-black/20 p-4 rounded-xl border border-white/5"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="max-w-2xl text-lg md:text-xl text-zinc-400 text-center mb-12 leading-relaxed"
         >
-          Dominating the streets with style, power, and unity. <br />
-          <span className="text-white italic text-shadow-sm font-medium">"The city never sleeps. Neither do we."</span>
+          Dominating the streets of Xlantis with unmatched power, strategic business, and a bond forged in loyalty. Experience the pinnacle of roleplay excellence.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
           className="flex flex-col sm:flex-row gap-6"
         >
-          <Button asChild size="lg" className="px-8 py-6 text-lg font-bold bg-[#ffd700] hover:bg-[#ffe033] text-black shadow-[0_0_20px_rgba(255,215,0,0.4)] hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] rounded-full transition-all">
-            <Link href="/apply">Apply Now</Link>
+          <Button
+            asChild
+            size="lg"
+            className="h-16 px-10 text-lg font-black bg-primary hover:bg-white text-black rounded-none skew-x-[-12deg] transition-all duration-300 group"
+          >
+            <Link href="/apply" className="flex items-center gap-2">
+              <span className="skew-x-[12deg]">APPLY HERE</span>
+            </Link>
           </Button>
-          <Button asChild variant="outline" size="lg" className="px-8 py-6 text-lg border-[#ffd700]/30 hover:border-[#ffd700] hover:bg-black/60 bg-black/40 backdrop-blur-md text-[#ffd700] rounded-full transition-all shadow-[0_0_15px_rgba(0,0,0,0.5)]">
-            <Link href="#about">Learn More</Link>
+
+          <Button
+            asChild
+            variant="outline"
+            size="lg"
+            className="h-16 px-10 text-lg font-bold border-white/10 hover:border-primary bg-white/5 backdrop-blur-md text-white hover:text-black rounded-none skew-x-[-12deg] transition-all duration-300"
+          >
+            <Link href="#about">
+              <span className="skew-x-[12deg]">EXPLORE LEGACY</span>
+            </Link>
           </Button>
         </motion.div>
       </div>
 
+      {/* Floating Scroll Indicator */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce"
+        style={{ opacity }}
+        animate={{ y: [0, 10, 0] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-12 z-10 flex flex-col items-center gap-2"
       >
-        <Link href="#about" aria-label="Scroll down" className="opacity-70 hover:opacity-100 transition-opacity">
-          <ArrowDown className="w-8 h-8 text-[#ffd700] drop-shadow-[0_0_8px_rgba(255,215,0,0.8)]" />
-        </Link>
+        <span className="text-[10px] uppercase tracking-[0.3em] text-zinc-500">Scroll to Discover</span>
+        <ChevronDown className="w-6 h-6 text-primary" />
       </motion.div>
     </section>
   );

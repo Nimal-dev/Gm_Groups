@@ -4,57 +4,26 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 250 100% 70%;
-    /* Neon Purple/Blue accent */
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --radius: 0.5rem;
-
-    /* Level Animation Variables */
-    --level-intensity: 10px;
-    --level-glow-color: rgba(255, 215, 0, 0.5);
-  }
-
-  .dark {
-    --background: 45 30% 6%; /* Deep rich gold-black */
-    --foreground: 45 20% 98%;
-    --card: 45 30% 6%;
-    --card-foreground: 45 20% 98%;
-    --popover: 45 30% 6%;
-    --popover-foreground: 45 20% 98%;
-    --primary: 45 100% 50%; /* Golden yellow primary */
-    --primary-foreground: 45 30% 6%;
-    --secondary: 45 20% 12%;
-    --secondary-foreground: 45 20% 98%;
-    --muted: 45 20% 12%;
-    --muted-foreground: 45 10% 65%;
-    --accent: 45 100% 50%;
-    --accent-foreground: 45 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 45 20% 98%;
-    --border: 45 20% 12%;
-    --input: 45 20% 12%;
-    --ring: 45 100% 50%;
-
-    /* Level Animation Variables Dark Mode */
-    --level-intensity: 12px;
-    --level-glow-color: rgba(255, 215, 0, 0.6);
+    --background: 0 0% 4%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 48 96% 53%; /* Neon Yellow #facc15 */
+    --primary-foreground: 0 0% 0%;
+    --secondary: 240 4% 12%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 4% 12%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 48 96% 53%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 4% 16%;
+    --input: 240 4% 16%;
+    --ring: 48 96% 53%;
+    --radius: 0.75rem;
   }
 
   * {
@@ -63,40 +32,37 @@
 
   body {
     @apply bg-background text-foreground font-body antialiased;
-    /* Golden tinted mesh gradient background */
-    background-image:
-      radial-gradient(at 0% 0%, rgba(255, 215, 0, 0.08) 0, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(204, 170, 0, 0.05) 0, transparent 50%),
-      radial-gradient(at 50% 100%, rgba(255, 215, 0, 0.05) 0, transparent 50%);
+    background-image: 
+      radial-gradient(circle at 50% -20%, rgba(250, 204, 21, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 0% 0%, rgba(20, 20, 20, 1) 0%, transparent 100%);
     background-attachment: fixed;
   }
 }
 
-/* Neon glow effect for buttons */
-.neon-button {
+/* Neon Glow Utilities */
+.neon-glow {
   @apply shadow-neon transition-all duration-300;
 }
 
-.neon-button:hover {
+.neon-glow:hover {
   @apply shadow-neon-strong;
 }
 
-/* Glowing border effect for cards */
 .neon-border {
-  @apply border-accent/20 shadow-neon-border transition-all duration-300;
+  @apply border-primary/20 shadow-neon-border transition-all duration-300;
 }
 
 .neon-border:hover {
-  @apply border-accent/50 shadow-neon-border-strong;
+  @apply border-primary/50 shadow-neon-border-strong;
 }
 
-/* Frosted Glass / Ice Effect */
-.glass-card {
-  @apply bg-white/5 backdrop-blur-md border border-white/20 shadow-lg transition-all duration-300;
+/* Elite Glassmorphism */
+.glass-pane {
+  @apply bg-[#121212]/60 backdrop-blur-xl border border-white/10 shadow-glass transition-all duration-500;
 }
 
-.glass-card:hover {
-  @apply bg-white/10 border-white/40 shadow-glass;
+.glass-pane:hover {
+  @apply bg-[#121212]/80 border-white/20;
 }
 
 @layer utilities {

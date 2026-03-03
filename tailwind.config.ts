@@ -15,39 +15,39 @@ export default {
         code: ['monospace'],
       },
       colors: {
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        background: '#0a0a0a',
+        foreground: '#ffffff',
         card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
+          DEFAULT: '#121212',
+          foreground: '#ffffff',
         },
         popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
+          DEFAULT: '#121212',
+          foreground: '#ffffff',
         },
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+          DEFAULT: '#facc15', // Neon Yellow
+          foreground: '#000000',
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
+          DEFAULT: '#1f1f1f',
+          foreground: '#ffffff',
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
+          DEFAULT: '#1f1f1f',
+          foreground: '#a1a1aa',
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
+          DEFAULT: '#facc15', // Neon Yellow
+          foreground: '#000000',
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
         },
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
+        border: '#27272a',
+        input: '#27272a',
+        ring: '#facc15',
         chart: {
           '1': 'hsl(var(--chart-1))',
           '2': 'hsl(var(--chart-2))',
@@ -67,11 +67,11 @@ export default {
         },
       },
       boxShadow: {
-        neon: '0 0 5px theme(colors.accent.DEFAULT), 0 0 10px theme(colors.accent.DEFAULT), 0 0 20px theme(colors.accent.DEFAULT)',
-        'neon-strong': '0 0 10px theme(colors.accent.DEFAULT), 0 0 20px theme(colors.accent.DEFAULT), 0 0 40px theme(colors.accent.DEFAULT)',
-        'neon-border': '0 0 15px -5px theme(colors.accent.DEFAULT)',
-        'neon-border-strong': '0 0 25px -5px theme(colors.accent.DEFAULT)',
-        glass: '0 0 20px rgba(255, 255, 255, 0.2)',
+        neon: '0 0 5px #facc15, 0 0 20px rgba(250, 204, 21, 0.3)',
+        'neon-strong': '0 0 10px #facc15, 0 0 40px rgba(250, 204, 21, 0.5)',
+        'neon-border': '0 0 0 1px rgba(250, 204, 21, 0.2), 0 0 15px -5px #facc15',
+        'neon-border-strong': '0 0 0 1px rgba(250, 204, 21, 0.4), 0 0 25px -5px #facc15',
+        glass: '0 8px 32px 0 rgba(0, 0, 0, 0.8)',
       },
       borderRadius: {
         lg: 'var(--radius)',

@@ -3,8 +3,6 @@ import { Header } from '@/components/header';
 import { AboutSection } from '@/components/sections/about-section';
 import { HeroSection } from '@/components/sections/hero-section';
 import { Footer } from '@/components/footer';
-// import { BurgershotCTA } from '@/components/sections/burgershot-cta';
-
 
 const PillarsSection = dynamic(() => import('@/components/sections/pillars-section').then(mod => mod.PillarsSection));
 const BusinessSection = dynamic(() => import('@/components/sections/business-section').then(mod => mod.BusinessSection));
@@ -12,7 +10,7 @@ const JoinUsSection = dynamic(() => import('@/components/sections/join-us-sectio
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
       <Header />
       <main>
         <HeroSection />

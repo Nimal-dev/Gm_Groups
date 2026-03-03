@@ -1,13 +1,21 @@
 import type { Metadata } from 'next';
-import { Poppins } from 'next/font/google';
+import { Outfit, Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Preloader } from '@/components/preloader';
+import { SmoothScrolling } from '@/components/smooth-scrolling';
 
-const poppins = Poppins({
-  variable: '--font-poppins',
+const outfit = Outfit({
+  variable: '--font-outfit',
   subsets: ['latin'],
-  weight: ['400', '600', '700'],
+  weight: ['700', '900'],
+  display: 'swap',
+});
+
+const inter = Inter({
+  variable: '--font-inter',
+  subsets: ['latin'],
+  weight: ['400', '500'],
   display: 'swap',
 });
 
@@ -19,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'GM Groups Xlantis',
     description: 'Dominating the Streets of Xlantis with style, power, and unity.',
-    url: 'https://gmgroups.xlantis.com', // Replace with actual URL if different
+    url: 'https://gmgroups.xlantis.com',
     siteName: 'GM Groups',
     locale: 'en_US',
     type: 'website',
@@ -28,7 +36,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'GM Groups Xlantis',
     description: 'The powerhouse of Xlantis. Join the legacy.',
-    // creator: '@gm_groups', // Add if available
   },
 };
 
@@ -39,10 +46,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${poppins.variable} font-body antialiased`}>
-        <Preloader />
-        {children}
-        <Toaster />
+      <body className={`${outfit.variable} ${inter.variable} font-body antialiased`}>
+        <SmoothScrolling>
+          <Preloader />
+          {children}
+          <Toaster />
+        </SmoothScrolling>
       </body>
     </html>
   );

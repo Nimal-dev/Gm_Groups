@@ -20,26 +20,19 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = scrollY.getPrevious() ?? 0;
-    if (latest > previous && latest > 150) {
-      setHidden(true);
-    } else {
-      setHidden(false);
-    }
-    setScrolled(latest > 50);
+    setScrolled(latest > 20);
   });
 
   return (
     <motion.header
-      variants={{
-        visible: { y: 0 },
-        hidden: { y: "-100%" },
-      }}
-      animate={hidden ? "hidden" : "visible"}
-      transition={{ duration: 0.35, ease: "easeInOut" }}
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 transition-all duration-300",
-        scrolled ? "bg-black/40 backdrop-blur-xl border-b border-[#ffd700]/20 shadow-[0_4_30px_rgba(0,0,0,0.1)]" : "bg-transparent"
+        "fixed z-50 flex items-center justify-between transition-all duration-500 ease-in-out",
+        scrolled
+          ? "top-4 inset-x-0 mx-auto w-[95%] max-w-7xl px-8 py-3 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.8)]"
+          : "top-0 left-0 right-0 px-6 py-6 bg-transparent"
       )}
     >
       <div className="flex items-center gap-2">
@@ -57,18 +50,18 @@ export function Header() {
         <NavItem href="/#join">Join Us</NavItem>
       </nav>
 
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" asChild className="flex text-white hover:bg-white/10 rounded-full mr-2">
+      <div className="flex items-center gap-2 md:gap-4">
+        <Button variant="ghost" asChild className="flex text-white hover:bg-white/10 rounded-full">
           <Link href="/dashboard" className="flex items-center gap-2">
             <LayoutDashboard className="w-4 h-4" />
-            <span className="hidden sm:inline">Dashboard</span>
+            <span className="hidden lg:inline">Dashboard</span>
           </Link>
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button className="relative px-4 py-2 text-sm font-medium text-[#ffd700] bg-black/40 hover:bg-black/60 border border-[#ffd700]/30 rounded-full transition-all flex items-center gap-1 outline-none data-[state=open]:bg-black/60 data-[state=open]:border-[#ffd700]/60 data-[state=open]:shadow-[0_0_20px_rgba(255,215,0,0.3)] backdrop-blur-md">
-              Services <ChevronDown className="w-4 h-4 ml-1 transition-transform duration-300 data-[state=open]:rotate-180" />
+            <Button className="relative px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-[#ffd700] bg-black/40 hover:bg-black/60 border border-[#ffd700]/30 rounded-full transition-all flex items-center gap-1 outline-none data-[state=open]:bg-black/60 data-[state=open]:border-[#ffd700]/60 data-[state=open]:shadow-[0_0_20px_rgba(255,215,0,0.3)] backdrop-blur-md">
+              Services <ChevronDown className="w-3 h-3 md:w-4 md:h-4 ml-0.5 md:ml-1 transition-transform duration-300 data-[state=open]:rotate-180" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" sideOffset={8} className="bg-black/80 border border-[#ffd700]/20 backdrop-blur-2xl text-white w-56 p-2 rounded-xl shadow-[0_8px_32px_rgba(255,215,0,0.1)] ring-1 ring-white/5 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 duration-200 ease-in-out">

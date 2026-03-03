@@ -2,9 +2,6 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { fadeIn, staggerContainer, slideUp } from "@/lib/animation-utils";
-
 import gm from "../../../public/GM.png"
 import ambaan from "../../../public/Ambaan.png"
 import nimal from "../../../public/Nimal.png"
@@ -32,60 +29,65 @@ const pillars = [
 
 export function PillarsSection() {
   return (
-    <section id="pillars" className="py-24 relative overflow-hidden">
-      {/* Background ambience with Golden Glassmorphism */}
-      <div className="absolute inset-0 bg-[#ffd700]/5 backdrop-blur-2xl -z-10" />
-      <div className="absolute inset-0 bg-black/80 mix-blend-multiply -z-10" />
-      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-[#ffd700]/5 rounded-full blur-[120px] -z-10" />
+    <section id="pillars" className="py-32 relative overflow-hidden bg-black">
+      {/* Decorative background */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-primary/2 opacity-20 blur-[120px] pointer-events-none" />
 
-      <div className="container px-4 mx-auto">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={fadeIn}
-          className="mb-16 text-center"
-        >
-          <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-4">
-            <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400">Our</span> <span className="text-transparent bg-clip-text bg-gradient-to-b from-[#ffd700] to-[#ccaa00] drop-shadow-[0_0_15px_rgba(255,215,0,0.5)]">Pillars</span>
+      <div className="container px-4 mx-auto relative z-10">
+        <div className="flex flex-col mb-20">
+          <motion.span
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            className="text-primary font-bold tracking-[0.3em] uppercase text-xs mb-4 px-4 border-l-2 border-primary"
+          >
+            The Foundation
+          </motion.span>
+          <h2 className="text-3xl sm:text-4xl md:text-7xl font-black tracking-tighter uppercase">
+            <span className="text-white">CORE</span><br />
+            <span className="text-zinc-800">LEADERSHIP</span>
           </h2>
-          <p className="max-w-2xl mx-auto text-lg text-muted-foreground">
-            Three core members form the foundation of our power.
-          </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-          className="grid gap-8 md:grid-cols-3"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {pillars.map((pillar, index) => (
-            <motion.div key={pillar.name} variants={slideUp} >
-              <Card className="h-full border-none bg-black/40 backdrop-blur-md border border-[#ffd700]/10 hover:border-[#ffd700]/50 transition-colors duration-500 group overflow-hidden shadow-[0_0_20px_rgba(255,215,0,0.05)] hover:shadow-[0_0_30px_rgba(255,215,0,0.15)]">
-                <CardHeader className="p-0 overflow-hidden">
-                  <div className="relative h-[400px] w-full overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent z-10 opactiy-60 group-hover:opacity-40 transition-opacity" />
-                    <Image
-                      src={pillar.image}
-                      alt={pillar.name}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0"
-                    />
+            <motion.div
+              key={pillar.name}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: index * 0.2 }}
+              className="group relative"
+            >
+              <div className="glass-pane p-4 h-full flex flex-col relative overflow-hidden">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-lg mb-8">
+                  <Image
+                    src={pillar.image}
+                    alt={pillar.name}
+                    fill
+                    className="object-cover transition-all duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0 contrast-125"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
+                </div>
+
+                <div className="space-y-4 relative z-10 flex-grow">
+                  <div className="flex flex-col">
+                    <span className="text-primary font-black tracking-widest text-[10px] uppercase mb-1">{pillar.title}</span>
+                    <h3 className="text-3xl font-black uppercase text-white tracking-tighter">{pillar.name}</h3>
                   </div>
-                </CardHeader>
-                <CardContent className="p-6 relative z-20 -mt-20">
-                  <CardTitle className="text-2xl font-bold uppercase text-white mb-2">{pillar.name}</CardTitle>
-                  <p className="text-sm font-semibold tracking-widest text-[#ffd700] mb-4">{pillar.title}</p>
-                  <p className="text-gray-400 text-sm leading-relaxed">
+                  <p className="text-zinc-400 font-light leading-relaxed">
                     {pillar.description}
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+
+                {/* Decorative Accent */}
+                <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              </div>
+
+              {/* Background Glow */}
+              <div className="absolute -inset-4 bg-primary/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10" />
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

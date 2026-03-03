@@ -3,66 +3,95 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
-import { fadeIn, slideUp } from "@/lib/animation-utils";
-
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import bs from "../../../public/bs.png"
 
 export function BusinessSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
+
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+
   return (
     <section
+      ref={containerRef}
       id="business"
-      className="relative py-32 sm:py-48 flex items-center justify-center overflow-hidden"
+      className="relative py-48 flex items-center justify-center overflow-hidden bg-black"
     >
-      {/* Parallax Background */}
+      {/* Heavy Parallax Background */}
+      <motion.div
+        style={{ y: bgY, backgroundImage: `url(${bs.src})` }}
+        className="absolute inset-0 bg-center bg-cover grayscale opacity-30"
+      />
       <div
-        className="absolute inset-0 bg-center bg-cover bg-fixed transform scale-110"
+        className="absolute inset-0 bg-center bg-cover bg-fixed opacity-10 pointer-events-none"
         style={{ backgroundImage: `url(${bs.src})` }}
       />
 
-      <div className="absolute inset-0 bg-[#ffd700]/10 backdrop-blur-lg" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-black/90 mix-blend-multiply" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black z-[1]" />
+      <div className="absolute inset-0 bg-primary/5 mix-blend-color z-[1]" />
 
       <div className="container relative z-10 px-4 mx-auto">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-20 items-center">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            variants={slideUp}
-            className="text-left"
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="space-y-10"
           >
-            <div className="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-[#ffd700] uppercase border border-[#ffd700]/30 rounded-full bg-black/50 backdrop-blur-md shadow-[0_0_10px_rgba(255,215,0,0.1)]">
-              Official Front
+            <div className="space-y-4">
+              <span className="text-primary font-black tracking-[0.4em] text-xs uppercase bg-primary/10 px-4 py-1.5 rounded-none border-l-4 border-primary">
+                The Flagship Front
+              </span>
+              <h2 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter uppercase leading-[0.8]">
+                <span className="text-white">BURGER</span><br />
+                <span className="text-primary">SHOT</span>
+              </h2>
             </div>
-            <h2 className="text-5xl md:text-7xl font-black tracking-tighter uppercase mb-6">
-              <span className="text-transparent bg-clip-text bg-gradient-to-b from-[#ffd700] to-[#ccaa00] block drop-shadow-xl">Burgershot</span>
-              <span className="text-2xl md:text-3xl font-light tracking-widest block mt-2 text-gray-300">Heart of Operations</span>
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-xl">
-              More than just a fast-food joint, Burgershot is a hub of information, a neutral ground for meetings, and a symbol of our public-facing dominance. It's the jewel in our commercial crown.
+
+            <p className="text-lg md:text-xl text-zinc-400 font-light leading-relaxed max-w-xl">
+              More than just a fast-food joint, Burgershot is a hub of information, a neutral ground for meetings, and a symbol of our public-facing dominance. It's the jewel in our commercial crown that keeps the city fed and our secrets safe.
             </p>
 
-            <Button asChild size="lg" className="px-8 py-6 text-lg font-bold bg-[#ffd700] text-black shadow-[0_0_20px_rgba(255,215,0,0.4)] hover:bg-[#ffe033] hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] rounded-full transition-all duration-300">
-              <Link href="/burgershot">
-                Explore Burgershot <ArrowRight className="w-5 h-5 ml-2" />
+            <Button
+              asChild
+              size="lg"
+              className="h-14 md:h-16 px-8 md:px-10 text-base md:text-lg font-black bg-primary hover:bg-white text-black rounded-none skew-x-[-12deg] transition-all duration-300 group"
+            >
+              <Link href="/burgershot" className="flex items-center gap-3">
+                <span className="skew-x-[12deg]">DOMINATE CUISINE</span>
+                <ArrowRight className="w-5 h-5 skew-x-[12deg] group-hover:translate-x-2 transition-transform" />
               </Link>
             </Button>
           </motion.div>
 
           <motion.div
-            initial="hidden"
-            whileInView="visible"
+            initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
             viewport={{ once: true }}
-            variants={fadeIn}
-            className="relative hidden md:flex items-center justify-center"
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            className="relative"
           >
-            <div className="relative p-8 border border-[#ffd700]/20 bg-black/40 backdrop-blur-xl rounded-2xl max-w-md text-center transform rotate-3 hover:rotate-0 transition-all duration-500 shadow-[0_0_40px_rgba(255,215,0,0.1)] hover:shadow-[0_0_50px_rgba(255,215,0,0.2)]">
-              <blockquote className="text-3xl italic font-serif text-white">
-                &ldquo;Where crime meets cuisine.&rdquo;
-              </blockquote>
-              <div className="mt-4 text-sm text-[#ffd700] tracking-widest uppercase font-bold">- The Motto</div>
+            <div className="glass-pane p-8 md:p-20 relative overflow-hidden group">
+              {/* Inner Glow */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[60px] -mr-16 -mt-16 group-hover:bg-primary/20 transition-colors" />
+
+              <p className="text-2xl md:text-5xl font-black italic text-white leading-tight uppercase tracking-tighter mb-6">
+                "Where crime meets cuisine."
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="h-0.5 w-12 bg-primary" />
+                <span className="text-primary font-bold tracking-widest uppercase text-xs">The Official Motto</span>
+              </div>
             </div>
+
+            {/* Background Accent */}
+            <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-primary/10 blur-[100px] rounded-full -z-10" />
           </motion.div>
         </div>
       </div>
