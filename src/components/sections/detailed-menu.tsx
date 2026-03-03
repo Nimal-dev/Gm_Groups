@@ -4,17 +4,17 @@ import { motion } from "framer-motion";
 
 const MENU_ITEMS = {
     burgers: [
-        { name: "Steahouse Supreme Burger", price: "$50,000", description: "Our signature classic. A mix of juicy chicken, bacon and steak patty, special sauce, lettuce, cheese, pickles, onions, ketchup on a sesame seed bun." },
-        { name: "Ocean Catch Burger", price: "$50,000", description: "Our new seafood burger. Fresh from the ocean the burger is infused in fried fish patty and cheese and the delicacy is delicious!!" },
-        { name: "The Cardiac Crusher", price: "$50,000", description: "Ready to stop your hearts! Introducing the new big burger with 3 beef pattys that can finish your hunger in a gif." },
-        { name: "Sunrise Ham Melt Sandwich", price: "$25,000", description: "Double cheese, ham, and a fried egg. Not for the faint of heart." },
+        { name: "Steahouse Supreme Burger", price: "$1,00,000", description: "Our signature classic. A mix of juicy chicken, bacon and steak patty, special sauce, lettuce, cheese, pickles, onions, ketchup on a sesame seed bun." },
+        { name: "Ocean Catch Burger", price: "$1,00,000", description: "Our new seafood burger. Fresh from the ocean the burger is infused in fried fish patty and cheese and the delicacy is delicious!!" },
+        { name: "The Cardiac Crusher", price: "$1,00,000", description: "Ready to stop your hearts! Introducing the new big burger with 3 beef pattys that can finish your hunger in a gif." },
+        { name: "Sunrise Ham Melt Sandwich", price: "$1,00,000", description: "Double cheese, ham, and a fried egg. Not for the faint of heart." },
     ],
     sides: [
-        { name: "Fries", price: "$25,000", description: "Crispy, salty, and perfect for sharing. Or not." },
+        { name: "Fries", price: "$1,00,000", description: "Crispy, salty, and perfect for sharing. Or not." },
     ],
     drinks: [
-        { name: "E-Cola", price: "$50,000", description: "The classic taste of virtual refreshment." },
-        { name: "Sprunk", price: "$50,000", description: "For when you need that extra green kick." },
+        { name: "E-Cola", price: "$1,00,000", description: "The classic taste of virtual refreshment." },
+        { name: "Sprunk", price: "$1,00,000", description: "For when you need that extra green kick." },
     ],
 };
 
