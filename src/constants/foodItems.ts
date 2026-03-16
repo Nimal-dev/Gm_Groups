@@ -1,7 +1,7 @@
 export const ITEM_CATEGORIES = {
     'food_items': {
         label: '🍔 Food Items',
-        items: ['Burger', 'Fries', 'ECola', 'Sprunk', 'Ocean Catch Burger']
+        items: ['KOI', 'Fries', 'ECola', 'Sprunk', 'Ocean Catch KOI']
     },
     'fresh_prep': {
         label: '🥗 Fresh & Sliced',
@@ -9,11 +9,11 @@ export const ITEM_CATEGORIES = {
     },
     'pantry_stats': {
         label: '🍞 Sliced Buns, Bread & Raw 🧊',
-        items: ['Sliced Burger Bun', 'Sliced Sandwich Bread', 'Sliced Bacon', 'Sliced Ham', 'Ice']
+        items: ['Sliced KOI Bun', 'Sliced Sandwich Bread', 'Sliced Bacon', 'Sliced Ham', 'Ice']
     },
     'fried_grilled_1': {
         label: '🔥 Grilled & Fried 1',
-        items: ['Grilled Burger Bun', 'Grilled Burger Meat', 'Grilled Steak', 'Fried Fish', 'Fried Egg']
+        items: ['Grilled KOI Bun', 'Grilled KOI Meat', 'Grilled Steak', 'Fried Fish', 'Fried Egg']
     },
     'fried_grilled_2': {
         label: '🥓 Grilled Sides',

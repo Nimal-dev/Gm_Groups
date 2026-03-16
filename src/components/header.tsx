@@ -43,7 +43,7 @@ export function Header() {
         <NavItem href="/">Home</NavItem>
         <NavItem href="/#about">About</NavItem>
         <NavItem href="/#pillars">Pillars</NavItem>
-        <NavItem href="/burgershot">Burgershot</NavItem>
+        <NavItem href="/koi-cafe">KOI Cafe</NavItem>
 
 
 

@@ -355,14 +355,14 @@ export default function CateringRequestPage() {
                                                     </Label>
                                                     <ScrollArea className="h-[300px] w-full rounded-md border border-white/10 bg-black/40 p-4 text-sm text-white/70">
                                                         <div className="space-y-4">
-                                                            <h4 className="font-bold text-white">GM BURGERSHOT: BULK ORDER POLICY</h4>
+                                                            <h4 className="font-bold text-white">GM KOI CAFE: BULK ORDER POLICY</h4>
                                                             <p>To ensure operational efficiency and the highest standard of service, the following protocols apply to all bulk procurements.</p>
 
                                                             {/* ... (Policy content remains the same, just rendering static text) ... */}
                                                             <div>
                                                                 <h5 className="font-semibold text-white/90">1. QUANTITY & VALUE THRESHOLDS</h5>
                                                                 <ul className="list-disc pl-4 space-y-1">
-                                                                    <li><strong>Definition of Unit:</strong> A "Unit" is defined as a Main Entrée (Burger/Sandwich) or Premium Side.</li>
+                                                                    <li><strong>Definition of Unit:</strong> A "Unit" is defined as a Main Entrée (KOI/Sandwich) or Premium Side.</li>
                                                                     <li><strong>Minimum Order:</strong> 100 Qualifying Units OR a Minimum Order Value (MOV) of $5,000,000.</li>
                                                                     <li><strong>Maximum Order:</strong> 500 Qualifying Units per batch. Orders exceeding 500 units require distinct negotiation with GM Management (10-day lead time).</li>
                                                                 </ul>
@@ -397,14 +397,14 @@ export default function CateringRequestPage() {
 
                                                             <div>
                                                                 <h5 className="font-semibold text-white/90">5. LIABILITY & WAIVER</h5>
-                                                                <p>Liability transfers to X-Club upon handover. X-Club assumes responsibility for cold chain storage (&lt;5°C) and safe reheating (&gt;75°C). X-Club indemnifies GM Burgershot against health claims for food consumed &gt;32 hours after handover or improperly stored. The foods can be consumed till 1% durability. Any foods consumed &lt;1% is strictly forbidden and will not come under burgershot’s responsibility.</p>
+                                                                <p>Liability transfers to X-Club upon handover. X-Club assumes responsibility for cold chain storage (&lt;5°C) and safe reheating (&gt;75°C). X-Club indemnifies GM KOI Cafe against health claims for food consumed &gt;32 hours after handover or improperly stored. The foods can be consumed till 1% durability. Any foods consumed &lt;1% is strictly forbidden and will not come under KOI Cafe’s responsibility.</p>
                                                             </div>
                                                             <div>
                                                                 <h5 className="font-semibold text-white/90">6.POLICY GOVERNANCE & AMENDMENTS</h5>
                                                                 <ul className="list-disc pl-4 space-y-1">
-                                                                    <li><strong>Right to Modify:</strong> GM Burgershot reserves the right to review, amend, or update this policy at any time, specifically in the event that operational flaws, loopholes, or financial discrepancies are identified.
+                                                                    <li><strong>Right to Modify:</strong> GM KOI Cafe reserves the right to review, amend, or update this policy at any time, specifically in the event that operational flaws, loopholes, or financial discrepancies are identified.
                                                                     </li>
-                                                                    <li><strong>Notification:</strong> Any such amendments will be effective immediately upon written notification to the Client. Continued use of GM Burgershot’s catering services constitutes acceptance of the revised terms.
+                                                                    <li><strong>Notification:</strong> Any such amendments will be effective immediately upon written notification to the Client. Continued use of GM KOI Cafe’s catering services constitutes acceptance of the revised terms.
                                                                     </li>
                                                                 </ul>
                                                             </div>

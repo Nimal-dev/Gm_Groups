@@ -21,8 +21,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'GM Groups Xlantis | Dominating the Streets',
-  description: 'GM Groups - The powerhouse of Xlantis. Dominating business, streets, and luxury. Join the elite network of Burgershot, GM Industries, and more.',
-  keywords: ['GM Groups', 'Xlantis', 'RP', 'Burgershot', 'Roleplay', 'Business', 'Gang', 'GTA V', 'FiveM', 'Gaming Community'],
+  description: 'GM Groups - The powerhouse of Xlantis. Dominating business, streets, and luxury. Join the elite network of KOI Cafe, GM Industries, and more.',
+  keywords: ['GM Groups', 'Xlantis', 'RP', 'KOI Cafe', 'Roleplay', 'Business', 'Gang', 'GTA V', 'FiveM', 'Gaming Community'],
   authors: [{ name: 'GM Groups Team' }],
   openGraph: {
     title: 'GM Groups Xlantis',

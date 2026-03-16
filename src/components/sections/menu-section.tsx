@@ -7,24 +7,24 @@ import { useRef, useState } from "react";
 const MENU_ITEMS = [
     {
         id: 1,
-        name: "The Money Shot",
+        name: "KOI Signature",
         description: "Our signature double-patty beast with secret Xlantis sauce.",
         price: "$15.00",
-        image: "/bs.png",
+        image: "/koicafe_bg.png",
     },
     {
         id: 2,
-        name: "Bleeder Burger",
+        name: "Spicy Shogun",
         description: "Classic American style with a spicy kick that leaves a mark.",
         price: "$12.50",
-        image: "/bs.png",
+        image: "/koicafe_bg.png",
     },
     {
         id: 3,
-        name: "Empire Combo",
+        name: "Zen Garden Combo",
         description: "The complete meal for the city's power players.",
         price: "$25.00",
-        image: "/bs.png",
+        image: "/koicafe_bg.png",
     },
 ];
 
@@ -61,7 +61,7 @@ function MenuCard({ item }: { item: typeof MENU_ITEMS[0] }) {
             style={{ transformStyle: "preserve-3d" }}
             className="glass-pane p-6 group cursor-pointer relative"
         >
-            <div className="absolute inset-0 border border-primary/0 group-hover:border-primary/40 transition-colors duration-500 rounded-xl" />
+            <div className="absolute inset-0 border border-[#27cb63]/0 group-hover:border-[#27cb63]/40 transition-colors duration-500 rounded-xl" />
 
             <div style={{ transform: "translateZ(50px)" }} className="relative z-10">
                 <div className="relative h-48 w-full mb-6 overflow-hidden rounded-lg bg-black/40">
@@ -76,7 +76,7 @@ function MenuCard({ item }: { item: typeof MENU_ITEMS[0] }) {
                 <div className="space-y-2">
                     <div className="flex justify-between items-center">
                         <h3 className="text-xl font-black uppercase text-white tracking-tighter">{item.name}</h3>
-                        <span className="text-primary font-bold">{item.price}</span>
+                        <span className="text-[#27cb63] font-bold">{item.price}</span>
                     </div>
                     <p className="text-zinc-400 text-sm leading-relaxed">{item.description}</p>
                 </div>
@@ -84,12 +84,12 @@ function MenuCard({ item }: { item: typeof MENU_ITEMS[0] }) {
                 <motion.div
                     initial={{ opacity: 0 }}
                     whileHover={{ opacity: 1 }}
-                    className="mt-6 h-1 w-full bg-gradient-to-r from-primary to-transparent"
+                    className="mt-6 h-1 w-full bg-gradient-to-r from-[#27cb63] to-transparent"
                 />
             </div>
 
             {/* Background Glow */}
-            <div className="absolute -inset-2 bg-primary/5 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+            <div className="absolute -inset-2 bg-[#27cb63]/5 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
         </motion.div>
     );
 }
@@ -102,9 +102,9 @@ export function MenuSection() {
                     <motion.span
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="text-primary font-bold tracking-[0.3em] uppercase text-xs"
+                        className="text-[#27cb63] font-bold tracking-[0.3em] uppercase text-xs"
                     >
-                        The Burgershot Experience
+                        The KOI Cafe Experience
                     </motion.span>
                     <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase text-center">
                         <span className="text-white">POWER ON A</span><br />

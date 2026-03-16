@@ -431,7 +431,7 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                         <li>Enter the full Client Name or Org.</li>
                                         <li>Input the agreed Total Amount.</li>
                                         <li>Select the correct Event Date.</li>
-                                        <li>List all items clearly in standard format (e.g. 100x Burgers).</li>
+                                        <li>List all items clearly in standard format (e.g. 100x KOIs).</li>
                                         <li>Submit to generate the Discord Order.</li>
                                     </ol>
                                 </div>
@@ -522,7 +522,7 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Items List</Label>
-                                        <Textarea required placeholder="100x Burgers, 50x Sodas..." value={recurringForm.items} onChange={e => setRecurringForm({ ...recurringForm, items: e.target.value })} />
+                                        <Textarea required placeholder="100x KOIs, 50x Sodas..." value={recurringForm.items} onChange={e => setRecurringForm({ ...recurringForm, items: e.target.value })} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Delivery Instructions</Label>

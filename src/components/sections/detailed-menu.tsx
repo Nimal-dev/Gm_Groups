@@ -3,11 +3,11 @@
 import { motion } from "framer-motion";
 
 const MENU_ITEMS = {
-    burgers: [
-        { name: "Steahouse Supreme Burger", price: "$1,00,000", description: "Our signature classic. A mix of juicy chicken, bacon and steak patty, special sauce, lettuce, cheese, pickles, onions, ketchup on a sesame seed bun." },
-        { name: "Ocean Catch Burger", price: "$1,00,000", description: "Our new seafood burger. Fresh from the ocean the burger is infused in fried fish patty and cheese and the delicacy is delicious!!" },
-        { name: "The Cardiac Crusher", price: "$1,00,000", description: "Ready to stop your hearts! Introducing the new big burger with 3 beef pattys that can finish your hunger in a gif." },
-        { name: "Sunrise Ham Melt Sandwich", price: "$1,00,000", description: "Double cheese, ham, and a fried egg. Not for the faint of heart." },
+    KOIs: [
+        { name: "Sakura Steakhouse Supreme", price: "$1,00,000", description: "Our signature classic. A mix of juicy chicken, bacon and steak patty, special sauce, lettuce, cheese, pickles, onions, ketchup on a sesame seed bun." },
+        { name: "Hokkaido Ocean Catch", price: "$1,00,000", description: "Our new seafood specialty. Fresh from the ocean, the catch is infused in fried fish patty and cheese - a true delicacy!!" },
+        { name: "Shogun's Feast", price: "$1,00,000", description: "Ready to satisfy the mightiest hunger! Introducing our largest offering with 3 beef patties that will finish your hunger in an instant." },
+        { name: "Zen Sunrise Sandwich", price: "$1,00,000", description: "Double cheese, ham, and a fried egg. A harmonious start to your day." },
     ],
     sides: [
         { name: "Fries", price: "$1,00,000", description: "Crispy, salty, and perfect for sharing. Or not." },
@@ -30,9 +30,9 @@ export function DetailedMenu() {
                         viewport={{ once: true }}
                         className="flex items-center justify-center gap-4 mb-4"
                     >
-                        <div className="w-12 h-[1px] bg-[#ff8c00]" />
-                        <span className="text-sm font-bold tracking-[0.2em] text-[#ff8c00] uppercase">The Offerings</span>
-                        <div className="w-12 h-[1px] bg-[#ff8c00]" />
+                        <div className="w-12 h-[1px] bg-[#27cb63]" />
+                        <span className="text-sm font-bold tracking-[0.2em] text-[#27cb63] uppercase">The Offerings</span>
+                        <div className="w-12 h-[1px] bg-[#27cb63]" />
                     </motion.div>
                     <motion.h2
                         initial={{ opacity: 0, y: 30 }}
@@ -41,7 +41,7 @@ export function DetailedMenu() {
                         viewport={{ once: true }}
                         className="text-6xl md:text-8xl font-black tracking-tighter uppercase"
                     >
-                        <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400">OUR</span> <span className="text-transparent bg-clip-text bg-gradient-to-b from-[#ff8c00] to-[#cc5200]">MENU</span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400">OUR</span> <span className="text-transparent bg-clip-text bg-gradient-to-b from-[#27cb63] to-[#1a8a44]">MENU</span>
                     </motion.h2>
                     <motion.p
                         initial={{ opacity: 0, y: 30 }}
@@ -63,16 +63,16 @@ export function DetailedMenu() {
                 >
                     <div>
                         <div className="flex items-center gap-4 mb-8">
-                            <h3 className="text-3xl font-black uppercase tracking-tight text-white">Burgers</h3>
-                            <div className="h-[2px] bg-[#ff8c00] flex-grow opacity-50" />
+                            <h3 className="text-3xl font-black uppercase tracking-tight text-white">Signatures</h3>
+                            <div className="h-[2px] bg-[#27cb63] flex-grow opacity-50" />
                         </div>
                         <div className="space-y-6">
-                            {MENU_ITEMS.burgers.map((item) => (
-                                <div key={item.name} className="p-6 rounded-xl bg-[#0f0f0f] border border-white/5 hover:border-[#ff8c00]/30 transition-colors">
+                            {MENU_ITEMS.KOIs.map((item) => (
+                                <div key={item.name} className="p-6 rounded-xl bg-[#0f0f0f] border border-white/5 hover:border-[#27cb63]/30 transition-colors">
                                     <div className="flex items-baseline justify-between w-full mb-3">
                                         <span className="text-lg font-bold text-white uppercase tracking-wide">{item.name}</span>
                                         <div className="flex-grow mx-4 border-b border-dotted border-gray-600/50" />
-                                        <span className="text-lg font-bold text-[#ff8c00]">{item.price}</span>
+                                        <span className="text-lg font-bold text-[#27cb63]">{item.price}</span>
                                     </div>
                                     <p className="text-sm text-gray-400 font-light leading-relaxed">{item.description}</p>
                                 </div>
@@ -84,15 +84,15 @@ export function DetailedMenu() {
                         <div>
                             <div className="flex items-center gap-4 mb-8">
                                 <h3 className="text-3xl font-black uppercase tracking-tight text-white">Sides</h3>
-                                <div className="h-[2px] bg-[#ff8c00] flex-grow opacity-50" />
+                                <div className="h-[2px] bg-[#27cb63] flex-grow opacity-50" />
                             </div>
                             <div className="space-y-6">
                                 {MENU_ITEMS.sides.map((item) => (
-                                    <div key={item.name} className="p-6 rounded-xl bg-[#0f0f0f] border border-white/5 hover:border-[#ff8c00]/30 transition-colors">
+                                    <div key={item.name} className="p-6 rounded-xl bg-[#0f0f0f] border border-white/5 hover:border-[#27cb63]/30 transition-colors">
                                         <div className="flex items-baseline justify-between w-full mb-3">
                                             <span className="text-lg font-bold text-white uppercase tracking-wide">{item.name}</span>
                                             <div className="flex-grow mx-4 border-b border-dotted border-gray-600/50" />
-                                            <span className="text-lg font-bold text-[#ff8c00]">{item.price}</span>
+                                            <span className="text-lg font-bold text-[#27cb63]">{item.price}</span>
                                         </div>
                                         <p className="text-sm text-gray-400 font-light leading-relaxed">{item.description}</p>
                                     </div>
@@ -103,15 +103,15 @@ export function DetailedMenu() {
                         <div>
                             <div className="flex items-center gap-4 mb-8">
                                 <h3 className="text-3xl font-black uppercase tracking-tight text-white">Drinks</h3>
-                                <div className="h-[2px] bg-[#ff8c00] flex-grow opacity-50" />
+                                <div className="h-[2px] bg-[#27cb63] flex-grow opacity-50" />
                             </div>
                             <div className="space-y-6">
                                 {MENU_ITEMS.drinks.map((item) => (
-                                    <div key={item.name} className="p-6 rounded-xl bg-[#0f0f0f] border border-white/5 hover:border-[#ff8c00]/30 transition-colors">
+                                    <div key={item.name} className="p-6 rounded-xl bg-[#0f0f0f] border border-white/5 hover:border-[#27cb63]/30 transition-colors">
                                         <div className="flex items-baseline justify-between w-full mb-3">
                                             <span className="text-lg font-bold text-white uppercase tracking-wide">{item.name}</span>
                                             <div className="flex-grow mx-4 border-b border-dotted border-gray-600/50" />
-                                            <span className="text-lg font-bold text-[#ff8c00]">{item.price}</span>
+                                            <span className="text-lg font-bold text-[#27cb63]">{item.price}</span>
                                         </div>
                                         <p className="text-sm text-gray-400 font-light leading-relaxed">{item.description}</p>
                                     </div>

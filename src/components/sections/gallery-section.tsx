@@ -7,8 +7,8 @@ const GALLERY_IMAGES = [
     { id: 1, src: "/1.png", title: "The High Life" },
     { id: 2, src: "/2.png", title: "Strategic Operations" },
     { id: 3, src: "/3.png", title: "The Inner Circle" },
-    { id: 4, src: "/kitchen.png", title: "Burgershot Kitchen" },
-    { id: 5, src: "/gm_logo_dark_removed.png", title: "Xlantis Skyline" },
+    { id: 4, src: "/kitchen.png", title: "KOI Cafe Kitchen" },
+    { id: 5, src: "/gm_logo_dark.png", title: "Xlantis Skyline" },
     { id: 6, src: "/bsoffice.png", title: "Executive Suite" },
 ];
 
@@ -20,12 +20,12 @@ export function GallerySection() {
                     <motion.span
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
-                        className="text-primary font-bold tracking-[0.3em] uppercase text-xs mb-4"
+                        className="text-[#27cb63] font-bold tracking-[0.3em] uppercase text-xs mb-4"
                     >
                         The Showcase
                     </motion.span>
                     <h2 className="text-4xl md:text-7xl font-black tracking-tighter uppercase">
-                        <span className="text-white">BURGERSHOT</span><br />
+                        <span className="text-white">KOI CAFE</span><br />
                         <span className="text-zinc-800">EXPERIENCES</span>
                     </h2>
                 </div>

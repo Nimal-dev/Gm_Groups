@@ -1,11 +1,13 @@
+'use client';
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
-export function BurgershotCTA() {
+export function KOICafeCTA() {
   return (
-    <section id="burgershot-cta" className="py-20 bg-background/50 sm:py-28">
+    <section id="koi-cafe-cta" className="py-20 bg-background/50 sm:py-28">
       <div className="container px-4 mx-auto text-center">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -24,7 +26,7 @@ export function BurgershotCTA() {
           viewport={{ once: true }}
           className="max-w-2xl mx-auto mt-4 text-lg text-muted-foreground"
         >
-          Explore our flagship business, see what's on the menu, and understand why Burgershot is the true heart of Xlantis.
+          Explore our flagship business, see what's on the menu, and understand why KOI Cafe is the true heart of Xlantis.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -33,9 +35,9 @@ export function BurgershotCTA() {
           viewport={{ once: true }}
           className="mt-8"
         >
-          <Button asChild size="lg" className="px-10 py-6 text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90">
-            <Link href="/burgershot">
-              Explore Burgershot <ArrowRight className="w-5 h-5 ml-2" />
+          <Button asChild size="lg" className="px-10 py-6 text-lg font-bold bg-[#27cb63] text-primary-foreground hover:bg-[#27cb63]/90">
+            <Link href="/koi-cafe">
+              Explore KOI Cafe <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
           </Button>
         </motion.div>
