@@ -80,94 +80,96 @@ export default async function DashboardPage() {
 
     // Main Content Tabs (Client Side)
     return (
-        <div className="min-h-screen p-4 md:p-8 space-y-8 pb-20">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-7xl mx-auto w-full">
-                <div>
-                    <h1 className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60 mb-2">
-                        Command Center
-                    </h1>
-                    <p className="text-muted-foreground">
-                        {role === 'admin' ? 'Full operational control & oversight.' : 'Staff operations dashboard.'}
-                    </p>
+        <div className="min-h-screen p-4 md:p-8 pb-20 flex justify-center w-full">
+            <div className="max-w-[1400px] w-full space-y-8">
+                {/* Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
+                    <div>
+                        <h1 className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60 mb-2">
+                            Command Center
+                        </h1>
+                        <p className="text-muted-foreground">
+                            {role === 'admin' ? 'Full operational control & oversight.' : 'Staff operations dashboard.'}
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <LogoutButton />
+                        <Badge variant="outline" className="glass-card px-4 py-1.5 text-xs font-mono border-accent/30 text-accent bg-accent/10">
+                            {role.toUpperCase()}
+                        </Badge>
+                    </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <LogoutButton />
-                    <Badge variant="outline" className="glass-card px-4 py-1.5 text-xs font-mono border-accent/30 text-accent bg-accent/10">
-                        {role.toUpperCase()}
-                    </Badge>
+
+                {/* Top Stats Row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 w-full">
+
+                    {role === 'admin' && (
+                        <>
+                            <StatsCard
+                                title="Company Balance"
+                                value={`$${(data.bankStats?.currentBalance || 0).toLocaleString('en-US')}`}
+                                subtitle="Live Available Funds"
+                                icon={<DollarSign className="w-5 h-5 text-yellow-400" />}
+                                glow
+                            />
+
+                            <StatsCard
+                                title="Current Month Income"
+                                value={`$${(data.bankStats?.totalIncome || 0).toLocaleString('en-US')}`}
+                                subtitle="Total Deposits"
+                                icon={<Activity className="w-5 h-5 text-green-400" />}
+                            />
+
+                            <StatsCard
+                                title="Current Month Expense"
+                                value={`$${(data.bankStats?.totalExpense || 0).toLocaleString('en-US')}`}
+                                subtitle="Withdrawals & Transfers"
+                                icon={<Activity className="w-5 h-5 text-red-400" />}
+                            />
+                        </>
+                    )}
+
+                    <StatsCard
+                        title="Active Duty"
+                        value={activeStaffCount}
+                        subtitle={`${activeStaffCount > 0 ? 'Staff currently online' : 'No staff online'}`}
+                        icon={<Users className="w-5 h-5 text-accent" />}
+                    />
+
+                    <StatsCard
+                        title="Pending Orders"
+                        value={pendingOrders}
+                        subtitle="Require immediate attention"
+                        icon={<ShoppingCart className="w-5 h-5 text-orange-400" />}
+                    />
+
+                    <StatsCard
+                        title="Active Process"
+                        value={inProgressOrders + readyOrders}
+                        subtitle="Orders currently in kitchen/ready"
+                        icon={<Activity className="w-5 h-5 text-blue-400" />}
+                    />
+
+                    <StatsCard
+                        title="Total Employees"
+                        value={totalStaff}
+                        subtitle="Registered staff members"
+                        icon={<FileText className="w-5 h-5 text-green-400" />}
+                    />
                 </div>
-            </div>
 
-            {/* Top Stats Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 max-w-7xl mx-auto w-full">
-
-                {role === 'admin' && (
-                    <>
-                        <StatsCard
-                            title="Company Balance"
-                            value={`$${(data.bankStats?.currentBalance || 0).toLocaleString('en-US')}`}
-                            subtitle="Live Available Funds"
-                            icon={<DollarSign className="w-5 h-5 text-yellow-400" />}
-                            glow
-                        />
-
-                        <StatsCard
-                            title="Current Month Income"
-                            value={`$${(data.bankStats?.totalIncome || 0).toLocaleString('en-US')}`}
-                            subtitle="Total Deposits"
-                            icon={<Activity className="w-5 h-5 text-green-400" />}
-                        />
-
-                        <StatsCard
-                            title="Current Month Expense"
-                            value={`$${(data.bankStats?.totalExpense || 0).toLocaleString('en-US')}`}
-                            subtitle="Withdrawals & Transfers"
-                            icon={<Activity className="w-5 h-5 text-red-400" />}
-                        />
-                    </>
-                )}
-
-                <StatsCard
-                    title="Active Duty"
-                    value={activeStaffCount}
-                    subtitle={`${activeStaffCount > 0 ? 'Staff currently online' : 'No staff online'}`}
-                    icon={<Users className="w-5 h-5 text-accent" />}
-                />
-
-                <StatsCard
-                    title="Pending Orders"
-                    value={pendingOrders}
-                    subtitle="Require immediate attention"
-                    icon={<ShoppingCart className="w-5 h-5 text-orange-400" />}
-                />
-
-                <StatsCard
-                    title="Active Process"
-                    value={inProgressOrders + readyOrders}
-                    subtitle="Orders currently in kitchen/ready"
-                    icon={<Activity className="w-5 h-5 text-blue-400" />}
-                />
-
-                <StatsCard
-                    title="Total Employees"
-                    value={totalStaff}
-                    subtitle="Registered staff members"
-                    icon={<FileText className="w-5 h-5 text-green-400" />}
+                {/* Main Content Layout (Client Side) */}
+                <DashboardV2
+                    activeStaff={activeStaff}
+                    activeOrders={activeOrders}
+                    recurringOrders={recurringOrders || []}
+                    allEmployees={allEmployees}
+                    recentSalaries={recentSalaries}
+                    activeLeaves={activeLeaves || []}
+                    userRole={role}
+                    currentUser={JSON.parse(JSON.stringify(currentUser))}
                 />
             </div>
-
-            {/* Main Content Layout (Client Side) */}
-            <DashboardV2
-                activeStaff={activeStaff}
-                activeOrders={activeOrders}
-                recurringOrders={recurringOrders || []}
-                allEmployees={allEmployees}
-                recentSalaries={recentSalaries}
-                activeLeaves={activeLeaves || []}
-                userRole={role}
-                currentUser={JSON.parse(JSON.stringify(currentUser))}
-            />
         </div>
     );
 }

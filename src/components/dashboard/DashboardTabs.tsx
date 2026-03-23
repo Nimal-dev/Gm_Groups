@@ -112,7 +112,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
     return (
         <Tabs defaultValue="overview" className="space-y-6">
             <div className="overflow-x-auto pb-2">
-                <TabsList className="glass-card bg-transparent border-0 p-1">
+                <TabsList className="glass-card bg-transparent border-0 p-1 w-max">
                     <TabsTrigger value="overview" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Overview</TabsTrigger>
                     {canManageBulk && (
                         <TabsTrigger value="bulk" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent relative">
@@ -588,13 +588,6 @@ function ActiveStaffList({ initialStaff }: { initialStaff: any[] }) {
 
     return (
         <div className="flex flex-col flex-1 min-h-0 relative">
-            <div className="absolute top-[-3.5rem] right-0 mr-8"> {/* Positioning button in header area hackily or we can move it up via props if we refactor parent. But actually we can just put it inside the card content if we change structure. For now, let's put it top right of this container which is inside the card content */}
-            </div>
-            {/* We want the refresh button to be accessible. 
-                 The parent renders the title. Let's add a small refresh icon absolute positioned or just inside the list area top right. 
-                 Actually, the parent component renders the CardHeader. I cannot easily put the button IN the header from here without lifting state.
-                 I will lift the refresh button to the list top right within the ScrollArea or just above it.
-             */}
             <div className="flex justify-end mb-2 px-2">
                 <Button
                     variant="ghost"

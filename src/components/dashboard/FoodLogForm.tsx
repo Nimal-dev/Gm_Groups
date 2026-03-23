@@ -79,7 +79,7 @@ export function FoodLogForm() {
     const totalItems = Object.values(quantities).reduce((a, b) => a + b, 0);
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full">
             {/* Left Column: Form */}
             <div className="lg:col-span-2">
                 <Card className="glass-card w-full">

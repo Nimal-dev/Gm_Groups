@@ -201,7 +201,7 @@ export default function CateringRequestPage() {
                                                                             <SelectValue placeholder="Select Organization" />
                                                                         </SelectTrigger>
                                                                     </FormControl>
-                                                                    <SelectContent className="bg-black/90 border-white/10 text-white">
+                                                                    <SelectContent className="bg-black/90 border-white/10 text-white cursor-pointer">
                                                                         <SelectItem value="BM Events">BM Events</SelectItem>
                                                                     </SelectContent>
                                                                 </Select>
@@ -355,7 +355,7 @@ export default function CateringRequestPage() {
                                                     </Label>
                                                     <ScrollArea className="h-[300px] w-full rounded-md border border-white/10 bg-black/40 p-4 text-sm text-white/70">
                                                         <div className="space-y-4">
-                                                            <h4 className="font-bold text-white">GM KOI CAFE: BULK ORDER POLICY</h4>
+                                                            <h4 className="font-bold text-white">GM CAFE: BULK ORDER POLICY</h4>
                                                             <p>To ensure operational efficiency and the highest standard of service, the following protocols apply to all bulk procurements.</p>
 
                                                             {/* ... (Policy content remains the same, just rendering static text) ... */}

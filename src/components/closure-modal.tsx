@@ -45,7 +45,7 @@ export function ClosureModal() {
                         <div className="grid gap-6">
                             <div className="space-y-4 text-center">
                                 <p className="text-sm md:text-base leading-relaxed text-white/80 font-light tracking-wide">
-                                    It is with a heavy heart that we announce the closing of <span className="text-white font-medium">KOIshot</span> on <span className="text-red-400">January 31st</span>. Following this date, the establishment will be put up for auction.
+                                    It is with a heavy heart that we announce the closing of <span className="text-white font-medium">CAFE</span> on <span className="text-red-400">January 31st</span>. Following this date, the establishment will be put up for auction.
                                 </p>
 
                                 <div className="h-px w-24 bg-gradient-to-r from-transparent via-white/20 to-transparent mx-auto my-6" />

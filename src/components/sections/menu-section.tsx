@@ -7,7 +7,7 @@ import { useRef, useState } from "react";
 const MENU_ITEMS = [
     {
         id: 1,
-        name: "KOI Signature",
+        name: "GM Signature",
         description: "Our signature double-patty beast with secret Xlantis sauce.",
         price: "$15.00",
         image: "/koicafe_bg.png",

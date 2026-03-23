@@ -84,7 +84,7 @@ export function AdminEmployeeTable() {
                 ) : (
                     <>
                         {/* Desktop Table View */}
-                        <div className="hidden md:block rounded-md border border-white/10 overflow-hidden">
+                        <div className="hidden md:block rounded-md border border-white/10 overflow-x-auto">
                             <Table>
                                 <TableHeader className="bg-white/5">
                                     <TableRow>

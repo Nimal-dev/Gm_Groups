@@ -146,7 +146,7 @@ const fetchDashboardData = unstable_cache(
             ]);
 
             // Fetch Current Balance (Since data model change: Query dedicated BankBalanceLog first)
-            // Hardcoded Company Account Number for GM KOIshot
+            // Hardcoded Company Account Number for GM CAFE
             const COMPANY_ACCOUNT_NUMBER = '1509517987';
 
             // 1. Try Dedicated Balance Log (New System)
