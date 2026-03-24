@@ -52,7 +52,7 @@ export default function KOICafePage() {
               transition={{ delay: 0.2 }}
               className="max-w-2xl mx-auto text-zinc-400 text-lg md:text-xl font-light leading-relaxed"
             >
-              Exquisite Japanese flavors meeting modern culinary innovation.
+              Exquisite Japanese flavors meeting modern culinary innovation at **GM Cafe & Restaurant**.
               Taste the heritage of GM Groups through our signature dishes.
             </motion.p>
           </div>

@@ -26,7 +26,7 @@ export function KOICafeCTA() {
           viewport={{ once: true }}
           className="max-w-2xl mx-auto mt-4 text-lg text-muted-foreground"
         >
-          Explore our flagship business, see what's on the menu, and understand why KOI Cafe is the true heart of Xlantis.
+          Explore our flagship **GM Cafe & Restaurant**, see what's on the menu, and understand why **KOI Cafe** is the true heart of Xlantis.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 50 }}
