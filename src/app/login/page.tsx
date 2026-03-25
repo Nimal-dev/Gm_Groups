@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useActionState } from 'react';
 import Link from 'next/link';
 import { discordLogin, mpinLogin } from '@/actions/auth';
 import { Button } from '@/components/ui/button';
@@ -9,13 +9,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lock, Home, UserRound, KeyRound, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useFormStatus, useFormState } from 'react-dom';
+import { useFormStatus } from 'react-dom';
 
 export default function LoginPage() {
     const [loginMethod, setLoginMethod] = useState<'mpin' | 'discord'>('mpin');
     
     // @ts-ignore
-    const [state, dispatch] = useFormState(mpinLogin, undefined);
+    const [state, dispatch] = useActionState(mpinLogin, undefined);
 
     const containerVariants: any = {
         hidden: { opacity: 0, y: 20 },
@@ -89,7 +89,7 @@ export default function LoginPage() {
                                 onClick={() => setLoginMethod('mpin')}
                                 className={`flex-1 text-xs font-medium py-2 rounded-md transition-all ${loginMethod === 'mpin' ? 'bg-accent text-white shadow-lg' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
                             >
-                                Nickname & MPIN
+                                Login ID & MPIN
                             </button>
                             <button
                                 onClick={() => setLoginMethod('discord')}
@@ -112,16 +112,16 @@ export default function LoginPage() {
                                         <form action={dispatch} className="space-y-4">
                                             <div className="space-y-4">
                                                 <div className="space-y-1.5 relative group">
-                                                    <Label htmlFor="nickname" className="text-xs text-white/70 uppercase tracking-wider pl-1">Nickname</Label>
+                                                    <Label htmlFor="loginId" className="text-xs text-white/70 uppercase tracking-wider pl-1">Login ID</Label>
                                                     <div className="relative">
                                                         <UserRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-accent transition-colors" />
-                                                        <Input 
-                                                            id="nickname"
-                                                            name="nickname"
+                                                        <input 
+                                                            id="loginId"
+                                                            name="loginId"
                                                             type="text" 
                                                             required
-                                                            placeholder="e.g. NIMAL PRINCE" 
-                                                            className="pl-10 bg-black/30 border-white/10 focus-visible:ring-accent focus-visible:border-accent text-white h-11 transition-all group-hover:border-white/20"
+                                                            placeholder="Enter your Login ID" 
+                                                            className="flex h-11 w-full rounded-md border border-white/10 bg-black/30 px-10 text-sm focus-visible:outline-none focus:border-accent text-white transition-all group-hover:border-white/20"
                                                         />
                                                     </div>
                                                 </div>

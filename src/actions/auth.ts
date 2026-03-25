@@ -13,20 +13,25 @@ export async function discordLogin() {
 
 export async function mpinLogin(prevState: any, formData: FormData) {
     try {
+        console.log('Attempting MPIN login for Login ID:', formData.get('loginId'));
         await signIn('credentials', {
-            nickname: formData.get('nickname'),
+            loginId: formData.get('loginId'),
             mpin: formData.get('mpin'),
             redirectTo: '/dashboard'
         });
     } catch (error) {
         if (error instanceof AuthError) {
+            console.error('AuthError during MPIN login:', error.type, error);
             switch (error.type) {
                 case 'CredentialsSignin':
-                    return { error: 'Invalid Nickname or MPIN.' };
+                    return { error: 'Invalid Login ID or MPIN.' };
+                case 'CallbackRouteError':
+                    return { error: 'Invalid credentials or database error.' };
                 default:
-                    return { error: 'Something went wrong.' };
+                    return { error: `Auth Error: ${error.type}` };
             }
         }
+        // Next.js Redirects are thrown as errors, we must re-throw them
         throw error;
     }
 }

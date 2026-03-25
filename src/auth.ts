@@ -149,7 +149,10 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     return false;
                 }
             }
-            return false; // Deny any non-Discord login attempts
+            if (account?.provider === 'credentials') {
+                return true;
+            }
+            return false; // Deny other non-Discord login attempts
         },
     },
     providers: [
@@ -161,24 +164,30 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         Credentials({
             name: 'MPIN Login',
             credentials: {
-                nickname: { label: "Nickname", type: "text" },
+                loginId: { label: "Login ID", type: "text" },
                 mpin: { label: "MPIN", type: "password" }
             },
             async authorize(credentials) {
-                if (!credentials?.nickname || !credentials?.mpin) {
+                if (!credentials?.loginId || !credentials?.mpin) {
                     throw new Error('Missing credentials');
                 }
 
                 await connectToDatabase();
-                const nicknameStr = String(credentials.nickname).trim();
+                const loginIdStr = String(credentials.loginId).trim();
 
                 const employee = await Employee.findOne({ 
-                    nickname: new RegExp('^' + nicknameStr + '$', 'i'), 
+                    loginId: { $regex: new RegExp('^' + loginIdStr + '$', 'i') }, 
                     status: 'Active' 
                 });
 
-                if (!employee || employee.mpin !== credentials.mpin) {
-                    throw new Error('Invalid Nickname or MPIN');
+                if (!employee) {
+                    console.warn(`[Auth] No active employee found for Login ID: ${loginIdStr}`);
+                    throw new Error('Invalid Login ID or MPIN');
+                }
+
+                if (employee.mpin !== credentials.mpin) {
+                    console.warn(`[Auth] MPIN mismatch for Login ID: ${loginIdStr}`);
+                    throw new Error('Invalid Login ID or MPIN');
                 }
 
                 // Map Rank to Website Role

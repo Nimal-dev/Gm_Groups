@@ -24,6 +24,7 @@ const EmployeeSchema = z.object({
     userId: z.string().min(1, "User ID is required"),
     username: z.string().min(1, "Username is required"),
     nickname: z.string().optional(),
+    loginId: z.string().optional(),
     mpin: z.string().optional(),
     rank: z.string().min(1, "Rank is required"),
     status: z.enum(['Active', 'Inactive']).default('Active'),
@@ -82,6 +83,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
             userId: '',
             username: '',
             nickname: '',
+            loginId: '',
             mpin: '',
             rank: 'Employee',
             status: 'Active',
@@ -96,6 +98,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
             userId: emp.userId,
             username: emp.username,
             nickname: emp.nickname || '',
+            loginId: emp.loginId || '',
             mpin: emp.mpin || '',
             rank: emp.rank,
             status: emp.status,
@@ -192,6 +195,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                                     <TableRow className="hover:bg-transparent border-white/10">
                                         <TableHead>User ID</TableHead>
                                         <TableHead>Username</TableHead>
+                                        <TableHead>Login ID</TableHead>
                                         <TableHead>MPIN</TableHead>
                                         <TableHead>Rank</TableHead>
                                         <TableHead>Bank Account</TableHead>
@@ -211,6 +215,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                                             <TableRow key={emp.userId} className="border-white/5 hover:bg-white/5">
                                                 <TableCell className="font-mono text-xs text-muted-foreground">{emp.userId}</TableCell>
                                                 <TableCell className="font-medium">{emp.username}</TableCell>
+                                                <TableCell className="font-mono text-xs text-accent">{emp.loginId || '-'}</TableCell>
                                                 <TableCell className="font-mono text-xs">{emp.mpin || '-'}</TableCell>
                                                 <TableCell>{emp.rank}</TableCell>
                                                 <TableCell>
@@ -278,6 +283,9 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                                                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-semibold mb-1">Rank</div>
                                                 <div className="text-white/80">{emp.rank}</div>
                                                 
+                                                <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-semibold mb-1 mt-2">Login ID</div>
+                                                <div className="text-accent font-mono text-xs">{emp.loginId || '-'}</div>
+
                                                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-semibold mb-1 mt-2">MPIN</div>
                                                 <div className="text-white/80 font-mono text-xs">{emp.mpin || '-'}</div>
                                             </div>
@@ -356,6 +364,15 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                                 className="bg-black/20 border-white/10"
                             />
                             {form.formState.errors.nickname && <p className="text-xs text-destructive">{form.formState.errors.nickname.message}</p>}
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Login ID (For Mobile Login)</Label>
+                            <Input
+                                {...form.register('loginId')}
+                                placeholder="Custom ID (Alphabets/Numbers)"
+                                className="bg-black/20 border-white/10 font-mono"
+                            />
+                            {form.formState.errors.loginId && <p className="text-xs text-destructive">{form.formState.errors.loginId.message}</p>}
                         </div>
                         <div className="space-y-2">
                             <Label>MPIN (Mobile Login)</Label>

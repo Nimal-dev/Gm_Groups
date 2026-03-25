@@ -4,6 +4,7 @@ export interface IEmployee extends Document {
     userId: string;
     username: string;
     nickname?: string;
+    loginId?: string; // New custom login identifier
     mpin?: string;
     rank: string;
     joinedAt: Date;
@@ -23,6 +24,7 @@ const EmployeeSchema: Schema = new Schema({
     userId: { type: String, required: true, unique: true },
     username: { type: String, required: true },
     nickname: { type: String },
+    loginId: { type: String, unique: true, sparse: true }, // Sparse unique to allow optional but unique
     mpin: { type: String },
     rank: { type: String, default: 'Employee' },
     joinedAt: { type: Date, default: Date.now },

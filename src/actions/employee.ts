@@ -28,8 +28,9 @@ export async function getAllEmployees() {
             id: emp._id.toString(),
             userId: emp.userId,
             username: emp.username,
-            nickname: emp.nickname, // Added nickname
-            mpin: isAdmin ? emp.mpin : undefined, // Conditionally expose MPIN
+            nickname: emp.nickname,
+            loginId: emp.loginId, // Exposed for admins 
+            mpin: isAdmin ? emp.mpin : undefined, 
             rank: emp.rank,
             status: emp.status,
             xp: emp.xp || 0,
@@ -96,6 +97,7 @@ export async function updateEmployee(userId: string, data: any) {
                 $set: {
                     username: data.username,
                     nickname: data.nickname,
+                    loginId: data.loginId,
                     mpin: data.mpin,
                     rank: data.rank,
                     status: data.status,
