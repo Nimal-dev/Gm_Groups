@@ -89,7 +89,7 @@ export function HeroSection() {
             className="h-16 px-10 text-lg font-black bg-primary hover:bg-white text-black rounded-none skew-x-[-12deg] transition-all duration-300 group"
           >
             <Link href="/apply" className="flex items-center gap-2">
-              <span className="skew-x-[12deg]">APPLY HERE</span>
+              <span className="skew-x-[12deg]">JOIN GM</span>
             </Link>
           </Button>
 

@@ -4,6 +4,7 @@ export interface IEmployee extends Document {
     userId: string;
     username: string;
     nickname?: string;
+    mpin?: string;
     rank: string;
     joinedAt: Date;
     status: 'Active' | 'Inactive';
@@ -22,6 +23,7 @@ const EmployeeSchema: Schema = new Schema({
     userId: { type: String, required: true, unique: true },
     username: { type: String, required: true },
     nickname: { type: String },
+    mpin: { type: String },
     rank: { type: String, default: 'Employee' },
     joinedAt: { type: Date, default: Date.now },
     status: { type: String, enum: ['Active', 'Inactive'], default: 'Active' },

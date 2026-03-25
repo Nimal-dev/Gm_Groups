@@ -21,11 +21,15 @@ export async function getAllEmployees() {
             .sort({ level: -1, xp: -1 })
             .lean();
 
+        const isAdmin = session.user.role === 'admin' || session.user.role === 'bulkhead';
+        
         // Serialize for client
         const serialized = employees.map(emp => ({
             id: emp._id.toString(),
             userId: emp.userId,
             username: emp.username,
+            nickname: emp.nickname, // Added nickname
+            mpin: isAdmin ? emp.mpin : undefined, // Conditionally expose MPIN
             rank: emp.rank,
             status: emp.status,
             xp: emp.xp || 0,
@@ -92,6 +96,7 @@ export async function updateEmployee(userId: string, data: any) {
                 $set: {
                     username: data.username,
                     nickname: data.nickname,
+                    mpin: data.mpin,
                     rank: data.rank,
                     status: data.status,
                     bankAccountNo: data.bankAccountNo

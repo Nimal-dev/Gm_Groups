@@ -1,6 +1,7 @@
 // ... (imports)
 import NextAuth from 'next-auth';
 import Discord from 'next-auth/providers/discord';
+import Credentials from 'next-auth/providers/credentials';
 import { authConfig } from './auth.config';
 import connectToDatabase from '@/lib/db';
 import Employee from '@/models/Employee';
@@ -31,6 +32,20 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         async jwt({ token, user, account, profile }) {
             // Initial Sign In
             if (account && user) {
+                if (account.provider === 'credentials') {
+                    return {
+                        accessToken: 'mpin-auth',
+                        refreshToken: null,
+                        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 Days
+                        user: {
+                            ...user,
+                            id: user.id,
+                            name: user.name,
+                            role: user.role,
+                        }
+                    };
+                }
+
                 return {
                     accessToken: account.access_token,
                     refreshToken: account.refresh_token,
@@ -46,6 +61,11 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
             // Return previous token if the access token has not expired yet
             if (Date.now() < (token.expiresAt as number)) {
+                return token;
+            }
+
+            if (token.accessToken === 'mpin-auth') {
+                // MPIN sessions inherently don't use Discord OAuth refresh tokens
                 return token;
             }
 
@@ -138,6 +158,46 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             clientSecret: process.env.AUTH_DISCORD_SECRET,
             authorization: { params: { scope: 'identify email guilds guilds.join' } }, // Use standard scopes + guilds.join if needed
         }),
+        Credentials({
+            name: 'MPIN Login',
+            credentials: {
+                nickname: { label: "Nickname", type: "text" },
+                mpin: { label: "MPIN", type: "password" }
+            },
+            async authorize(credentials) {
+                if (!credentials?.nickname || !credentials?.mpin) {
+                    throw new Error('Missing credentials');
+                }
+
+                await connectToDatabase();
+                const nicknameStr = String(credentials.nickname).trim();
+
+                const employee = await Employee.findOne({ 
+                    nickname: new RegExp('^' + nicknameStr + '$', 'i'), 
+                    status: 'Active' 
+                });
+
+                if (!employee || employee.mpin !== credentials.mpin) {
+                    throw new Error('Invalid Nickname or MPIN');
+                }
+
+                // Map Rank to Website Role
+                const rank = employee.rank.toLowerCase();
+                let role = 'staff'; 
+
+                if (rank.includes('owner') || rank.includes('boss') || rank.includes('management') || rank.includes('manager') || rank.includes('lawyer')) {
+                    role = 'admin';
+                } else if (rank.includes('head') || rank.includes('bulk') || rank.includes('lead')) {
+                    role = 'bulkhead';
+                }
+
+                return {
+                    id: employee.userId, // Use original discord user ID mapping
+                    name: employee.username,
+                    role: role,
+                } as any;
+            }
+        })
     ],
 });
 

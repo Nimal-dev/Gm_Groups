@@ -24,6 +24,7 @@ const EmployeeSchema = z.object({
     userId: z.string().min(1, "User ID is required"),
     username: z.string().min(1, "Username is required"),
     nickname: z.string().optional(),
+    mpin: z.string().optional(),
     rank: z.string().min(1, "Rank is required"),
     status: z.enum(['Active', 'Inactive']).default('Active'),
     bankAccountNo: z.string().optional(),
@@ -81,6 +82,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
             userId: '',
             username: '',
             nickname: '',
+            mpin: '',
             rank: 'Employee',
             status: 'Active',
             bankAccountNo: ''
@@ -94,6 +96,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
             userId: emp.userId,
             username: emp.username,
             nickname: emp.nickname || '',
+            mpin: emp.mpin || '',
             rank: emp.rank,
             status: emp.status,
             bankAccountNo: emp.bankAccountNo || ''
@@ -189,7 +192,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                                     <TableRow className="hover:bg-transparent border-white/10">
                                         <TableHead>User ID</TableHead>
                                         <TableHead>Username</TableHead>
-                                        {/* <TableHead>Nickname</TableHead> */}
+                                        <TableHead>MPIN</TableHead>
                                         <TableHead>Rank</TableHead>
                                         <TableHead>Bank Account</TableHead>
                                         <TableHead>Status</TableHead>
@@ -208,7 +211,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                                             <TableRow key={emp.userId} className="border-white/5 hover:bg-white/5">
                                                 <TableCell className="font-mono text-xs text-muted-foreground">{emp.userId}</TableCell>
                                                 <TableCell className="font-medium">{emp.username}</TableCell>
-                                                {/* <TableCell className="text-muted-foreground">{emp.nickname || '-'}</TableCell> */}
+                                                <TableCell className="font-mono text-xs">{emp.mpin || '-'}</TableCell>
                                                 <TableCell>{emp.rank}</TableCell>
                                                 <TableCell>
                                                     <div className="flex items-center gap-2">
@@ -274,6 +277,9 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                                             <div>
                                                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-semibold mb-1">Rank</div>
                                                 <div className="text-white/80">{emp.rank}</div>
+                                                
+                                                <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-semibold mb-1 mt-2">MPIN</div>
+                                                <div className="text-white/80 font-mono text-xs">{emp.mpin || '-'}</div>
                                             </div>
                                             <div>
                                                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-semibold mb-1">Bank Account</div>
@@ -350,6 +356,16 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                                 className="bg-black/20 border-white/10"
                             />
                             {form.formState.errors.nickname && <p className="text-xs text-destructive">{form.formState.errors.nickname.message}</p>}
+                        </div>
+                        <div className="space-y-2">
+                            <Label>MPIN (Mobile Login)</Label>
+                            <Input
+                                {...form.register('mpin')}
+                                placeholder="4-digit PIN (e.g., 1234)"
+                                maxLength={10}
+                                className="bg-black/20 border-white/10 font-mono"
+                            />
+                            {form.formState.errors.mpin && <p className="text-xs text-destructive">{form.formState.errors.mpin.message}</p>}
                         </div>
                         <div className="space-y-2">
                             <Label>Rank</Label>
