@@ -147,7 +147,7 @@ const fetchDashboardData = unstable_cache(
 
             // Fetch Current Balance (Since data model change: Query dedicated BankBalanceLog first)
             // Hardcoded Company Account Number for GM CAFE
-            const COMPANY_ACCOUNT_NUMBER = '1509517987';
+            const COMPANY_ACCOUNT_NUMBER = '3571970372';
 
             // 1. Try Dedicated Balance Log (New System)
             const balanceLog = await BankBalanceLog.findOne({ accountNumber: COMPANY_ACCOUNT_NUMBER })
