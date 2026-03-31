@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ITEM_CATEGORIES } from '@/constants/foodItems';
+import { ITEM_CATEGORIES, BATCH_SIZES } from '@/constants/foodItems';
 import { submitPreparedFoodLog } from '@/actions/preparedFood';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,20 +17,24 @@ export function FoodLogForm() {
     const [activeTab, setActiveTab] = useState(Object.keys(ITEM_CATEGORIES)[0]);
 
     const handleQuantityChange = (item: string, value: number) => {
+        const batchSize = BATCH_SIZES[item] || 1;
+        // Snap the manually typed value to the nearest multiple of batchSize
+        const snappedValue = Math.max(0, Math.round(value / batchSize) * batchSize);
+        
         setQuantities(prev => {
-            const newVal = Math.max(0, value);
-            if (newVal === 0) {
+            if (snappedValue === 0) {
                 const { [item]: _, ...rest } = prev;
                 return rest;
             }
-            return { ...prev, [item]: newVal };
+            return { ...prev, [item]: snappedValue };
         });
     };
 
     const adjustQuantity = (item: string, delta: number) => {
+        const batchSize = BATCH_SIZES[item] || 1;
         setQuantities(prev => {
             const current = prev[item] || 0;
-            const newVal = Math.max(0, current + delta);
+            const newVal = Math.max(0, current + (delta * batchSize));
             if (newVal === 0) {
                 const { [item]: _, ...rest } = prev;
                 return rest;
@@ -113,7 +117,10 @@ export function FoodLogForm() {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {cat.items.map(item => (
                                             <div key={item} className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
-                                                <span className="font-medium text-sm truncate pr-2" title={item}>{item}</span>
+                                                <div className="flex flex-col">
+                                                    <span className="font-medium text-sm truncate pr-2" title={item}>{item}</span>
+                                                    <span className="text-xs text-muted-foreground">Batch: {BATCH_SIZES[item] || 1}</span>
+                                                </div>
                                                 <div className="flex items-center gap-2">
                                                     <Button
                                                         variant="outline"
@@ -127,9 +134,10 @@ export function FoodLogForm() {
                                                     <Input
                                                         type="number"
                                                         min="0"
+                                                        step={BATCH_SIZES[item] || 1}
                                                         value={quantities[item] || ''}
                                                         onChange={(e) => handleQuantityChange(item, parseInt(e.target.value) || 0)}
-                                                        className="w-14 h-8 text-center bg-transparent border-white/20 p-0"
+                                                        className="w-16 h-8 text-center bg-transparent border-white/20 p-0"
                                                         placeholder="0"
                                                     />
                                                     <Button
