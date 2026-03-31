@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Save, Package } from 'lucide-react';
 import { RAW_MATERIALS } from '@/constants/foodItems';
+import { getInventory, updateInventory } from '@/actions/inventory';
 
 interface InventoryItem {
     itemName: string;
@@ -29,21 +30,25 @@ export function InventoryManager({ currentUser }: { currentUser: any }) {
     const fetchInventory = async () => {
         setIsLoading(true);
         try {
-            const res = await fetch('/api/inventory');
-            if (res.ok) {
-                const data = await res.json();
-                if (data.success) {
-                    // Merge DB items with RAW_MATERIALS to ensure all fields are visible
-                    const serverItems: InventoryItem[] = data.items;
-                    const mergedItems = RAW_MATERIALS.map(mat => {
-                        const found = serverItems.find(i => i.itemName === mat);
-                        return found || { itemName: mat, quantity: 0 };
-                    });
-                    setInventory(mergedItems);
-                }
+            const data = await getInventory();
+            if (data.success && data.items) {
+                // Merge DB items with RAW_MATERIALS to ensure all fields are visible
+                const serverItems: InventoryItem[] = data.items;
+                const mergedItems = RAW_MATERIALS.map(mat => {
+                    const found = serverItems.find(i => i.itemName === mat);
+                    return found || { itemName: mat, quantity: 0 };
+                });
+                setInventory(mergedItems);
+            } else {
+                toast({ title: 'Fetch Error', description: data.error, variant: 'destructive' });
+                // Fallback to empty values if completely fails so page doesn't break
+                const fallbackItems = RAW_MATERIALS.map(mat => ({ itemName: mat, quantity: 0 }));
+                setInventory(fallbackItems);
             }
         } catch (error) {
             console.error("Failed to fetch inventory", error);
+            const fallbackItems = RAW_MATERIALS.map(mat => ({ itemName: mat, quantity: 0 }));
+            setInventory(fallbackItems);
         } finally {
             setIsLoading(false);
         }
@@ -75,16 +80,8 @@ export function InventoryManager({ currentUser }: { currentUser: any }) {
 
         setIsSaving(true);
         try {
-            const res = await fetch('/api/inventory/update', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    items: itemsToUpdate,
-                    updatedBy: currentUser?.name || currentUser?.username || 'Unknown Staff'
-                })
-            });
+            const data = await updateInventory(itemsToUpdate);
 
-            const data = await res.json();
             if (data.success) {
                 toast({ title: 'Success', description: 'Inventory updated and logged to Discord.', className: 'bg-green-600 border-none' });
                 setPendingChanges({});
