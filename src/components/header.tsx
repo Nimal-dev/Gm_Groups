@@ -58,7 +58,7 @@ export function Header() {
           </Link>
         </Button>
 
-        <DropdownMenu>
+        {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button className="relative px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-[#ffd700] bg-black/40 hover:bg-black/60 border border-[#ffd700]/30 rounded-full transition-all flex items-center gap-1 outline-none data-[state=open]:bg-black/60 data-[state=open]:border-[#ffd700]/60 data-[state=open]:shadow-[0_0_20px_rgba(255,215,0,0.3)] backdrop-blur-md">
               Services <ChevronDown className="w-3 h-3 md:w-4 md:h-4 ml-0.5 md:ml-1 transition-transform duration-300 data-[state=open]:rotate-180" />
@@ -77,7 +77,7 @@ export function Header() {
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
 
         <Button variant="outline" className="hidden border-[#ffd700]/50 hover:bg-[#ffd700] hover:text-black hover:shadow-[0_0_20px_rgba(255,215,0,0.4)] md:flex bg-black/40 backdrop-blur-md text-[#ffd700] transition-all rounded-full">
           <Link href="/#join">Enlist Now</Link>
