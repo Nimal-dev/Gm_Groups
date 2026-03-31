@@ -21,10 +21,10 @@ export function formatInvoice(items: { description: string; quantity: number; pr
     const grandTotal = subtotal - discountAmount;
 
     return `
-${center('GM CAFE INVOICE')}
+${center('KOI CAFE INVOICE')}
 
 FROM:                                           TO:
-GM CAFE                                   ${to.substring(0, 30)}
+KOI CAFE                                   ${to.substring(0, 30)}
 ${(from || 'Manager').substring(0, 30).padEnd(46)}
 
                                                 Date:       ${generatedDate}
@@ -43,11 +43,11 @@ ${itemRows || center('No Items', 80)}
 --------------------------------------------------------------------------------
  
  PAYMENT DETAILS:
- Bank Account: 1509517987 (GM CAFE)
+ Bank Account: 3571970372 (KOI CAFE)
 
 SAFETY NOTICE:
 The Food can be consumed upto 1% durability. Anything consumed less than 1% is
-harmful and GM CAFE is not responsible for it.
+harmful and KOI CAFE is not responsible for it.
 
 ACKNOWLEDGEMENT:
 I acknowledge receipt of the above items in good condition and agree to the
@@ -70,7 +70,7 @@ export function formatReport(type: string, data: any, to: string, from: string, 
     const periodEnd = new Date(data.endDate).toLocaleDateString('en-GB');
 
     return `
-${center('GM CAFE')}
+${center('KOI CAFE')}
 ${center(`${type.toUpperCase()} PERFORMANCE REVIEW`)}
 
 REPORT METADATA
@@ -78,7 +78,7 @@ REPORT METADATA
 Date Generated: ${generatedDate}
 Report Period:  ${periodStart} - ${periodEnd}
 Prepared By:    ${from || '[Name]'}
-Recipient:      ${to || 'High Command'}
+Recipient:      ${to || '[Organization Name]'}
 ================================================================================
 
 FINANCIAL OVERVIEW
@@ -102,7 +102,7 @@ HUMAN RESOURCES SUMMARY
 CERTIFICATION
 --------------------------------------------------------------------------------
 I hereby certify that the information provided in this report is accurate and
-reflects the financial and operational status of GM CAFE.
+reflects the financial and operational status of KOI CAFE.
 
 Signature: NIMAL PRINCE
 Title:     Restaurant Manager
@@ -162,14 +162,14 @@ export function formatCitizenContract(data: { items: any[], eventDate: string },
     const balance = grandTotal - advance;
 
     return `
-${center('GM CAFE')}
+${center('KOI CAFE')}
 ${center('CITIZEN BULK ORDER AGREEMENT')}
 
 Date of Booking: ${bookingDate}
 
 1. Parties Involved
     - SERVICE PROVIDER
-      Name: GM CAFE
+      Name: KOI CAFE
       Representative: ${(providerName || 'Nimal Prince').toUpperCase()}
       
     - CLIENT
@@ -209,14 +209,14 @@ ${separator}
 
 *Collection & Liability:
 - The Client acknowledges that food is being collected 24 hours prior to consumption.
-- Upon handover on the Collection Date, GM CAFE transfers all liability regarding food safety to the Client.
-- GM CAFE is not responsible for spoilage due to improper storage.
+- Upon handover on the Collection Date, KOI CAFE transfers all liability regarding food safety to the Client.
+- KOI CAFE is not responsible for spoilage due to improper storage.
 - If uncollected, food is discarded, and Client remains liable for the Full Grand Total.
 
 6. ACCEPTANCE
 By signing below, both parties agree to the terms listed above.
 
-For GM CAFE: Signature: GM | ${(providerName || 'Nimal Prince').toUpperCase()} Date: ${collectionDateStr}
+For KOI CAFE: Signature: GM | ${(providerName || 'Nimal Prince').toUpperCase()} Date: ${collectionDateStr}
 
 For Client: Signature: ${(clientName || '__________________').toUpperCase()} Date: ${collectionDateStr} 
 `.replace(/^\n/, '');
@@ -270,14 +270,14 @@ export function formatEventContract(data: { items: any[], eventDate: string, col
     const feeRow = feeAmount > 0 ? tableRow(feeName, feeDisplay) : tableRow("Surcharge/Fee", "$ 0");
 
     return `
-${center('GM CAFE')}
+${center('KOI CAFE')}
 ${center('BULK ORDER & CATERING POLICY')}
 
 Date of Booking: ${bookingDate}
 
 1. PARTIES INVOLVED
     - SERVICE PROVIDER
-      Name: GM CAFE 
+      Name: KOI CAFE 
       Representative: ${(providerName || 'Nimal Prince').toUpperCase()}
 
     - CLIENT
@@ -320,9 +320,9 @@ ${separator}
 
    QUALITY CONTROL & LIABILITY:
    - Chain of Custody: Liability transfers to Client immediately upon handover.
-   - Food Safety: GM CAFE certifies food leaves at safe temps.
+   - Food Safety: KOI CAFE certifies food leaves at safe temps.
    - Client Responsibility: Maintaining below 5°C and reheating >75°C.
-   - Waiver: Client indemnifies GM CAFE against claims arising from 
+   - Waiver: Client indemnifies KOI CAFE against claims arising from 
      consumption >32 hours after handover or improper storage.
    - Durability: Food consumed <1% durability is strictly forbidden.
 
@@ -330,7 +330,7 @@ ${separator}
    By signing below, the Client accepts the "Bulk Order & Catering Policy" 
    and agrees to the financial terms above.
 
-   For GM CAFE: ___________________________ Date: ${collectionDateStr}
+   For KOI CAFE: ___________________________ Date: ${collectionDateStr}
    (Signed by ${(providerName || 'Manager').toUpperCase()})
 
    For ${(clientName || 'Client').toUpperCase()}: ___________________________ Date: ${collectionDateStr}
@@ -366,14 +366,14 @@ export function formatRecurringContract(data: any, clientName: string, clientRep
     const securityDeposit = data.securityDeposit > 0 ? data.securityDeposit : (totalPayablePerCycle * 2);
 
     return `
-${center('GM CAFE')}
+${center('KOI CAFE')}
 ${center('RECURRING BULK ORDER AGREEMENT')}
 
 Agreement Date: ${agreementDate}
 
 1. PARTIES INVOLVED
 SERVICE PROVIDER (SUPPLIER): 
-Name: GM CAFE
+Name: KOI CAFE
 Representative: ${(providerName || 'Manager').toUpperCase()}
 Contact: MADHAVAN UNNI (91732487)
 
@@ -433,18 +433,18 @@ A late fee of ${fmt(data.lateFee)} applies to any payment overdue by more than 3
 If the Client terminates without notice, the Security Deposit will be forfeited.
 
 3. Collection & Liability (Strict):
-Handover: Upon handover on the Designated Collection Day, GM CAFE transfers all liability regarding food safety, temperature control, and storage to the Client.
+Handover: Upon handover on the Designated Collection Day, KOI CAFE transfers all liability regarding food safety, temperature control, and storage to the Client.
 
-Storage: The Client is solely responsible for maintaining appropriate refrigeration/heating standards once the items leave GM CAFE premises. GM CAFE is not liable for spoilage due to Client negligence.
+Storage: The Client is solely responsible for maintaining appropriate refrigeration/heating standards once the items leave KOI CAFE premises. KOI CAFE is not liable for spoilage due to Client negligence.
 
 Uncollected Goods: If the order is not collected on the agreed day, the food will be discarded for safety reasons, but the Client remains liable for the full cost of that cycle, as the stock was prepared specifically for them.
 
-4. Price Fluctuations: GM CAFE reserves the right to adjust Unit Prices based on raw material market rates. A 15-day notice will be provided to the Client before any price increase takes effect.
+4. Price Fluctuations: KOI CAFE reserves the right to adjust Unit Prices based on raw material market rates. A 15-day notice will be provided to the Client before any price increase takes effect.
 
 6. ACCEPTANCE
 By signing below, the Client agrees to the recurring supply terms, the security deposit requirement, and the liability transfer.
 
-For GM CAFE
+For KOI CAFE
 Date: ${agreementDate}
 Signature: 
 ${(providerName || 'MADHAVAN UNNI').toUpperCase()}
