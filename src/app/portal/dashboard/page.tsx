@@ -44,7 +44,15 @@ export default async function PortalDashboardPage() {
     }
 
     const data = await getDashboardData();
-    const { activeStaff, error } = data;
+    const { 
+        activeStaff = [], 
+        activeOrders = [], 
+        recurringOrders = [], 
+        allEmployees = [], 
+        recentSalaries = [], 
+        activeLeaves = [], 
+        error 
+    } = data;
 
     if (error) {
         return (
@@ -90,6 +98,11 @@ export default async function PortalDashboardPage() {
                 {/* Main Content Layout */}
                 <PortalDashboardClient
                     activeStaff={activeStaff}
+                    activeOrders={activeOrders}
+                    recurringOrders={recurringOrders}
+                    allEmployees={allEmployees}
+                    recentSalaries={recentSalaries}
+                    activeLeaves={activeLeaves}
                     userRole={role}
                     currentUser={JSON.parse(JSON.stringify(currentUser))}
                 />
