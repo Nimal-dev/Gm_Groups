@@ -7,9 +7,18 @@ export function Preloader() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Hide the preloader after a short delay
+        // Check if preloader has already been shown in this session
+        const hasSeenPreloader = sessionStorage.getItem('gm_v2_hasSeenPreloader');
+        
+        if (hasSeenPreloader) {
+            setIsLoading(false);
+            return; // Skip the animation entirely
+        }
+
+        // Hide the preloader after a short delay and mark as seen for the session
         const timer = setTimeout(() => {
             setIsLoading(false);
+            sessionStorage.setItem('gm_v2_hasSeenPreloader', 'true');
         }, 3800); // slightly longer to let all animations play out
 
         return () => clearTimeout(timer);
