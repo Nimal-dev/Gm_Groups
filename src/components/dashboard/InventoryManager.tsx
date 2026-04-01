@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, Package } from 'lucide-react';
+import { Loader2, Save, Package, Plus } from 'lucide-react';
 import { RAW_MATERIALS } from '@/constants/foodItems';
 import { getInventory, updateInventory } from '@/actions/inventory';
 
@@ -20,6 +20,7 @@ export function InventoryManager({ currentUser }: { currentUser: any }) {
     const { toast } = useToast();
     const [inventory, setInventory] = useState<InventoryItem[]>([]);
     const [pendingChanges, setPendingChanges] = useState<Record<string, number>>({});
+    const [additionalChanges, setAdditionalChanges] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
 
@@ -58,6 +59,26 @@ export function InventoryManager({ currentUser }: { currentUser: any }) {
         const parsed = parseInt(value, 10);
         if (isNaN(parsed) || parsed < 0) return;
         setPendingChanges(prev => ({ ...prev, [itemName]: parsed }));
+    };
+
+    const handleAddChange = (itemName: string, value: string) => {
+        setAdditionalChanges(prev => ({ ...prev, [itemName]: value }));
+    };
+
+    const handleApplyAddition = (itemName: string, currentQty: number) => {
+        const addValue = parseInt(additionalChanges[itemName] || "0", 10);
+        if (isNaN(addValue) || addValue <= 0) return;
+
+        const baseQty = pendingChanges[itemName] !== undefined ? pendingChanges[itemName] : currentQty;
+        const newTotal = baseQty + addValue;
+        
+        setPendingChanges(prev => ({ ...prev, [itemName]: newTotal }));
+        
+        setAdditionalChanges(prev => {
+            const temp = { ...prev };
+            delete temp[itemName];
+            return temp;
+        });
     };
 
     const getDisplayQuantity = (itemName: string, originalQty: number) => {
@@ -140,15 +161,45 @@ export function InventoryManager({ currentUser }: { currentUser: any }) {
                                         <h3 className="font-bold text-sm truncate mb-1" title={item.itemName}>{item.itemName}</h3>
                                         <p className="text-[10px] text-muted-foreground mb-3 opacity-60">Last updated: {item.lastUpdatedDate ? new Date(item.lastUpdatedDate).toLocaleDateString() : 'Never'}</p>
                                     </div>
-                                    <div className="flex items-center justify-between mt-auto">
-                                        <span className="text-xs text-muted-foreground uppercase tracking-widest font-mono">Qty:</span>
-                                        <Input
-                                            type="number"
-                                            min="0"
-                                            value={getDisplayQuantity(item.itemName, item.quantity)}
-                                            onChange={(e) => handleQuantityChange(item.itemName, e.target.value)}
-                                            className="w-20 text-center font-bold font-mono h-8 bg-black/40 border-white/10"
-                                        />
+                                    <div className="flex flex-col gap-2 mt-auto">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs text-muted-foreground uppercase tracking-widest font-mono">Qty:</span>
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                value={getDisplayQuantity(item.itemName, item.quantity)}
+                                                onChange={(e) => handleQuantityChange(item.itemName, e.target.value)}
+                                                className="w-20 text-center font-bold font-mono h-8 bg-black/40 border-white/10"
+                                            />
+                                        </div>
+                                        <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                                            <span className="text-[10px] text-green-500 uppercase tracking-widest font-mono">+ Add:</span>
+                                            <div className="flex gap-1 items-center">
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    placeholder="0"
+                                                    value={additionalChanges[item.itemName] || ''}
+                                                    onChange={(e) => handleAddChange(item.itemName, e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault();
+                                                            handleApplyAddition(item.itemName, item.quantity);
+                                                        }
+                                                    }}
+                                                    className="w-12 text-center text-xs h-6 bg-black/40 border-green-500/30 text-green-400 placeholder:text-green-500/30 px-1"
+                                                />
+                                                <Button 
+                                                    size="icon" 
+                                                    variant="ghost" 
+                                                    onClick={() => handleApplyAddition(item.itemName, item.quantity)}
+                                                    className="h-6 w-6 text-green-500 hover:text-green-400 hover:bg-green-500/20"
+                                                    title="Add to total"
+                                                >
+                                                    <Plus className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             );
