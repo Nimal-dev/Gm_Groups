@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
@@ -57,7 +58,7 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
     // Citizen Form State
-    const [citizenForm, setCitizenForm] = useState({ to: '', amount: '', eventDate: '', details: '' });
+    const [citizenForm, setCitizenForm] = useState({ to: '', amount: '', eventDate: '', details: '', isAutoFine: true, customTotal: '' });
 
     // Recurring Form State
     const [recurringForm, setRecurringForm] = useState({ customer: '', clientRep: '', items: '', amount: '', startDate: '', intervalDays: '7', deliveryDetails: '', securityDeposit: '' });
@@ -82,7 +83,7 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
         setLoading(false);
         if (res.success) {
             toast({ title: 'Success', description: `Order #${res.orderId} created successfully.` });
-            setCitizenForm({ to: '', amount: '', eventDate: '', details: '' });
+            setCitizenForm({ to: '', amount: '', eventDate: '', details: '', isAutoFine: true, customTotal: '' });
         } else {
             toast({ variant: 'destructive', title: 'Error', description: res.error });
         }
@@ -348,9 +349,13 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                             <div className="lg:col-span-2">
                                 <form onSubmit={(e) => {
                                     e.preventDefault();
-                                    const base = parseFloat(citizenForm.amount) || 0;
-                                    const calc = calculateBulkOrderSurcharge(base, citizenForm.eventDate);
-                                    handleCitizenSubmit(e, calc.total.toString());
+                                    if (citizenForm.isAutoFine) {
+                                        const base = parseFloat(citizenForm.amount) || 0;
+                                        const calc = calculateBulkOrderSurcharge(base, citizenForm.eventDate);
+                                        handleCitizenSubmit(e, calc.total.toString());
+                                    } else {
+                                        handleCitizenSubmit(e, citizenForm.customTotal);
+                                    }
                                 }} className="space-y-4 p-4 bg-black/20 rounded-lg border border-white/5">
                                     <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                                         <Package className="w-5 h-5 text-accent" /> Create Citizen Bulk Order
@@ -365,35 +370,65 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                             <Input required type="number" placeholder="5000" value={citizenForm.amount} onChange={e => setCitizenForm({ ...citizenForm, amount: e.target.value })} />
                                         </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label>Event Date (YYYY-MM-DD)</Label>
-                                        <div className="relative">
-                                            <Input required type="date" value={citizenForm.eventDate} onChange={e => setCitizenForm({ ...citizenForm, eventDate: e.target.value })} />
+                                    <div className="space-y-4">
+                                        <div className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id="autoFine"
+                                                checked={citizenForm.isAutoFine}
+                                                onCheckedChange={(checked) => setCitizenForm({ ...citizenForm, isAutoFine: !!checked })}
+                                            />
+                                            <Label htmlFor="autoFine" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                                Automatic Fine Calculation
+                                            </Label>
                                         </div>
-                                        <p className="text-[10px] text-muted-foreground">Surcharge is automatically calculated based on this date.</p>
+
+                                        {citizenForm.isAutoFine ? (
+                                            <div className="space-y-2">
+                                                <Label>Event Date (YYYY-MM-DD)</Label>
+                                                <div className="relative">
+                                                    <Input required type="date" value={citizenForm.eventDate} onChange={e => setCitizenForm({ ...citizenForm, eventDate: e.target.value })} />
+                                                </div>
+                                                <p className="text-[10px] text-muted-foreground">Surcharge is automatically calculated based on this date.</p>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-2">
+                                                <Label>Custom Total Amount ($)</Label>
+                                                <Input required type="number" placeholder="Total inclusive of all fees" value={citizenForm.customTotal} onChange={e => setCitizenForm({ ...citizenForm, customTotal: e.target.value })} />
+                                                <p className="text-[10px] text-muted-foreground text-orange-400">Manual overridden total will be used.</p>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="p-3 bg-white/5 rounded border border-white/10 text-sm space-y-1">
-                                        {(() => {
-                                            const base = parseFloat(citizenForm.amount) || 0;
-                                            const calc = calculateBulkOrderSurcharge(base, citizenForm.eventDate);
-                                            return (
-                                                <>
-                                                    <div className="flex justify-between text-muted-foreground">
-                                                        <span>Base Amount:</span>
-                                                        <span>${calc.base}</span>
-                                                    </div>
-                                                    <div className="flex justify-between text-orange-400">
-                                                        <span>Surcharge ({calc.msg}):</span>
-                                                        <span>+${calc.surcharge}</span>
-                                                    </div>
-                                                    <div className="flex justify-between font-bold text-lg pt-2 border-t border-white/10">
-                                                        <span>Total to Pay:</span>
-                                                        <span className="text-green-400">${calc.total}</span>
-                                                    </div>
-                                                </>
-                                            )
-                                        })()}
-                                    </div>
+                                    {citizenForm.isAutoFine ? (
+                                        <div className="p-3 bg-white/5 rounded border border-white/10 text-sm space-y-1">
+                                            {(() => {
+                                                const base = parseFloat(citizenForm.amount) || 0;
+                                                const calc = calculateBulkOrderSurcharge(base, citizenForm.eventDate);
+                                                return (
+                                                    <>
+                                                        <div className="flex justify-between text-muted-foreground">
+                                                            <span>Base Amount:</span>
+                                                            <span>${calc.base}</span>
+                                                        </div>
+                                                        <div className="flex justify-between text-orange-400">
+                                                            <span>Surcharge ({calc.msg}):</span>
+                                                            <span>+${calc.surcharge}</span>
+                                                        </div>
+                                                        <div className="flex justify-between font-bold text-lg pt-2 border-t border-white/10">
+                                                            <span>Total to Pay:</span>
+                                                            <span className="text-green-400">${calc.total}</span>
+                                                        </div>
+                                                    </>
+                                                )
+                                            })()}
+                                        </div>
+                                    ) : (
+                                        <div className="p-3 bg-orange-500/10 rounded border border-orange-500/20 text-sm">
+                                            <div className="flex justify-between font-bold text-lg">
+                                                <span>Custom Total:</span>
+                                                <span className="text-orange-400">${citizenForm.customTotal || '0'}</span>
+                                            </div>
+                                        </div>
+                                    )}
                                     <div className="space-y-2">
                                         <Label>Order Details</Label>
                                         <Textarea required placeholder="List of items..." className="h-40 font-mono" value={citizenForm.details} onChange={e => setCitizenForm({ ...citizenForm, details: e.target.value })} />
