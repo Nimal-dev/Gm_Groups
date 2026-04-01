@@ -35,3 +35,27 @@ export async function mpinLogin(prevState: any, formData: FormData) {
         throw error;
     }
 }
+
+export async function portalMpinLogin(prevState: any, formData: FormData) {
+    try {
+        console.log('Attempting Portal MPIN login for Login ID:', formData.get('loginId'));
+        await signIn('credentials', {
+            loginId: formData.get('loginId'),
+            mpin: formData.get('mpin'),
+            redirectTo: '/portal/dashboard'
+        });
+    } catch (error) {
+        if (error instanceof AuthError) {
+            console.error('AuthError during Portal MPIN login:', error.type, error);
+            switch (error.type) {
+                case 'CredentialsSignin':
+                    return { error: 'Invalid Login ID or MPIN.' };
+                case 'CallbackRouteError':
+                    return { error: 'Invalid credentials or database error.' };
+                default:
+                    return { error: `Auth Error: ${error.type}` };
+            }
+        }
+        throw error;
+    }
+}

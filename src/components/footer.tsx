@@ -40,6 +40,7 @@ export function Footer() {
           <div className="flex gap-4 mt-2">
             <Link href="#" className="hover:text-[#ffd700] hover:drop-shadow-[0_0_8px_rgba(255,215,0,0.5)] transition-all">Privacy</Link>
             <Link href="#" className="hover:text-[#ffd700] hover:drop-shadow-[0_0_8px_rgba(255,215,0,0.5)] transition-all">Terms</Link>
+            <Link href="/portal/login" className="hover:text-[#ffd700] hover:drop-shadow-[0_0_8px_rgba(255,215,0,0.5)] transition-all">Employee Portal</Link>
           </div>
         </div>
       </div>

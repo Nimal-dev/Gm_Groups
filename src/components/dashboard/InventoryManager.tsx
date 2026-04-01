@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, Package, Plus } from 'lucide-react';
+import { Loader2, Save, Package, Plus, Search } from 'lucide-react';
 import { RAW_MATERIALS } from '@/constants/foodItems';
 import { getInventory, updateInventory } from '@/actions/inventory';
 
@@ -23,6 +23,7 @@ export function InventoryManager({ currentUser }: { currentUser: any }) {
     const [additionalChanges, setAdditionalChanges] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         fetchInventory();
@@ -123,10 +124,14 @@ export function InventoryManager({ currentUser }: { currentUser: any }) {
         return item ? pendingChanges[k] !== item.quantity : true;
     }).length;
 
+    const filteredInventory = inventory.filter(item =>
+        item.itemName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <Card className="glass-card w-full">
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
+            <CardHeader className="flex flex-col sm:flex-row sm:items-start lg:items-center justify-between gap-4 border-b border-white/5 pb-4 mb-4">
+                <div className="flex-1">
                     <CardTitle className="flex items-center gap-2">
                         <Package className="w-6 h-6 text-accent" />
                         Stock Inventory Management
@@ -135,14 +140,26 @@ export function InventoryManager({ currentUser }: { currentUser: any }) {
                         Update raw materials based on recent deliveries or audits.
                     </CardDescription>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" onClick={fetchInventory} disabled={isLoading || isSaving}>
-                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : "Refresh"}
-                    </Button>
-                    <Button onClick={handleSave} disabled={changedCount === 0 || isSaving || isLoading} className="bg-orange-600 hover:bg-orange-700">
-                        {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                        Save Changes ({changedCount})
-                    </Button>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+                    <div className="relative w-full sm:w-64">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            type="text"
+                            placeholder="Search items..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-9 bg-black/40 border-white/10 w-full"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" onClick={fetchInventory} disabled={isLoading || isSaving} className="flex-1 sm:flex-none">
+                            {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : "Refresh"}
+                        </Button>
+                        <Button onClick={handleSave} disabled={changedCount === 0 || isSaving || isLoading} className="bg-orange-600 hover:bg-orange-700 flex-1 sm:flex-none">
+                            {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                            Save ({changedCount})
+                        </Button>
+                    </div>
                 </div>
             </CardHeader>
             <CardContent>
@@ -153,7 +170,7 @@ export function InventoryManager({ currentUser }: { currentUser: any }) {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {/* We use a merged list of all known materials plus DB items in case DB lacks some initially */}
-                        {inventory.map((item) => {
+                        {filteredInventory.map((item) => {
                             const isChanged = pendingChanges[item.itemName] !== undefined && pendingChanges[item.itemName] !== item.quantity;
                             return (
                                 <div key={item.itemName} className={`p-4 rounded-xl border transition-colors flex flex-col justify-between h-full ${isChanged ? 'bg-orange-500/10 border-orange-500/50' : 'bg-black/20 border-white/5 hover:bg-black/40'}`}>

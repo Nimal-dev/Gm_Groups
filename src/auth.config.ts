@@ -10,13 +10,15 @@ export const authConfig = {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
             const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
+            const isOnPortalDashboard = nextUrl.pathname.startsWith('/portal/dashboard');
             const isApplicant = auth?.user?.role === 'applicant';
 
-            if (isOnDashboard) {
+            if (isOnDashboard || isOnPortalDashboard) {
                 if (isLoggedIn && !isApplicant) return true;
                 return false; // Redirect unauthenticated users or applicants to login page
-            } else if (isLoggedIn && nextUrl.pathname === '/login') {
+            } else if (isLoggedIn && (nextUrl.pathname === '/login' || nextUrl.pathname === '/portal/login')) {
                 if (isApplicant) return Response.redirect(new URL('/apply', nextUrl));
+                if (nextUrl.pathname === '/portal/login') return Response.redirect(new URL('/portal/dashboard', nextUrl));
                 return Response.redirect(new URL('/dashboard', nextUrl));
             } else if (isLoggedIn && isApplicant && !nextUrl.pathname.startsWith('/apply')) {
                 // If they are logged in as an applicant, heavily bias them towards the /apply page

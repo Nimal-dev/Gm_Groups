@@ -19,6 +19,35 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     ...authConfig,
     secret: process.env.AUTH_SECRET,
     trustHost: true,
+    useSecureCookies: process.env.NODE_ENV === 'production',
+    cookies: {
+        sessionToken: {
+            name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}authjs.session-token`,
+            options: {
+                httpOnly: true,
+                sameSite: 'none',
+                path: '/',
+                secure: true
+            }
+        },
+        callbackUrl: {
+            name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}authjs.callback-url`,
+            options: {
+                sameSite: 'none',
+                path: '/',
+                secure: true
+            }
+        },
+        csrfToken: {
+            name: `${process.env.NODE_ENV === 'production' ? '__Host-' : ''}authjs.csrf-token`,
+            options: {
+                httpOnly: true,
+                sameSite: 'none',
+                path: '/',
+                secure: true
+            }
+        }
+    },
     session: {
         strategy: "jwt",
         maxAge: 7 * 24 * 60 * 60, // 7 Days
