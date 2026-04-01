@@ -26,11 +26,31 @@ const BulkOrderManager = dynamic(() => import('@/components/dashboard/BulkOrderM
     loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Bulk Order System...</div>,
     ssr: false
 });
+const EmployeeManagement = dynamic(() => import('@/components/dashboard/EmployeeManagement').then(mod => mod.EmployeeManagement), {
+    loading: () => <div className="h-[500px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Employees...</div>,
+    ssr: false
+});
+const LogsExplorer = dynamic(() => import('@/components/dashboard/LogsExplorer').then(mod => mod.LogsExplorer), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Logs...</div>,
+    ssr: false
+});
+const BankLogsExplorer = dynamic(() => import('@/components/dashboard/BankLogsExplorer').then(mod => mod.BankLogsExplorer), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Bank Records...</div>,
+    ssr: false
+});
+const PayrollManagement = dynamic(() => import('@/components/dashboard/SalaryManagement').then(mod => mod.PayrollManagement), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Payroll...</div>,
+    ssr: false
+});
+const AdminEmployeeTable = dynamic(() => import('@/components/dashboard/AdminEmployeeTable').then(mod => mod.AdminEmployeeTable), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Leaderboard...</div>,
+    ssr: false
+});
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clock, RefreshCw, Users, ShoppingCart, Package } from 'lucide-react';
+import { Clock, RefreshCw, Users, ShoppingCart, Package, DollarSign, Activity, ListChecks } from 'lucide-react';
 import { OrderRow } from '@/components/dashboard/OrderRowShared';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -41,6 +61,10 @@ interface PortalDashboardClientProps {
     activeStaff?: any[];
     activeOrders?: any[];
     recurringOrders?: any[];
+    allEmployees?: any[];
+    recentSalaries?: any[];
+    activeLeaves?: any[];
+    bankStats?: any;
 }
 
 export function PortalDashboardClient({
@@ -48,7 +72,11 @@ export function PortalDashboardClient({
     userRole,
     activeStaff = [],
     activeOrders = [],
-    recurringOrders = []
+    recurringOrders = [],
+    allEmployees = [],
+    recentSalaries = [],
+    activeLeaves = [],
+    bankStats = { totalIncome: 0, totalExpense: 0, currentBalance: 0 }
 }: PortalDashboardClientProps) {
     const isAdmin = userRole === 'admin';
     const isBulkhead = userRole === 'bulkhead';
@@ -82,6 +110,16 @@ export function PortalDashboardClient({
                         <TabsTrigger value="food" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Food Log</TabsTrigger>
                         <TabsTrigger value="inventory" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Inventory</TabsTrigger>
                         <TabsTrigger value="raw" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Raw Request</TabsTrigger>
+                        <TabsTrigger value="logs" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Duty Logs</TabsTrigger>
+                        {isAdmin && (
+                            <>
+                                <TabsTrigger value="staff" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Staff Management</TabsTrigger>
+                                <TabsTrigger value="employees" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">All Employees (XP)</TabsTrigger>
+                                <TabsTrigger value="payroll" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Payroll</TabsTrigger>
+                                <TabsTrigger value="bank" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Bank Logs</TabsTrigger>
+                                <TabsTrigger value="finances" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Salary History</TabsTrigger>
+                            </>
+                        )}
                         <TabsTrigger value="reports" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Reports</TabsTrigger>
                     </TabsList>
                 </div>
@@ -237,6 +275,78 @@ export function PortalDashboardClient({
                 <TabsContent value="reports" className="space-y-6">
                     <ReportsGenerator userRole={userRole} />
                 </TabsContent>
+
+                <TabsContent value="logs" className="space-y-6 h-auto min-h-[500px] lg:h-[800px]">
+                    <LogsExplorer employees={allEmployees} />
+                </TabsContent>
+
+                {isAdmin && (
+                    <>
+                        <TabsContent value="staff" className="space-y-6 h-auto min-h-[500px] lg:h-[800px]">
+                            <EmployeeManagement employees={allEmployees} />
+                        </TabsContent>
+
+                        <TabsContent value="employees" className="space-y-6 h-auto min-h-[500px] lg:h-[800px]">
+                            <AdminEmployeeTable />
+                        </TabsContent>
+
+                        <TabsContent value="payroll" className="space-y-6 h-auto min-h-[500px] lg:h-[800px]">
+                            <PayrollManagement employees={allEmployees} />
+                        </TabsContent>
+
+                        <TabsContent value="bank" className="space-y-6 h-auto min-h-[500px] lg:h-[800px]">
+                            <BankLogsExplorer key="portal-bank-view" />
+                        </TabsContent>
+
+                        <TabsContent value="finances" className="space-y-6">
+                            <Card className="glass-card">
+                                <CardHeader>
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <CardTitle className="flex items-center gap-2">
+                                                <DollarSign className="w-5 h-5 text-green-400" /> Recent Salary Logs
+                                            </CardTitle>
+                                            <CardDescription>Latest processed salary payments.</CardDescription>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-xs text-muted-foreground uppercase tracking-wider">Current Balance</p>
+                                            <p className="text-xl font-bold font-mono text-green-400">${bankStats.currentBalance?.toLocaleString() || '0'}</p>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-3">
+                                        {recentSalaries.map((log: any) => (
+                                            <div key={log._id} className="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="p-2 rounded-full bg-green-500/10 text-green-500">
+                                                        <DollarSign className="w-5 h-5" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-mono font-medium text-lg">${log.amount.toLocaleString('en-US')}</p>
+                                                        <p className="font-semibold">{log.username || log.userId}</p>
+                                                        <p className="text-xs text-muted-foreground opacity-70">ID: {log.userId}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-3 md:mt-0 text-left md:text-right">
+                                                    {log.notes && <p className="text-xs italic text-accent mb-1 px-2 py-0.5 bg-accent/10 rounded-full inline-block">Note: {log.notes}</p>}
+                                                    <p className="text-sm text-muted-foreground">Processed by {log.processorName || log.processedBy}</p>
+                                                    <p className="text-xs opacity-50 font-mono">{new Date(log.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {recentSalaries.length === 0 && (
+                                            <div className="text-center py-20 bg-white/5 rounded-lg border border-dashed border-white/10">
+                                                <Activity className="w-10 h-10 mx-auto mb-2 opacity-20" />
+                                                <p className="text-muted-foreground">No recent salary records found.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                    </>
+                )}
             </Tabs>
         </div>
     );
