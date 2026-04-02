@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
@@ -32,17 +33,27 @@ export default function RawRequestPage() {
     const { toast } = useToast();
     const [success, setSuccess] = useState(false);
 
+    const searchParams = useSearchParams();
+
     const form = useForm<RawRequestFormValues>({
         resolver: zodResolver(RawRequestSchema),
         defaultValues: {
             ingameName: '',
-            partner: '',
+            partner: searchParams.get('partner') || '',
             urgency: '',
-            items: '',
+            items: searchParams.get('items') || '',
             datetime: '',
             notes: ''
         }
     });
+
+    // Update form when search params change (if needed)
+    useEffect(() => {
+        const items = searchParams.get('items');
+        const partner = searchParams.get('partner');
+        if (items) form.setValue('items', items);
+        if (partner) form.setValue('partner', partner);
+    }, [searchParams, form]);
 
     const isSubmitting = form.formState.isSubmitting;
 

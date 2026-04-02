@@ -52,6 +52,10 @@ const AdminEmployeeTable = dynamic(() => import('@/components/dashboard/AdminEmp
     loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Leaderboard...</div>,
     ssr: false
 });
+const FoodPrepCalculator = dynamic(() => import('@/components/dashboard/FoodPrepCalculator').then(mod => mod.FoodPrepCalculator), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Calculator...</div>,
+    ssr: false
+});
 
 import { LeaveManagementCard } from '@/components/dashboard/LeaveManagementCard';
 
@@ -154,6 +158,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                     <TabsTrigger value="recurring" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Recurring Orders</TabsTrigger>
                     <TabsTrigger value="foodlog" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Food Log</TabsTrigger>
                     <TabsTrigger value="inventory" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Inventory</TabsTrigger>
+                    <TabsTrigger value="calculator" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent text-primary/80 font-bold">Calculator</TabsTrigger>
                     <TabsTrigger value="reports" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Reports</TabsTrigger>
                 </TabsList>
             </div>
@@ -459,6 +464,11 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
             {/* INVENTORY TAB */}
             <TabsContent value="inventory" className="space-y-6">
                 <InventoryManager currentUser={currentUser} />
+            </TabsContent>
+
+            {/* CALCULATOR TAB */}
+            <TabsContent value="calculator" className="space-y-6">
+                <FoodPrepCalculator />
             </TabsContent>
 
             {/* REPORTS TAB - For everyone now (restricted inside) */}
