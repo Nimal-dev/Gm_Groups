@@ -55,8 +55,8 @@ export function FoodPrepCalculator() {
     }, [results]);
 
     const generateRequestUrl = (partner: 'YKZ' | 'MLB') => {
-        const itemsStr = results.map(r => `${r.quantity}x ${RAW_MATERIALS[r.materialId].name}`).join(', ');
-        const notes = `Target Food Prep: ${selections.map(s => `${s.targetQuantity}x ${MENU_ITEMS.find(m => m.id === s.id)?.name}`).join(', ')}. Estimated Weight: ${totals.weight.toFixed(2)}kg.`;
+        const itemsStr = results.map(r => `${r.quantity}x ${RAW_MATERIALS[r.materialId].name}`).join('\n');
+        const notes = `Target Food Prep:\n${selections.map(s => `${s.targetQuantity}x ${MENU_ITEMS.find(m => m.id === s.id)?.name}`).join('\n')}\nEstimated Weight: ${totals.weight.toFixed(2)}kg.`;
         return `/rawrequest?partner=${partner}&items=${encodeURIComponent(itemsStr)}&notes=${encodeURIComponent(notes)}`;
     };
 

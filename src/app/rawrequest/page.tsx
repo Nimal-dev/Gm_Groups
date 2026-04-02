@@ -46,7 +46,6 @@ function RawRequestForm() {
         }
     });
 
-    // Update form when search params change (if needed)
     useEffect(() => {
         const items = searchParams.get('items');
         const partner = searchParams.get('partner');
@@ -60,7 +59,6 @@ function RawRequestForm() {
 
     const onSubmit = async (data: RawRequestFormValues) => {
         const result = await submitRawRequest(data);
-
         if (result.success) {
             setSuccess(true);
             toast({
