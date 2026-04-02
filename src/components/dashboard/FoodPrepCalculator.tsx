@@ -2,10 +2,10 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Plus, Trash2, Calculator, ArrowRight, Package, Scale, 
-  DollarSign, ShoppingCart, Info, Building2, Layers,
-  CheckCircle2, AlertCircle, X, Search
+import {
+    Plus, Trash2, Calculator, ArrowRight, Package, Scale,
+    DollarSign, ShoppingCart, Info, Building2, Layers,
+    CheckCircle2, AlertCircle, X, Search
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -24,8 +24,8 @@ export function FoodPrepCalculator() {
     const [partnerPreference, setPartnerPreference] = useState<'YKZ' | 'MLB' | 'BOTH'>('BOTH');
 
     const filteredMenuItems = useMemo(() => {
-        return MENU_ITEMS.filter(item => 
-            item.category !== 'Component' && 
+        return MENU_ITEMS.filter(item =>
+            item.category !== 'Component' &&
             item.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
     }, [searchTerm]);
@@ -56,7 +56,7 @@ export function FoodPrepCalculator() {
 
     const generateRequestUrl = (partner: 'YKZ' | 'MLB') => {
         const itemsStr = results.map(r => `${r.quantity}x ${RAW_MATERIALS[r.materialId].name}`).join('\n');
-        const notes = `Target Food Prep:\n${selections.map(s => `${s.targetQuantity}x ${MENU_ITEMS.find(m => m.id === s.id)?.name}`).join('\n')}\nEstimated Weight: ${totals.weight.toFixed(2)}kg.`;
+        const notes = `Need these items delivered to 8228 KOI CAFE, \nThis is an automated message from inside the city and the person requesting will not be able to see the Discord messages. \nDo use ingame methods to contact us!`;
         return `/rawrequest?partner=${partner}&items=${encodeURIComponent(itemsStr)}&notes=${encodeURIComponent(notes)}`;
     };
 
@@ -79,8 +79,8 @@ export function FoodPrepCalculator() {
                     <CardContent className="space-y-4">
                         <div className="relative">
                             <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                            <Input 
-                                placeholder="Search menu..." 
+                            <Input
+                                placeholder="Search menu..."
                                 className="pl-9 bg-white/5 border-white/10"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -253,7 +253,7 @@ export function FoodPrepCalculator() {
                                     <div className="flex items-baseline gap-2">
                                         <span className="text-3xl font-black font-mono">${totals.ykz.toLocaleString()}</span>
                                     </div>
-                                    <Button 
+                                    <Button
                                         className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold h-12 rounded-xl group transition-all"
                                         disabled={results.length === 0}
                                         onClick={() => handleTransfer('YKZ')}
@@ -273,7 +273,7 @@ export function FoodPrepCalculator() {
                                     <div className="flex items-baseline gap-2">
                                         <span className="text-3xl font-black font-mono">${totals.mlb.toLocaleString()}</span>
                                     </div>
-                                    <Button 
+                                    <Button
                                         className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold h-12 rounded-xl group transition-all"
                                         disabled={results.length === 0}
                                         onClick={() => handleTransfer('MLB')}
@@ -282,7 +282,7 @@ export function FoodPrepCalculator() {
                                     </Button>
                                 </div>
                             </div>
-                            
+
                             <div className="pt-4 border-t border-white/5 flex items-start gap-3">
                                 <AlertCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                                 <p className="text-[10px] text-muted-foreground leading-relaxed italic">
