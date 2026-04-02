@@ -10,7 +10,7 @@ const MENU_ITEMS = [
         name: "BBQ Ribs",
         jpName: "BBQリブ",
         description: "Tender, slow-cooked ribs glazed with our signature Japanese BBQ sauce.",
-        price: "1,00,000",
+        price: "28,800",
         image: "/Menu/BBQ_ribs.png",
         colorTheme: "red",
         tag: "焼き肉" // Yakiniku (Grilled meat)
@@ -20,7 +20,7 @@ const MENU_ITEMS = [
         name: "Ramen",
         jpName: "ラーメン",
         description: "Authentic rich broth with authentic noodles, sliced pork, and a soft-boiled egg.",
-        price: "1,00,000",
+        price: "67,200",
         image: "/Menu/Ramen.png",
         colorTheme: "red",
         tag: "名物" // Meibutsu (Specialty)
@@ -30,7 +30,7 @@ const MENU_ITEMS = [
         name: "Dragon Roll",
         jpName: "ドラゴンロール",
         description: "Premium sushi roll featuring eel, cucumber, and avocado with unagi sauce.",
-        price: "1,00,000",
+        price: "48,960",
         image: "/Menu/Dragon_roll.png",
         colorTheme: "green",
         tag: "新鮮" // Shinsen (Fresh)
@@ -40,7 +40,7 @@ const MENU_ITEMS = [
         name: "Virgin mojito",
         jpName: "バージンモヒート",
         description: "Refreshing mocktail with muddled mint, fresh lime, and sparkling soda.",
-        price: "1,00,000",
+        price: "28,200",
         image: "/Menu/Virgin_mojito.png",
         colorTheme: "green",
         tag: "爽やか" // Sawayaka (Refreshing)
@@ -50,7 +50,7 @@ const MENU_ITEMS = [
         name: "Matcha Milk tea",
         jpName: "抹茶ミルクティー",
         description: "Premium ceremonial grade matcha blended with creamy milk and tapioca pearls.",
-        price: "1,00,000",
+        price: "60,000",
         image: "/Menu/Matcha_Milk_tea.png",
         colorTheme: "green",
         tag: "極上" // Gokujou (Premium)
