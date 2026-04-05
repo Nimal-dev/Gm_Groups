@@ -181,7 +181,7 @@ export function BankLogsExplorer() {
                     </div>
 
                     {/* Table (Desktop) */}
-                    <div className="hidden md:flex rounded-md border border-white/10 flex-1 overflow-hidden relative flex-col">
+                    <div className="hidden md:flex rounded-md border border-white/10 flex-1 overflow-hidden relative flex-col min-h-[600px]">
                         <div className="flex-1 overflow-auto">
                             <div className="min-w-[800px]">
                                 <Table>
