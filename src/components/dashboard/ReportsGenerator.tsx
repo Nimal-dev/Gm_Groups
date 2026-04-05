@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar, FileText, Loader2, Copy, Send } from 'lucide-react';
-import { generateReportData } from '@/actions/report';
+import { generateReportData, generateFullShopReportData, FullReportData } from '@/actions/report';
 import { sendReportToDiscord } from '@/actions/discord';
 import { logActivity } from '@/actions/log';
+import { generateShopPDF } from '@/lib/pdf-generator';
 import { formatInvoice, formatReport, formatCitizenContract, formatEventContract, formatRecurringContract } from '@/lib/report-formatters';
 import { useToast } from '@/hooks/use-toast';
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -52,6 +53,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
     const [clientRep, setClientRep] = useState(''); // Acts as Client Representative for Recurring
     const [reportFrom, setReportFrom] = useState(''); // Acts as Service Provider Rep
     const [generatedText, setGeneratedText] = useState('');
+    const [fullReportData, setFullReportData] = useState<FullReportData | null>(null);
     const [sending, setSending] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -167,6 +169,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
     const handleGenerate = async () => {
         setLoading(true);
         setGeneratedText('');
+        setFullReportData(null);
         try {
             let reportText = '';
 
@@ -193,6 +196,26 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                 if (!isValid) throw new Error("Please correct contract errors.");
                 const data = recurringForm.getValues();
                 reportText = formatRecurringContract(data, reportTo, clientRep, reportFrom);
+            }
+            else if (reportType === 'Full Shop Report') {
+                const isValid = await reportForm.trigger();
+                if (!isValid) throw new Error("Please correct date errors.");
+                const data = reportForm.getValues();
+                const result = await generateFullShopReportData(new Date(data.startDate), new Date(data.endDate));
+                if (!result.success || !result.data) throw new Error(result.error || 'Failed to fetch shop data');
+                
+                setFullReportData(result.data);
+                
+                // Text representation for Discord/Clipboard
+                reportText = `KOI CAFE - FULL SHOP REPORT\n` +
+                             `Period: ${new Date(result.data.startDate).toLocaleDateString()} - ${new Date(result.data.endDate).toLocaleDateString()}\n` +
+                             `---------------------------\n` +
+                             `Opening: $${result.data.financials.openingBalance.toLocaleString()}\n` +
+                             `Closing: $${result.data.financials.closingBalance.toLocaleString()}\n` +
+                             `Net Profit: $${result.data.financials.netProfit.toLocaleString()}\n` +
+                             `---------------------------\n` +
+                             `Total Employees: ${result.data.hr.totalEmployees}\n` +
+                             `Hired: ${result.data.hr.membersAdded}`;
             }
             else {
                 const isValid = await reportForm.trigger();
@@ -237,6 +260,16 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
         }
     };
 
+    const handleDownloadPDF = async () => {
+        if (!fullReportData) return;
+        try {
+            await generateShopPDF(fullReportData, reportTo, reportFrom);
+            toast({ title: "Success", description: "PDF generated and downloading." });
+        } catch (error: any) {
+            toast({ variant: "destructive", title: "PDF Error", description: error.message });
+        }
+    };
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-[45fr_55fr] gap-6">
             <Card className="glass-card h-fit">
@@ -257,6 +290,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                                 {isAdmin && <>
                                     <SelectItem value="Weekly">Weekly Report</SelectItem>
                                     <SelectItem value="Monthly">Monthly Report</SelectItem>
+                                    <SelectItem value="Full Shop Report">Detailed Overall Report (PDF)</SelectItem>
                                 </>}
                                 <SelectItem value="Invoice">Invoice</SelectItem>
                                 {canManageBulk && <>
@@ -398,7 +432,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                         </div>
                     )}
 
-                    {(reportType === 'Weekly' || reportType === 'Monthly') && (
+                    {(reportType === 'Weekly' || reportType === 'Monthly' || reportType === 'Full Shop Report') && (
                         <div className="space-y-4 border-t border-white/10 pt-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
@@ -410,10 +444,12 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                                     <Input type="date" {...reportForm.register('endDate')} className="glass-input" />
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <Label>Members Removed</Label>
-                                <Input type="text" placeholder="0" {...reportForm.register('membersRemoved')} className="glass-input" />
-                            </div>
+                            {reportType !== 'Full Shop Report' && (
+                                <div className="space-y-2">
+                                    <Label>Members Removed</Label>
+                                    <Input type="text" placeholder="0" {...reportForm.register('membersRemoved')} className="glass-input" />
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -451,6 +487,11 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                         <Button variant="ghost" size="sm" onClick={copyToClipboard} disabled={!generatedText}>
                             <Copy className="w-4 h-4 mr-2" /> Copy
                         </Button>
+                        {reportType === 'Full Shop Report' && fullReportData && (
+                            <Button variant="outline" size="sm" onClick={handleDownloadPDF} className="bg-green-600/20 hover:bg-green-600/40 text-green-400 border-green-600/50">
+                                <FileText className="w-4 h-4 mr-2" /> Download PDF
+                            </Button>
+                        )}
                     </div>
                 </CardHeader>
                 <CardContent className="flex-1 p-0">
