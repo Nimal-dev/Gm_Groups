@@ -5,6 +5,7 @@ import BankTransaction from '@/models/BankTransaction';
 import Employee from '@/models/Employee';
 import SalaryLog from '@/models/SalaryLog';
 import BankBalanceLog from '@/models/BankBalanceLog';
+import DutyLog from '@/models/DutyLog';
 import { fetchBot } from '@/lib/bot-api';
 
 interface ReportData {
@@ -34,7 +35,9 @@ export interface FullReportData {
         membersRemoved: number;
         totalEmployees: number;
     };
-    recentTransactions: any[];
+    allTransactions: any[];
+    allSalaries: any[];
+    dutyLogs: any[];
 }
 
 export async function generateReportData(startDate: Date, endDate: Date): Promise<{ success: boolean; data?: ReportData; error?: string }> {
@@ -170,6 +173,11 @@ export async function generateFullShopReportData(startDate: Date, endDate: Date)
         const membersAdded = await Employee.countDocuments({ joinedAt: { $gte: start, $lte: end } });
         const totalEmployees = await Employee.countDocuments();
 
+        // 6. Duty Logs
+        const dutyLogs = await DutyLog.find({
+            startTime: { $gte: start.getTime(), $lte: end.getTime() }
+        }).sort({ startTime: -1 }).lean();
+
         return {
             success: true,
             data: {
@@ -189,7 +197,9 @@ export async function generateFullShopReportData(startDate: Date, endDate: Date)
                     membersRemoved: 0,
                     totalEmployees
                 },
-                recentTransactions: transactions.slice(0, 10) // Top 10 for the report
+                allTransactions: transactions,
+                allSalaries: salaryLogs,
+                dutyLogs
             }
         };
 
