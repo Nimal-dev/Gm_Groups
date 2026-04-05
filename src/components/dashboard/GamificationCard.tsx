@@ -24,9 +24,9 @@ interface GamificationCardProps {
 }
 
 export function GamificationCard({ user }: GamificationCardProps) {
-    // Level Logic: Level = floor(sqrt(XP) * 0.2) + 1
-    // XP for current level start: ( (Level-1) / 0.2 )^2  => ( (Level-1) * 5 )^2
-    // XP for next level start: ( Level / 0.2 )^2 => ( Level * 5 )^2
+    // Level Logic: Level = floor(sqrt(XP) * 0.18) + 1
+    // XP for current level start: ( (Level-1) / 0.18 )^2 
+    // XP for next level start: ( Level / 0.18 )^2 
     const currentLevel = user.level || 1;
     const currentXp = user.xp || 0;
 
@@ -38,7 +38,7 @@ export function GamificationCard({ user }: GamificationCardProps) {
         '--level-intensity': `${20 + (currentLevel * 2)}px`,
     } as React.CSSProperties;
 
-    const getXpForLevel = (lvl: number) => Math.pow((lvl - 1) * 5, 2);
+    const getXpForLevel = (lvl: number) => Math.pow((lvl - 1) / 0.18, 2);
 
     const startXp = getXpForLevel(currentLevel);
     const nextXp = getXpForLevel(currentLevel + 1);
