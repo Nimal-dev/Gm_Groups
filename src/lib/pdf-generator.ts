@@ -2,10 +2,18 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { FullReportData } from '@/actions/report';
 
+export interface ReportOptions {
+    includeFinancials: boolean;
+    includeBankLedger: boolean;
+    includeSalaries: boolean;
+    includeDutyLogs: boolean;
+    includeInventory: boolean;
+}
+
 /**
  * Generates a professional PDF report for the shop.
  */
-export async function generateShopPDF(data: FullReportData, reportTo: string, reportFrom: string) {
+export async function generateShopPDF(data: FullReportData, reportTo: string, reportFrom: string, options: ReportOptions) {
     // @ts-ignore - jspdf-autotable extends jsPDF but types can be tricky
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
@@ -39,122 +47,132 @@ export async function generateShopPDF(data: FullReportData, reportTo: string, re
     doc.text(`Prepared By: ${reportFrom || 'Management'}`, 14, 62);
     doc.text(`Recipient: ${reportTo || 'General Administration'}`, 14, 68);
 
+    // --- Sections ---
+    let sectionNum = 1;
+    let currentY = 85;
+
     // --- 1. Financial Summary ---
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    doc.text('1. FINANCIAL SUMMARY', 14, 85);
-    
-    const financialSummary = [
-        ['Metric', 'Amount'],
-        ['Opening Balance', fmt(data.financials.openingBalance)],
-        ['Total Income (Deposits)', fmt(data.financials.totalIncome)],
-        ['Total Operational Expense', fmt(data.financials.totalExpense)],
-        ['Total Salaries Paid', fmt(data.financials.totalSalaries)],
-        ['Closing Balance', fmt(data.financials.closingBalance)],
-        ['NET PROFIT / LOSS', fmt(data.financials.netProfit)]
-    ];
+    if (options.includeFinancials) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text(`${sectionNum++}. FINANCIAL SUMMARY`, 14, currentY);
+        
+        const financialSummary = [
+            ['Metric', 'Amount'],
+            ['Opening Balance', fmt(data.financials.openingBalance)],
+            ['Total Income (Deposits)', fmt(data.financials.totalIncome)],
+            ['Total Operational Expense', fmt(data.financials.totalExpense)],
+            ['Total Salaries Paid', fmt(data.financials.totalSalaries)],
+            ['Closing Balance', fmt(data.financials.closingBalance)],
+            ['NET PROFIT / LOSS', fmt(data.financials.netProfit)]
+        ];
 
-    (doc as any).autoTable({
-        startY: 90,
-        head: [financialSummary[0]],
-        body: financialSummary.slice(1),
-        theme: 'striped',
-        headStyles: { fillColor: [43, 63, 229] },
-        columnStyles: { 1: { halign: 'right', fontStyle: 'bold' } },
-        didParseCell: function(cellData: any) {
-            if (cellData.row.index === 5) {
-                const val = cellData.cell.raw;
-                cellData.cell.styles.fillColor = val.includes('-') ? [254, 226, 226] : [220, 252, 231];
-                cellData.cell.styles.textColor = val.includes('-') ? [153, 27, 27] : [22, 101, 52];
+        (doc as any).autoTable({
+            startY: currentY + 5,
+            head: [financialSummary[0]],
+            body: financialSummary.slice(1),
+            theme: 'striped',
+            headStyles: { fillColor: [43, 63, 229] },
+            columnStyles: { 1: { halign: 'right', fontStyle: 'bold' } },
+            didParseCell: function(cellData: any) {
+                if (cellData.row.index === 5) {
+                    const val = cellData.cell.raw;
+                    cellData.cell.styles.fillColor = val.includes('-') ? [254, 226, 226] : [220, 252, 231];
+                    cellData.cell.styles.textColor = val.includes('-') ? [153, 27, 27] : [22, 101, 52];
+                }
             }
-        }
-    });
-
-    let currentY = (doc as any).lastAutoTable.finalY + 15;
+        });
+        currentY = (doc as any).lastAutoTable.finalY + 15;
+    }
 
     // --- 2. Detailed Bank Ledger ---
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    doc.text('2. DETAILED BANK LEDGER', 14, currentY);
-    
-    const bankBody = data.allTransactions.length > 0
-        ? data.allTransactions.map(t => [formatDate(t.date), t.transactionType, t.amount.toLocaleString(), (t.memo || t.transferredTo || '').substring(0, 40)])
-        : [['No transactions found', '', '', '']];
+    if (options.includeBankLedger) {
+        if (currentY > 250) { doc.addPage(); currentY = 20; }
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text(`${sectionNum++}. DETAILED BANK LEDGER`, 14, currentY);
+        
+        const bankBody = data.allTransactions.length > 0
+            ? data.allTransactions.map(t => [formatDate(t.date), t.transactionType, t.amount.toLocaleString(), (t.memo || t.transferredTo || '').substring(0, 40)])
+            : [['No transactions found', '', '', '']];
 
-    (doc as any).autoTable({
-        startY: currentY + 5,
-        head: [['Date', 'Type', 'Amount', 'Memo/Details']],
-        body: bankBody,
-        theme: 'grid',
-        headStyles: { fillColor: [31, 41, 55] },
-        styles: { fontSize: 8 },
-        columnStyles: { 2: { halign: 'right' } }
-    });
-
-    currentY = (doc as any).lastAutoTable.finalY + 15;
+        (doc as any).autoTable({
+            startY: currentY + 5,
+            head: [['Date', 'Type', 'Amount', 'Memo/Details']],
+            body: bankBody,
+            theme: 'grid',
+            headStyles: { fillColor: [31, 41, 55] },
+            styles: { fontSize: 8 },
+            columnStyles: { 2: { halign: 'right' } }
+        });
+        currentY = (doc as any).lastAutoTable.finalY + 15;
+    }
 
     // --- 3. Salary Payouts ---
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    if (currentY > 250) { doc.addPage(); currentY = 20; }
-    doc.text('3. SALARY PAYOUTS', 14, currentY);
+    if (options.includeSalaries) {
+        if (currentY > 250) { doc.addPage(); currentY = 20; }
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text(`${sectionNum++}. SALARY PAYOUTS`, 14, currentY);
 
-    const salaryBody = data.allSalaries.length > 0
-        ? data.allSalaries.map(s => [formatDate(s.date), s.username || s.userId, fmt(s.amount), s.processorName || 'System'])
-        : [['No salaries recorded', '', '', '']];
+        const salaryBody = data.allSalaries.length > 0
+            ? data.allSalaries.map(s => [formatDate(s.date), s.username || s.userId, fmt(s.amount), s.processorName || 'System'])
+            : [['No salaries recorded', '', '', '']];
 
-    (doc as any).autoTable({
-        startY: currentY + 5,
-        head: [['Date', 'Recipient', 'Amount', 'Processed By']],
-        body: salaryBody,
-        theme: 'striped',
-        headStyles: { fillColor: [107, 114, 128] },
-        styles: { fontSize: 9 }
-    });
-
-    currentY = (doc as any).lastAutoTable.finalY + 15;
+        (doc as any).autoTable({
+            startY: currentY + 5,
+            head: [['Date', 'Recipient', 'Amount', 'Processed By']],
+            body: salaryBody,
+            theme: 'striped',
+            headStyles: { fillColor: [107, 114, 128] },
+            styles: { fontSize: 9 }
+        });
+        currentY = (doc as any).lastAutoTable.finalY + 15;
+    }
 
     // --- 4. Staff Activity (Duty Logs) ---
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    if (currentY > 250) { doc.addPage(); currentY = 20; }
-    doc.text('4. STAFF ACTIVITY (DUTY LOGS)', 14, currentY);
+    if (options.includeDutyLogs) {
+        if (currentY > 250) { doc.addPage(); currentY = 20; }
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text(`${sectionNum++}. STAFF ACTIVITY (DUTY LOGS)`, 14, currentY);
 
-    const dutyBody = data.dutyLogs.length > 0
-        ? data.dutyLogs.map(d => [d.username, formatDate(new Date(d.startTime).toISOString()), (d.durationMs / 1000 / 60 / 60).toFixed(2) + ' hrs'])
-        : [['No activity recorded', '', '']];
+        const dutyBody = data.dutyLogs.length > 0
+            ? data.dutyLogs.map(d => [d.username, formatDate(new Date(d.startTime).toISOString()), (d.durationMs / 1000 / 60 / 60).toFixed(2) + ' hrs'])
+            : [['No activity recorded', '', '']];
 
-    (doc as any).autoTable({
-        startY: currentY + 5,
-        head: [['Staff Name', 'Date', 'Duration']],
-        body: dutyBody,
-        theme: 'grid',
-        headStyles: { fillColor: [55, 65, 81] },
-        styles: { fontSize: 9 }
-    });
-
-    currentY = (doc as any).lastAutoTable.finalY + 15;
+        (doc as any).autoTable({
+            startY: currentY + 5,
+            head: [['Staff Name', 'Date', 'Duration']],
+            body: dutyBody,
+            theme: 'grid',
+            headStyles: { fillColor: [55, 65, 81] },
+            styles: { fontSize: 9 }
+        });
+        currentY = (doc as any).lastAutoTable.finalY + 15;
+    }
 
     // --- 5. Inventory Snapshot ---
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    if (currentY > 250) { doc.addPage(); currentY = 20; }
-    doc.text('5. INVENTORY SNAPSHOT', 14, currentY);
-    
-    const inventoryBody = data.inventory.length > 0 
-        ? data.inventory.map(item => [item.itemName, item.quantity.toString()])
-        : [['No inventory data available', '']];
+    if (options.includeInventory) {
+        if (currentY > 250) { doc.addPage(); currentY = 20; }
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text(`${sectionNum++}. INVENTORY SNAPSHOT`, 14, currentY);
+        
+        const inventoryBody = data.inventory.length > 0 
+            ? data.inventory.map(item => [item.itemName, item.quantity.toString()])
+            : [['No inventory data available', '']];
 
-    (doc as any).autoTable({
-        startY: currentY + 5,
-        head: [['Item Name', 'Current Quantity']],
-        body: inventoryBody,
-        theme: 'grid',
-        headStyles: { fillColor: [75, 85, 99] },
-        columnStyles: { 1: { halign: 'center' } }
-    });
-
-    currentY = (doc as any).lastAutoTable.finalY + 25;
+        (doc as any).autoTable({
+            startY: currentY + 5,
+            head: [['Item Name', 'Current Quantity']],
+            body: inventoryBody,
+            theme: 'grid',
+            headStyles: { fillColor: [75, 85, 99] },
+            columnStyles: { 1: { halign: 'center' } }
+        });
+        currentY = (doc as any).lastAutoTable.finalY + 15;
+    }
 
     // --- Footer / Signatures ---
     if (currentY > 250) {

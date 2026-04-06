@@ -58,6 +58,13 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
     const [loading, setLoading] = useState(false);
 
     const [autoCalcDeposit, setAutoCalcDeposit] = useState(true);
+    const [reportOptions, setReportOptions] = useState({
+        includeFinancials: true,
+        includeBankLedger: true,
+        includeSalaries: true,
+        includeDutyLogs: true,
+        includeInventory: true
+    });
 
     // Invoice Form
     const InvoiceFormSchema = z.object({
@@ -263,7 +270,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
     const handleDownloadPDF = async () => {
         if (!fullReportData) return;
         try {
-            await generateShopPDF(fullReportData, reportTo, reportFrom);
+            await generateShopPDF(fullReportData, reportTo, reportFrom, reportOptions);
             toast({ title: "Success", description: "PDF generated and downloading." });
         } catch (error: any) {
             toast({ variant: "destructive", title: "PDF Error", description: error.message });
@@ -444,6 +451,55 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                                     <Input type="date" {...reportForm.register('endDate')} className="glass-input" />
                                 </div>
                             </div>
+                            
+                            {reportType === 'Full Shop Report' && (
+                                <div className="space-y-3 bg-black/20 p-4 rounded-lg border border-white/5">
+                                    <Label className="text-accent">Include Sections in PDF</Label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                                        <div className="flex items-center space-x-2">
+                                            <Checkbox 
+                                                id="inc-fin" 
+                                                checked={reportOptions.includeFinancials} 
+                                                onCheckedChange={(checked) => setReportOptions(prev => ({ ...prev, includeFinancials: !!checked }))}
+                                            />
+                                            <Label htmlFor="inc-fin" className="text-xs cursor-pointer">Financial Summary</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Checkbox 
+                                                id="inc-bank" 
+                                                checked={reportOptions.includeBankLedger} 
+                                                onCheckedChange={(checked) => setReportOptions(prev => ({ ...prev, includeBankLedger: !!checked }))}
+                                            />
+                                            <Label htmlFor="inc-bank" className="text-xs cursor-pointer">Detailed Bank Ledger</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Checkbox 
+                                                id="inc-sal" 
+                                                checked={reportOptions.includeSalaries} 
+                                                onCheckedChange={(checked) => setReportOptions(prev => ({ ...prev, includeSalaries: !!checked }))}
+                                            />
+                                            <Label htmlFor="inc-sal" className="text-xs cursor-pointer">Salary Payouts</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Checkbox 
+                                                id="inc-duty" 
+                                                checked={reportOptions.includeDutyLogs} 
+                                                onCheckedChange={(checked) => setReportOptions(prev => ({ ...prev, includeDutyLogs: !!checked }))}
+                                            />
+                                            <Label htmlFor="inc-duty" className="text-xs cursor-pointer">Staff Activity (Duty Logs)</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Checkbox 
+                                                id="inc-inv" 
+                                                checked={reportOptions.includeInventory} 
+                                                onCheckedChange={(checked) => setReportOptions(prev => ({ ...prev, includeInventory: !!checked }))}
+                                            />
+                                            <Label htmlFor="inc-inv" className="text-xs cursor-pointer">Inventory Snapshot</Label>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {reportType !== 'Full Shop Report' && (
                                 <div className="space-y-2">
                                     <Label>Members Removed</Label>
