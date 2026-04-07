@@ -74,7 +74,18 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
     });
 
     // Recurring Form State
-    const [recurringForm, setRecurringForm] = useState({ customer: '', clientRep: '', items: '', amount: '', startDate: '', intervalDays: '7', deliveryDetails: '', securityDeposit: '' });
+    const [recurringForm, setRecurringForm] = useState({ 
+        customer: '', 
+        clientRep: '', 
+        items: [] as OrderItem[], 
+        discount: '0',
+        amount: '', 
+        startDate: '', 
+        intervalDays: '7', 
+        deliveryDetails: '', 
+        securityDeposit: '',
+        isAutoDeposit: true
+    });
 
     const [pendingCount, setPendingCount] = useState(0);
     const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
@@ -104,7 +115,21 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
         };
     }, [citizenForm]);
 
-    // --- HANDLERS ---
+    const recurringTotals = useMemo(() => {
+        const subtotal = recurringForm.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const discountPct = parseFloat(recurringForm.discount) || 0;
+        const discountAmount = (subtotal * discountPct) / 100;
+        const deliveryAmount = subtotal - discountAmount;
+        const autoDeposit = deliveryAmount * 2;
+        
+        return {
+            subtotal,
+            discountAmount,
+            deliveryAmount,
+            autoDeposit,
+            finalDeposit: recurringForm.isAutoDeposit ? autoDeposit : (parseFloat(recurringForm.securityDeposit) || 0)
+        };
+    }, [recurringForm]);
 
     const handleCitizenSubmit = useCallback(async (e: React.FormEvent, overrideAmount?: string, formattedDetails?: string) => {
         setLoading(true);
@@ -126,19 +151,49 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
     const handleRecurringSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+
+        // Format Items
+        const fmt = (n: number) => `$ ${n.toLocaleString('en-US')}`;
+        let itemsText = "RECURRING ITEMS:\n------------------------------------------\n";
+        recurringForm.items.forEach((item, i) => {
+            itemsText += `${i+1}. ${item.description.padEnd(25)} x${item.quantity.toString().padEnd(4)} @ ${fmt(item.price)}\n`;
+        });
+        itemsText += "------------------------------------------\n";
+        itemsText += `Subtotal: ${fmt(recurringTotals.subtotal)}\n`;
+        if (recurringTotals.discountAmount > 0) {
+            itemsText += `Discount (${recurringForm.discount}%): -${fmt(recurringTotals.discountAmount)}\n`;
+        }
+        itemsText += `Delivery Total: ${fmt(recurringTotals.deliveryAmount)}\n`;
+        if (recurringTotals.finalDeposit > 0) {
+            itemsText += `Security Deposit: ${fmt(recurringTotals.finalDeposit)}\n`;
+        }
+
         const res = await createRecurringOrder({
             ...recurringForm,
+            items: itemsText,
+            amount: recurringTotals.deliveryAmount.toString(),
             intervalDays: parseInt(recurringForm.intervalDays),
-            securityDeposit: recurringForm.securityDeposit ? parseFloat(recurringForm.securityDeposit) : undefined
+            securityDeposit: recurringTotals.finalDeposit
         });
         setLoading(false);
         if (res.success) {
             toast({ title: 'Success', description: 'Recurring Contract created.' });
-            setRecurringForm({ customer: '', clientRep: '', items: '', amount: '', startDate: '', intervalDays: '7', deliveryDetails: '', securityDeposit: '' });
+            setRecurringForm({ 
+                customer: '', 
+                clientRep: '', 
+                items: [], 
+                discount: '0', 
+                amount: '', 
+                startDate: '', 
+                intervalDays: '7', 
+                deliveryDetails: '', 
+                securityDeposit: '',
+                isAutoDeposit: true
+            });
         } else {
             toast({ variant: 'destructive', title: 'Error', description: res.error });
         }
-    }, [recurringForm, toast]);
+    }, [recurringForm, recurringTotals, toast]);
 
 
     const handleEndContract = useCallback(async (contractId: string) => {
@@ -600,17 +655,114 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                             <Input placeholder="Ex. Chief Davis" value={recurringForm.clientRep} onChange={e => setRecurringForm({ ...recurringForm, clientRep: e.target.value })} />
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <Label>Amount Per Delivery</Label>
-                                            <Input required placeholder="5000" value={recurringForm.amount} onChange={e => {
-                                                const amt = parseFloat(e.target.value || '0');
-                                                setRecurringForm({ ...recurringForm, amount: e.target.value, securityDeposit: (amt * 2).toString() });
-                                            }} />
+                                            <Label className="flex justify-between items-center text-green-400/90">
+                                                Contract Items
+                                                <Button 
+                                                    type="button" 
+                                                    variant="outline" 
+                                                    size="sm" 
+                                                    onClick={() => setRecurringForm(prev => ({ ...prev, items: [...prev.items, { description: '', quantity: 1, price: 0 }] }))}
+                                                    className="h-7 text-xs border-dashed border-green-500/30 text-green-400 hover:bg-green-500/10"
+                                                >
+                                                    <Plus className="w-3 h-3 mr-1" /> Add Item
+                                                </Button>
+                                            </Label>
+                                            <div className="space-y-2 border border-white/5 p-2 rounded-lg bg-black/40 max-h-[300px] overflow-y-auto">
+                                                {recurringForm.items.length === 0 && <p className="text-center py-4 text-xs text-muted-foreground">No items added to contract.</p>}
+                                                {recurringForm.items.map((item, index) => (
+                                                    <div key={index} className="grid grid-cols-12 gap-2 items-center bg-white/5 p-2 rounded border border-white/5 group">
+                                                        <div className="col-span-6">
+                                                            <Input placeholder="Item Name" className="h-8 text-xs bg-black/40 border-white/10" value={item.description} onChange={e => {
+                                                                const newItems = [...recurringForm.items];
+                                                                newItems[index].description = e.target.value;
+                                                                setRecurringForm({ ...recurringForm, items: newItems });
+                                                            }} required />
+                                                        </div>
+                                                        <div className="col-span-2">
+                                                            <Input type="number" placeholder="Qty" className="h-8 text-xs bg-black/40 border-white/10 text-center" value={item.quantity} onChange={e => {
+                                                                const newItems = [...recurringForm.items];
+                                                                newItems[index].quantity = parseInt(e.target.value) || 0;
+                                                                setRecurringForm({ ...recurringForm, items: newItems });
+                                                            }} required min="1" />
+                                                        </div>
+                                                        <div className="col-span-3">
+                                                            <Input type="number" placeholder="Price" className="h-8 text-xs bg-black/40 border-white/10 text-center" value={item.price} onChange={e => {
+                                                                const newItems = [...recurringForm.items];
+                                                                newItems[index].price = parseFloat(e.target.value) || 0;
+                                                                setRecurringForm({ ...recurringForm, items: newItems });
+                                                            }} required min="0" />
+                                                        </div>
+                                                        <div className="col-span-1 flex justify-center">
+                                                            <Button 
+                                                                type="button" 
+                                                                variant="ghost" 
+                                                                size="icon" 
+                                                                className="h-7 w-7 text-red-400 opacity-50 group-hover:opacity-100 transition-opacity" 
+                                                                onClick={() => {
+                                                                    const newItems = [...recurringForm.items];
+                                                                    newItems.splice(index, 1);
+                                                                    setRecurringForm({ ...recurringForm, items: newItems });
+                                                                }}
+                                                            >
+                                                                <Trash2 className="w-3.5 h-3.5" />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                        <div className="space-y-2">
-                                            <Label>Security Deposit (Auto-calc)</Label>
-                                            <Input placeholder="10000" value={recurringForm.securityDeposit} onChange={e => setRecurringForm({ ...recurringForm, securityDeposit: e.target.value })} />
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Label>Discount (%)</Label>
+                                                <Input type="number" placeholder="0" value={recurringForm.discount} onChange={e => setRecurringForm({ ...recurringForm, discount: e.target.value })} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label>Security Deposit ($)</Label>
+                                                <Input 
+                                                    type="number" 
+                                                    placeholder={recurringForm.isAutoDeposit ? "Auto-calculated" : "Custom amount"} 
+                                                    value={recurringForm.isAutoDeposit ? recurringTotals.autoDeposit : recurringForm.securityDeposit} 
+                                                    onChange={e => !recurringForm.isAutoDeposit && setRecurringForm({ ...recurringForm, securityDeposit: e.target.value })} 
+                                                    disabled={recurringForm.isAutoDeposit}
+                                                    className={recurringForm.isAutoDeposit ? "bg-black/20 text-muted-foreground cursor-not-allowed" : ""}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center space-x-3 p-2 bg-white/5 rounded-lg border border-white/5">
+                                            <Checkbox
+                                                id="autoDeposit"
+                                                checked={recurringForm.isAutoDeposit}
+                                                onCheckedChange={(checked) => setRecurringForm({ ...recurringForm, isAutoDeposit: !!checked })}
+                                                className="w-5 h-5"
+                                            />
+                                            <Label htmlFor="autoDeposit" className="text-sm font-medium cursor-pointer">
+                                                Automatic Security Deposit (2x Delivery Amount)
+                                            </Label>
+                                        </div>
+
+                                        <div className="p-4 bg-black/40 rounded-lg border border-green-500/10 space-y-2 shadow-inner">
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-muted-foreground">Contract Subtotal:</span>
+                                                <span className="font-mono text-white">${recurringTotals.subtotal.toLocaleString()}</span>
+                                            </div>
+                                            {recurringTotals.discountAmount > 0 && (
+                                                <div className="flex justify-between items-center text-sm">
+                                                    <span className="text-muted-foreground">Discount ({recurringForm.discount}%):</span>
+                                                    <span className="font-mono text-red-400">-${recurringTotals.discountAmount.toLocaleString()}</span>
+                                                </div>
+                                            )}
+                                            <div className="flex justify-between items-center pt-2 border-t border-white/10">
+                                                <span className="font-bold text-green-400">AMOUNT PER DELIVERY:</span>
+                                                <span className="font-bold text-xl text-green-400 font-mono">${recurringTotals.deliveryAmount.toLocaleString()}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-muted-foreground">Security Deposit:</span>
+                                                <span className="font-mono text-orange-400">${recurringTotals.finalDeposit.toLocaleString()}</span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
@@ -653,15 +805,11 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label>Items List</Label>
-                                        <Textarea required placeholder="100x KOIs, 50x Sodas..." value={recurringForm.items} onChange={e => setRecurringForm({ ...recurringForm, items: e.target.value })} />
+                                        <Label>Delivery Details (Location/Time)</Label>
+                                        <Input placeholder="Ex. Vespucci PD HQ @ 8 PM" value={recurringForm.deliveryDetails} onChange={e => setRecurringForm({ ...recurringForm, deliveryDetails: e.target.value })} />
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label>Delivery Instructions</Label>
-                                        <Input placeholder="Leave at reception..." value={recurringForm.deliveryDetails} onChange={e => setRecurringForm({ ...recurringForm, deliveryDetails: e.target.value })} />
-                                    </div>
-                                    <Button type="submit" disabled={loading} className="w-full bg-green-600 hover:bg-green-700">
-                                        {loading ? <Loader2 className="animate-spin mr-2" /> : <RefreshCw className="w-4 h-4 mr-2" />} Create Contract
+                                    <Button type="submit" disabled={loading || recurringForm.items.length === 0} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold h-12 shadow-lg shadow-green-500/20 transition-all active:scale-[0.98]">
+                                        {loading ? <Loader2 className="animate-spin mr-2" /> : <RefreshCw className="w-5 h-5 mr-2" />} Create Contract
                                     </Button>
                                 </form>
                             </div>
