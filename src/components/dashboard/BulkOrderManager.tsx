@@ -154,11 +154,10 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
 
         // Format Items
         const fmt = (n: number) => `$ ${n.toLocaleString('en-US')}`;
-        let itemsText = "RECURRING ITEMS:\n------------------------------------------\n";
+        let itemsText = "RECURRING ITEMS:\n";
         recurringForm.items.forEach((item, i) => {
             itemsText += `${i + 1}. ${item.description.padEnd(25)} x${item.quantity.toString().padEnd(4)}\n`;
         });
-        itemsText += "------------------------------------------\n";
         itemsText += `Subtotal: ${fmt(recurringTotals.subtotal)}\n`;
         if (recurringTotals.discountAmount > 0) {
             itemsText += `Discount (${recurringForm.discount}%): -${fmt(recurringTotals.discountAmount)}\n`;
