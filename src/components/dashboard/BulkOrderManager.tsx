@@ -156,7 +156,7 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
         const fmt = (n: number) => `$ ${n.toLocaleString('en-US')}`;
         let itemsText = "RECURRING ITEMS:\n------------------------------------------\n";
         recurringForm.items.forEach((item, i) => {
-            itemsText += `${i + 1}. ${item.description.padEnd(25)} x${item.quantity.toString().padEnd(4)} @ ${fmt(item.price)}\n`;
+            itemsText += `${i + 1}. ${item.description.padEnd(25)} x${item.quantity.toString().padEnd(4)}\n`;
         });
         itemsText += "------------------------------------------\n";
         itemsText += `Subtotal: ${fmt(recurringTotals.subtotal)}\n`;
