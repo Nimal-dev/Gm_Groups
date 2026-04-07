@@ -56,6 +56,10 @@ const FoodPrepCalculator = dynamic(() => import('@/components/dashboard/FoodPrep
     loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Calculator...</div>,
     ssr: false
 });
+const SalesLogForm = dynamic(() => import('@/components/dashboard/SalesLogForm').then(mod => mod.SalesLogForm), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Sales Log...</div>,
+    ssr: false
+});
 
 import { LeaveManagementCard } from '@/components/dashboard/LeaveManagementCard';
 
@@ -157,6 +161,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
 
                     <TabsTrigger value="recurring" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Recurring Orders</TabsTrigger>
                     <TabsTrigger value="foodlog" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Food Log</TabsTrigger>
+                    <TabsTrigger value="saleslog" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Sales Log</TabsTrigger>
                     <TabsTrigger value="inventory" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Inventory</TabsTrigger>
                     <TabsTrigger value="calculator" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent text-primary/80 font-bold">Calculator</TabsTrigger>
                     <TabsTrigger value="reports" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Reports</TabsTrigger>
@@ -459,6 +464,11 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
             {/* FOOD LOG TAB */}
             <TabsContent value="foodlog" className="space-y-6">
                 <FoodLogForm />
+            </TabsContent>
+
+            {/* SALES LOG TAB */}
+            <TabsContent value="saleslog" className="space-y-6">
+                <SalesLogForm />
             </TabsContent>
 
             {/* INVENTORY TAB */}

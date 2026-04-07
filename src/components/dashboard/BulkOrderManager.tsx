@@ -64,25 +64,25 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
     // Citizen Form State
-    const [citizenForm, setCitizenForm] = useState({ 
-        to: '', 
-        deliveryDate: '', 
-        items: [] as OrderItem[], 
+    const [citizenForm, setCitizenForm] = useState({
+        to: '',
+        deliveryDate: '',
+        items: [] as OrderItem[],
         discount: '0',
-        isAutoFine: true, 
-        customTotal: '' 
+        isAutoFine: true,
+        customTotal: ''
     });
 
     // Recurring Form State
-    const [recurringForm, setRecurringForm] = useState({ 
-        customer: '', 
-        clientRep: '', 
-        items: [] as OrderItem[], 
+    const [recurringForm, setRecurringForm] = useState({
+        customer: '',
+        clientRep: '',
+        items: [] as OrderItem[],
         discount: '0',
-        amount: '', 
-        startDate: '', 
-        intervalDays: '7', 
-        deliveryDetails: '', 
+        amount: '',
+        startDate: '',
+        intervalDays: '7',
+        deliveryDetails: '',
         securityDeposit: '',
         isAutoDeposit: true
     });
@@ -101,9 +101,9 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
         const discountPct = parseFloat(citizenForm.discount) || 0;
         const discountAmount = (subtotal * discountPct) / 100;
         const discountedBase = subtotal - discountAmount;
-        
+
         const surchargeInfo = calculateBulkOrderSurcharge(discountedBase, citizenForm.deliveryDate);
-        
+
         return {
             subtotal,
             discountAmount,
@@ -121,7 +121,7 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
         const discountAmount = (subtotal * discountPct) / 100;
         const deliveryAmount = subtotal - discountAmount;
         const autoDeposit = deliveryAmount * 2;
-        
+
         return {
             subtotal,
             discountAmount,
@@ -156,7 +156,7 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
         const fmt = (n: number) => `$ ${n.toLocaleString('en-US')}`;
         let itemsText = "RECURRING ITEMS:\n------------------------------------------\n";
         recurringForm.items.forEach((item, i) => {
-            itemsText += `${i+1}. ${item.description.padEnd(25)} x${item.quantity.toString().padEnd(4)} @ ${fmt(item.price)}\n`;
+            itemsText += `${i + 1}. ${item.description.padEnd(25)} x${item.quantity.toString().padEnd(4)} @ ${fmt(item.price)}\n`;
         });
         itemsText += "------------------------------------------\n";
         itemsText += `Subtotal: ${fmt(recurringTotals.subtotal)}\n`;
@@ -178,15 +178,15 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
         setLoading(false);
         if (res.success) {
             toast({ title: 'Success', description: 'Recurring Contract created.' });
-            setRecurringForm({ 
-                customer: '', 
-                clientRep: '', 
-                items: [], 
-                discount: '0', 
-                amount: '', 
-                startDate: '', 
-                intervalDays: '7', 
-                deliveryDetails: '', 
+            setRecurringForm({
+                customer: '',
+                clientRep: '',
+                items: [],
+                discount: '0',
+                amount: '',
+                startDate: '',
+                intervalDays: '7',
+                deliveryDetails: '',
                 securityDeposit: '',
                 isAutoDeposit: true
             });
@@ -438,12 +438,12 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                             <div className="lg:col-span-2">
                                 <form onSubmit={(e) => {
                                     e.preventDefault();
-                                    
+
                                     // Format Details
                                     const fmt = (n: number) => `$ ${n.toLocaleString('en-US')}`;
                                     let detailsText = "ORDER ITEMS:\n------------------------------------------\n";
                                     citizenForm.items.forEach((item, i) => {
-                                        detailsText += `${i+1}. ${item.description.padEnd(30)} x${item.quantity.toString().padEnd(5)} @ ${fmt(item.price).padEnd(10)} = ${fmt(item.price * item.quantity)}\n`;
+                                        detailsText += `${i + 1}. ${item.description.padEnd(30)} x${item.quantity.toString().padEnd(5)}\n`;
                                     });
                                     detailsText += "------------------------------------------\n";
                                     detailsText += `Subtotal: ${fmt(citizenTotals.subtotal)}\n`;
@@ -455,13 +455,13 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                     }
                                     detailsText += `GRAND TOTAL: ${fmt(citizenTotals.total)}\n`;
                                     detailsText += `Delivery Date: ${citizenForm.deliveryDate}\n`;
-                                    
+
                                     handleCitizenSubmit(e, citizenTotals.total.toString(), detailsText);
                                 }} className="space-y-4 p-4 bg-black/20 rounded-lg border border-white/5">
                                     <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
                                         <Package className="w-5 h-5 text-accent" /> Create Citizen Bulk Order
                                     </h3>
-                                    
+
                                     <div className="space-y-4">
                                         <div className="space-y-2">
                                             <Label>Customer / Organization Name</Label>
@@ -471,10 +471,10 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                         <div className="space-y-2">
                                             <Label className="flex justify-between items-center text-accent/90">
                                                 Order Items
-                                                <Button 
-                                                    type="button" 
-                                                    variant="outline" 
-                                                    size="sm" 
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
                                                     onClick={() => setCitizenForm(prev => ({ ...prev, items: [...prev.items, { description: '', quantity: 1, price: 0 }] }))}
                                                     className="h-7 text-xs border-dashed"
                                                 >
@@ -507,11 +507,11 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                                             }} required min="0" />
                                                         </div>
                                                         <div className="col-span-1 flex justify-center">
-                                                            <Button 
-                                                                type="button" 
-                                                                variant="ghost" 
-                                                                size="icon" 
-                                                                className="h-7 w-7 text-red-400 opacity-50 group-hover:opacity-100 transition-opacity" 
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-7 w-7 text-red-400 opacity-50 group-hover:opacity-100 transition-opacity"
                                                                 onClick={() => {
                                                                     const newItems = [...citizenForm.items];
                                                                     newItems.splice(index, 1);
@@ -659,10 +659,10 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                         <div className="space-y-2">
                                             <Label className="flex justify-between items-center text-green-400/90">
                                                 Contract Items
-                                                <Button 
-                                                    type="button" 
-                                                    variant="outline" 
-                                                    size="sm" 
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
                                                     onClick={() => setRecurringForm(prev => ({ ...prev, items: [...prev.items, { description: '', quantity: 1, price: 0 }] }))}
                                                     className="h-7 text-xs border-dashed border-green-500/30 text-green-400 hover:bg-green-500/10"
                                                 >
@@ -695,11 +695,11 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                                             }} required min="0" />
                                                         </div>
                                                         <div className="col-span-1 flex justify-center">
-                                                            <Button 
-                                                                type="button" 
-                                                                variant="ghost" 
-                                                                size="icon" 
-                                                                className="h-7 w-7 text-red-400 opacity-50 group-hover:opacity-100 transition-opacity" 
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-7 w-7 text-red-400 opacity-50 group-hover:opacity-100 transition-opacity"
                                                                 onClick={() => {
                                                                     const newItems = [...recurringForm.items];
                                                                     newItems.splice(index, 1);
@@ -721,11 +721,11 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                             </div>
                                             <div className="space-y-2">
                                                 <Label>Security Deposit ($)</Label>
-                                                <Input 
-                                                    type="number" 
-                                                    placeholder={recurringForm.isAutoDeposit ? "Auto-calculated" : "Custom amount"} 
-                                                    value={recurringForm.isAutoDeposit ? recurringTotals.autoDeposit : recurringForm.securityDeposit} 
-                                                    onChange={e => !recurringForm.isAutoDeposit && setRecurringForm({ ...recurringForm, securityDeposit: e.target.value })} 
+                                                <Input
+                                                    type="number"
+                                                    placeholder={recurringForm.isAutoDeposit ? "Auto-calculated" : "Custom amount"}
+                                                    value={recurringForm.isAutoDeposit ? recurringTotals.autoDeposit : recurringForm.securityDeposit}
+                                                    onChange={e => !recurringForm.isAutoDeposit && setRecurringForm({ ...recurringForm, securityDeposit: e.target.value })}
                                                     disabled={recurringForm.isAutoDeposit}
                                                     className={recurringForm.isAutoDeposit ? "bg-black/20 text-muted-foreground cursor-not-allowed" : ""}
                                                 />
