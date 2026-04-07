@@ -162,9 +162,12 @@ export function SalesLogForm() {
                                                         >
                                                             <Minus className="w-3 h-3" />
                                                         </Button>
-                                                        <span className="w-6 text-center text-sm font-bold font-mono">
-                                                            {quantities[item.id] || 0}
-                                                        </span>
+                                                        <Input
+                                                            type="number"
+                                                            value={quantities[item.id] || 0}
+                                                            onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value) || 0)}
+                                                            className="w-10 h-7 p-0 text-center text-sm font-bold font-mono bg-transparent border-none focus-visible:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                        />
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
