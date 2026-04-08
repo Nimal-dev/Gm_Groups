@@ -108,8 +108,8 @@ export async function clockOut() {
             // Fallback to localhost if BOT_API_URL is missing, matching logActivity implementation
             const { fetchBot } = await import('@/lib/bot-api');
 
-            // Fire and forget (don't block clock out if bot is down)
-            fetchBot('/api/duty-log', {
+            // Await fetch so the serverless function does not terminate before request completes
+            await fetchBot('/api/duty-log', {
                 method: 'POST',
                 body: JSON.stringify({
                     userId: session.user.id,

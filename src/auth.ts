@@ -162,7 +162,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
                     // Log the login activity
                     const { fetchBot } = await import('@/lib/bot-api');
-                    fetchBot('/api/website-log', {
+                    await fetchBot('/api/website-log', {
                         method: 'POST',
                         body: JSON.stringify({
                             action: 'Login',
