@@ -9,11 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar, FileText, Loader2, Copy, Send } from 'lucide-react';
-import { generateReportData, generateFullShopReportData, FullReportData } from '@/actions/report';
+import { generateReportData, generateFullShopReportData, generateSalesReportData, FullReportData } from '@/actions/report';
 import { sendReportToDiscord } from '@/actions/discord';
 import { logActivity } from '@/actions/log';
 import { generateShopPDF } from '@/lib/pdf-generator';
-import { formatInvoice, formatReport, formatCitizenContract, formatEventContract, formatRecurringContract } from '@/lib/report-formatters';
+import { formatInvoice, formatReport, formatCitizenContract, formatEventContract, formatRecurringContract, formatSalesReport } from '@/lib/report-formatters';
 import { useToast } from '@/hooks/use-toast';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -224,6 +224,15 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                              `Total Employees: ${result.data.hr.totalEmployees}\n` +
                              `Hired: ${result.data.hr.membersAdded}`;
             }
+            else if (reportType === 'Sales Report') {
+                const isValid = await reportForm.trigger();
+                if (!isValid) throw new Error("Please correct date errors.");
+                const data = reportForm.getValues();
+                const result = await generateSalesReportData(new Date(data.startDate), new Date(data.endDate));
+                if (!result.success || !result.data) throw new Error(result.error || 'Failed to fetch sales data');
+                
+                reportText = formatSalesReport(result.data, reportTo, reportFrom, result.data.aiAnalysis);
+            }
             else {
                 const isValid = await reportForm.trigger();
                 if (!isValid) throw new Error("Please correct date errors.");
@@ -297,6 +306,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                                 {isAdmin && <>
                                     <SelectItem value="Weekly">Weekly Report</SelectItem>
                                     <SelectItem value="Monthly">Monthly Report</SelectItem>
+                                    <SelectItem value="Sales Report">AI Sales Report</SelectItem>
                                     <SelectItem value="Full Shop Report">Detailed Overall Report (PDF)</SelectItem>
                                 </>}
                                 <SelectItem value="Invoice">Invoice</SelectItem>
@@ -439,7 +449,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                         </div>
                     )}
 
-                    {(reportType === 'Weekly' || reportType === 'Monthly' || reportType === 'Full Shop Report') && (
+                    {(reportType === 'Weekly' || reportType === 'Monthly' || reportType === 'Sales Report' || reportType === 'Full Shop Report') && (
                         <div className="space-y-4 border-t border-white/10 pt-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
@@ -500,7 +510,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                                 </div>
                             )}
 
-                            {reportType !== 'Full Shop Report' && (
+                            {reportType !== 'Full Shop Report' && reportType !== 'Sales Report' && (
                                 <div className="space-y-2">
                                     <Label>Members Removed</Label>
                                     <Input type="text" placeholder="0" {...reportForm.register('membersRemoved')} className="glass-input" />

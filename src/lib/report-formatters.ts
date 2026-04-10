@@ -454,3 +454,70 @@ Date: ${agreementDate}
 Signature: ${clientRep} 
 `.replace(/^\n/, '');
 }
+
+export function formatSalesReport(data: any, to: string, from: string, aiAnalysis: string) {
+    const fmt = (n: number) => `$ ${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const padStart = (str: string, length: number) => str.padStart(length);
+    const center = (str: string, width: number = 80) => {
+        const padding = Math.max(0, Math.floor((width - str.length) / 2));
+        return ' '.repeat(padding) + str;
+    };
+
+    const generatedDate = new Date().toLocaleDateString('en-GB');
+    const periodStart = new Date(data.startDate).toLocaleDateString('en-GB');
+    const periodEnd = new Date(data.endDate).toLocaleDateString('en-GB');
+
+    const formatMins = (ms: number) => Math.round(ms / 60000);
+
+    const itemsRows = data.itemsReport.slice(0, 15).map((item: any, i: number) => {
+        const name = item.name.substring(0, 30).padEnd(32);
+        const qty = item.quantity.toString().padStart(8);
+        const st = fmt(item.subtotal).padStart(15);
+        return ` ${(i + 1).toString().padStart(2)}. ${name}${qty}${st}`;
+    }).join('\n');
+
+    return `
+${center('KOI CAFE')}
+${center('SALES & PERFORMANCE REPORT')}
+
+REPORT METADATA
+================================================================================
+Date Generated: ${generatedDate}
+Report Period:  ${periodStart} - ${periodEnd}
+Prepared By:    ${from || '[System]'}
+Recipient:      ${to || 'Management'}
+================================================================================
+
+SALES OVERVIEW
+--------------------------------------------------------------------------------
+ Metric                   | Value
+--------------------------|-----------------------------------------------------
+ Total Sales Revenue      | ${padStart(fmt(data.totalSalesAmount), 20)}
+ Avg Daily Revenue        | ${padStart(fmt(data.avgAmountPerDay), 20)}
+ Avg Daily Transactions   | ${padStart(data.avgSalesPerDay.toFixed(1), 20)}
+ Total Shop Uptime (mins) | ${padStart(formatMins(data.totalUptimeMs).toString(), 20)}
+ Avg Daily Uptime (mins)  | ${padStart(formatMins(data.avgUptimePerDayMs).toString(), 20)}
+--------------------------------------------------------------------------------
+
+TOP ITEMS SOLD
+--------------------------------------------------------------------------------
+ Rank Item Name                        Quantity       Subtotal
+--------------------------------------------------------------------------------
+${itemsRows || ' No sales data recorded in this period.'}
+--------------------------------------------------------------------------------
+
+AI STRATEGY ANALYSIS
+================================================================================
+${aiAnalysis}
+================================================================================
+
+CERTIFICATION
+--------------------------------------------------------------------------------
+I hereby certify that the information provided in this report is accurate and
+reflects the recorded operations of KOI CAFE.
+
+Signature: ______________________
+Name:      ${from || 'Manager'}
+Date:      ${generatedDate}
+`.replace(/^\n/, '');
+}

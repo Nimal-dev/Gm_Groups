@@ -6,7 +6,9 @@ import Employee from '@/models/Employee';
 import SalaryLog from '@/models/SalaryLog';
 import BankBalanceLog from '@/models/BankBalanceLog';
 import DutyLog from '@/models/DutyLog';
+import SalesLog from '@/models/SalesLog';
 import { fetchBot } from '@/lib/bot-api';
+import { ai } from '@/ai/genkit';
 
 interface ReportData {
     startDate: string;
@@ -206,5 +208,144 @@ export async function generateFullShopReportData(startDate: Date, endDate: Date)
     } catch (error: any) {
         console.error('Full Report Generation Error:', error);
         return { success: false, error: 'Failed to generate full shop report data.' };
+    }
+}
+
+export interface SalesReportData {
+    startDate: string;
+    endDate: string;
+    itemsReport: { name: string; quantity: number; subtotal: number }[];
+    totalSalesAmount: number;
+    avgSalesPerDay: number;
+    avgAmountPerDay: number;
+    totalUptimeMs: number;
+    avgUptimePerDayMs: number;
+    aiAnalysis: string;
+}
+
+export async function generateSalesReportData(startDate: Date, endDate: Date): Promise<{ success: boolean; data?: SalesReportData; error?: string }> {
+    try {
+        await connectToDatabase();
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            return { success: false, error: 'Invalid Date Range provided.' };
+        }
+        start.setHours(0, 0, 0, 0);
+        end.setHours(23, 59, 59, 999);
+
+        // Optimize for Free Tier: Use MongoDB Aggregation instead of in-memory maps
+        const salesStats = await SalesLog.aggregate([
+            { $match: { createdAt: { $gte: start, $lte: end } } },
+            {
+                $group: {
+                    _id: null,
+                    totalSalesAmount: { $sum: "$total" },
+                    totalTransactions: { $sum: 1 },
+                    items: { $push: "$items" }
+                }
+            }
+        ]);
+
+        let totalSalesAmount = 0;
+        let totalTransactions = 0;
+        let itemTracker: Record<string, { quantity: number; subtotal: number }> = {};
+
+        if (salesStats.length > 0) {
+            totalSalesAmount = salesStats[0].totalSalesAmount;
+            totalTransactions = salesStats[0].totalTransactions;
+            
+            // Unwind nested items to aggregate (done in JS here as size of unique items is small and easier on M0 cluster CPU limits for complex unwinds)
+            salesStats[0].items.flat().forEach((item: any) => {
+                if (!itemTracker[item.name]) {
+                    itemTracker[item.name] = { quantity: 0, subtotal: 0 };
+                }
+                itemTracker[item.name].quantity += item.quantity;
+                itemTracker[item.name].subtotal += (item.price * item.quantity);
+            });
+        }
+
+        // Calculate days span
+        const MS_PER_DAY = 1000 * 60 * 60 * 24;
+        const daysCount = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / MS_PER_DAY));
+
+        const itemsReport = Object.keys(itemTracker).map(name => ({
+            name,
+            quantity: itemTracker[name].quantity,
+            subtotal: itemTracker[name].subtotal
+        })).sort((a, b) => b.quantity - Math.max(a.quantity, 0));
+
+        const avgSalesPerDay = totalTransactions / daysCount;
+        const avgAmountPerDay = totalSalesAmount / daysCount;
+
+        // Optimize DutyLogs with aggregation
+        const dutyStats = await DutyLog.aggregate([
+            { $match: { startTime: { $gte: start.getTime(), $lte: end.getTime() } } },
+            {
+                $group: {
+                    _id: null,
+                    totalUptimeMs: { $sum: "$durationMs" },
+                    uniqueDays: {
+                        $addToSet: {
+                            $dateToString: { format: "%Y-%m-%d", date: { $toDate: "$startTime" } }
+                        }
+                    }
+                }
+            }
+        ]);
+
+        const totalUptimeMs = dutyStats.length > 0 ? dutyStats[0].totalUptimeMs : 0;
+        const openDaysCount = dutyStats.length > 0 ? Math.max(1, dutyStats[0].uniqueDays.length) : 1;
+        const avgUptimePerDayMs = totalUptimeMs / openDaysCount;
+
+        // AI Analysis
+        let aiAnalysisText = "";
+        try {
+            const formatMins = (ms: number) => Math.round(ms / 60000);
+            const prompt = `Analyze the following sales data for a coffee/food shop from ${start.toLocaleDateString()} to ${end.toLocaleDateString()}.
+Data:
+- Total Sales Amount: $${totalSalesAmount.toLocaleString()}
+- Average Daily Sales Count (Transactions): ${avgSalesPerDay.toFixed(1)}
+- Average Daily Revenue: $${avgAmountPerDay.toLocaleString()}
+- Total Shop Uptime: ${formatMins(totalUptimeMs)} minutes
+- Average Daily Open Time: ${formatMins(avgUptimePerDayMs)} minutes
+- Top Items Sold:
+${itemsReport.slice(0, 10).map(i => `  * ${i.name}: ${i.quantity} units ($${i.subtotal})`).join('\n')}
+
+Business Strategies Context:
+- In-restaurant sales (walk-ins)
+- Bulk orders for governments, clubs, and families.
+- Customer acquisition teams actively out acquiring customers.
+
+Task:
+Write a highly positive, professional Markdown report emphasizing the success of this period. Focus ONLY on the good outcomes and achievements. Since this is an official report, frame the metrics as a direct result of our highly effective strategies (in-restaurant, bulk, and acquisition teams). Even if the numbers are low, praise the operational consistency, uptime, and the hard work of the team. Do NOT mention any missing data, inaccuracies, low performance, or loopholes. Produce a polished 2-3 paragraph presentation that highlights this period as a definitive success.`;
+
+            const aiResponse = await ai.generate(prompt);
+            aiAnalysisText = aiResponse.text;
+        } catch (aiErr) {
+            console.error("AI Generation Error:", aiErr);
+            aiAnalysisText = "AI Analysis is currently unavailable due to an error fetching insights.";
+        }
+
+
+        return {
+            success: true,
+            data: {
+                startDate: start.toISOString(),
+                endDate: end.toISOString(),
+                itemsReport,
+                totalSalesAmount,
+                avgSalesPerDay,
+                avgAmountPerDay,
+                totalUptimeMs,
+                avgUptimePerDayMs,
+                aiAnalysis: aiAnalysisText
+            }
+        };
+
+    } catch (error: any) {
+        console.error('Sales Report Generation Error:', error);
+        return { success: false, error: 'Failed to generate sales report data.' };
     }
 }
