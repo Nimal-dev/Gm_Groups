@@ -8,7 +8,7 @@ import BankBalanceLog from '@/models/BankBalanceLog';
 import DutyLog from '@/models/DutyLog';
 import SalesLog from '@/models/SalesLog';
 import { fetchBot } from '@/lib/bot-api';
-import { ai } from '@/ai/genkit';
+import Groq from 'groq-sdk';
 
 interface ReportData {
     startDate: string;
@@ -321,8 +321,12 @@ Business Strategies Context:
 Task:
 Write a highly positive, professional Markdown report emphasizing the success of this period. Focus ONLY on the good outcomes and achievements. Since this is an official report, frame the metrics as a direct result of our highly effective strategies (in-restaurant, bulk, and acquisition teams). Even if the numbers are low, praise the operational consistency, uptime, and the hard work of the team. Do NOT mention any missing data, inaccuracies, low performance, or loopholes. Produce a polished 2-3 paragraph presentation that highlights this period as a definitive success.`;
 
-            const aiResponse = await ai.generate(prompt);
-            aiAnalysisText = aiResponse.text;
+            const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+            const completion = await groq.chat.completions.create({
+                messages: [{ role: "user", content: prompt }],
+                model: "llama-3.3-70b-versatile",
+            });
+            aiAnalysisText = completion.choices[0]?.message?.content || "AI Analysis unavailable.";
         } catch (aiErr) {
             console.error("AI Generation Error:", aiErr);
             aiAnalysisText = "AI Analysis is currently unavailable due to an error fetching insights.";
