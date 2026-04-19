@@ -13,7 +13,7 @@ import { useFormStatus } from 'react-dom';
 
 export default function LoginPage() {
     const [loginMethod, setLoginMethod] = useState<'mpin' | 'discord'>('mpin');
-    
+
     // @ts-ignore
     const [state, dispatch] = useActionState(mpinLogin, undefined);
 
@@ -80,9 +80,9 @@ export default function LoginPage() {
                             Secure Access Terminal
                         </CardDescription>
                     </CardHeader>
-                    
+
                     <CardContent className="space-y-5 relative z-10">
-                        
+
                         {/* Method Toggle */}
                         <div className="flex p-1 bg-black/40 rounded-lg border border-white/5 mb-6">
                             <button
@@ -98,7 +98,7 @@ export default function LoginPage() {
                                 Discord OAuth
                             </button>
                         </div>
-                        
+
                         <div className="min-h-[180px]">
                             <AnimatePresence mode="wait">
                                 {loginMethod === 'mpin' ? (
@@ -129,13 +129,13 @@ export default function LoginPage() {
                                                     <Label htmlFor="mpin" className="text-xs text-white/70 uppercase tracking-wider pl-1">Secure MPIN</Label>
                                                     <div className="relative">
                                                         <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-accent transition-colors" />
-                                                        <Input 
+                                                        <Input
                                                             id="mpin"
                                                             name="mpin"
                                                             type="password"
                                                             maxLength={4}
                                                             required
-                                                            placeholder="••••" 
+                                                            placeholder="••••"
                                                             className="pl-10 text-center tracking-[0.5em] font-mono text-lg bg-black/30 border-white/10 focus-visible:ring-accent focus-visible:border-accent text-white h-11 transition-all group-hover:border-white/20"
                                                         />
                                                     </div>
@@ -189,7 +189,7 @@ function MpinSubmitButton() {
     const { pending } = useFormStatus();
 
     return (
-        <Button 
+        <Button
             className="w-full bg-accent hover:bg-accent/80 text-white font-medium shadow-[0_0_15px_rgba(124,58,237,0.3)] hover:shadow-[0_0_20px_rgba(124,58,237,0.5)] h-11 mt-6 transition-all"
             type="submit"
             disabled={pending}
