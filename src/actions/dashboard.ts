@@ -8,6 +8,7 @@ import SalaryLog from '@/models/SalaryLog';
 import BankTransaction from '@/models/BankTransaction';
 import BankBalanceLog from '@/models/BankBalanceLog';
 import RecurringOrder from '@/models/RecurringOrder';
+import DailySalary from '@/models/DailySalary';
 import { unstable_cache } from 'next/cache';
 
 // Internal data fetching function
@@ -18,7 +19,7 @@ const fetchDashboardData = unstable_cache(
 
             // Fetch data provided with lean() for performance
             // Use .select() to fetch ONLY what is needed for the dashboard cards/tables
-            const [activeStaff, activeOrders, allEmployees, recentSalaries, activeLeaves, recurringOrders] = await Promise.all([
+            const [activeStaff, activeOrders, allEmployees, recentSalaries, activeLeaves, recurringOrders, dailySalaries] = await Promise.all([
                 DutySession.find({ endTime: null })
                     .select('userId username startTime')
                     .sort({ startTime: -1 })
@@ -45,7 +46,11 @@ const fetchDashboardData = unstable_cache(
 
                 RecurringOrder.find({})
                     .sort({ createdAt: -1 })
-                    .lean()
+                    .lean(),
+
+                DailySalary.find({ 
+                    date: new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }) 
+                }).lean()
             ]);
 
             // Process Active Staff (InMemory Map is fast for small n)
@@ -79,6 +84,12 @@ const fetchDashboardData = unstable_cache(
                 ...e,
                 _id: e._id.toString(),
                 joinedAt: e.joinedAt ? new Date(e.joinedAt).toISOString() : null
+            }));
+
+            const serializedDailySalaries = dailySalaries.map((ds: any) => ({
+                ...ds,
+                _id: ds._id.toString(),
+                lastUpdated: ds.lastUpdated ? new Date(ds.lastUpdated).toISOString() : null
             }));
 
             const serializedSalaries = recentSalaries.map((s: any) => ({
@@ -184,6 +195,7 @@ const fetchDashboardData = unstable_cache(
                 allEmployees: serializedEmployees,
                 recentSalaries: serializedSalaries,
                 activeLeaves: serializedLeaves,
+                dailySalaries: serializedDailySalaries,
                 bankStats: { totalIncome, totalExpense, currentBalance }, // Added currentBalance
                 timestamp: new Date().toISOString(),
                 error: null
@@ -209,6 +221,7 @@ export async function getDashboardData() {
             allEmployees: [],
             recentSalaries: [],
             activeLeaves: [],
+            dailySalaries: [],
             bankStats: { totalIncome: 0, totalExpense: 0, currentBalance: 0 },
             timestamp: new Date().toISOString(),
             error: error.message

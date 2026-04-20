@@ -18,6 +18,7 @@ export interface IEmployee extends Document {
         unlockedAt: Date;
         icon?: string;
     }[];
+    unpaidSalary: number;
 }
 
 const EmployeeSchema: Schema = new Schema({
@@ -37,7 +38,8 @@ const EmployeeSchema: Schema = new Schema({
         title: String,
         unlockedAt: Date,
         icon: String
-    }]
+    }],
+    unpaidSalary: { type: Number, default: 0 }
 });
 
 // Index for optimization

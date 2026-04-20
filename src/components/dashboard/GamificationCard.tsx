@@ -62,11 +62,12 @@ export function GamificationCard({ user }: GamificationCardProps) {
 
     return (
         <motion.div
+            className="h-full"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
         >
-            <Card className="glass-card mb-6 border-accent/20 relative overflow-hidden hover:border-accent/40 transition-colors duration-500">
+            <Card className="glass-card h-full border-accent/20 relative overflow-hidden hover:border-accent/40 transition-colors duration-500 flex flex-col justify-center">
                 {/* Background Decoration */}
                 <motion.div
                     animate={{ rotate: 360 }}

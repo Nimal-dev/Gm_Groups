@@ -52,7 +52,7 @@ export default async function DashboardPage() {
     }
 
     const data = await getDashboardData();
-    const { activeStaff, activeOrders, allEmployees, recentSalaries, recurringOrders, error } = data;
+    const { activeStaff, activeOrders, allEmployees, recentSalaries, recurringOrders, dailySalaries, error } = data;
 
     if (error) {
         // ... existing error handling
@@ -166,6 +166,7 @@ export default async function DashboardPage() {
                     allEmployees={allEmployees}
                     recentSalaries={recentSalaries}
                     activeLeaves={activeLeaves || []}
+                    dailySalaries={dailySalaries || []}
                     userRole={role}
                     currentUser={JSON.parse(JSON.stringify(currentUser))}
                 />

@@ -19,9 +19,15 @@ export async function logPayment(userId: string, amount: number, notes?: string)
 
         await connectToDatabase();
 
-        // Verify employee exists
-        const employee = await Employee.findOne({ userId });
-        if (!employee) throw new Error("Employee not found");
+        // Atomic update to prevent race conditions during simultaneous earning increments
+        const result = await Employee.findOneAndUpdate(
+            { userId },
+            { $inc: { unpaidSalary: -amount } },
+            { new: true }
+        );
+        
+        if (!result) throw new Error("Employee not found");
+        const employee = result;
 
         const processorId = session.user.id || session.user.email || 'System';
         const processorName = session.user.name || session.user.email || 'Admin'; // Capture name

@@ -73,10 +73,11 @@ interface DashboardTabsProps {
     recentSalaries: any[];
     activeLeaves: any[];
     userRole?: string;
-    currentUser?: any; // Added
+    currentUser?: any; 
+    dailySalaries?: any[];
 }
 
-export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allEmployees, recentSalaries, activeLeaves, userRole = 'staff', currentUser }: DashboardTabsProps) {
+export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allEmployees, recentSalaries, activeLeaves, dailySalaries = [], userRole = 'staff', currentUser }: DashboardTabsProps) {
     const { toast } = useToast();
     const router = useRouter();
     const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
@@ -106,6 +107,10 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
 
     const activeContracts = recurringOrders.filter((o: any) => o.status === 'Active');
     const endedContracts = recurringOrders.filter((o: any) => o.status === 'Ended');
+
+    // Calculate User's Salary
+    const todaySalary = dailySalaries.find((ds: any) => ds.userId === currentUser?.userId);
+    const totalUnpaid = currentUser?.unpaidSalary || 0;
 
     const handleEndContract = async (contractId: string) => {
         if (!confirm('Are you sure you want to end this recurring contract? This action cannot be undone.')) return;
@@ -206,9 +211,11 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                                             </div>
                                         </div>
 
-                                        <div className="mt-3 pt-3 border-t border-white/10">
-                                            <p className="text-xs text-muted-foreground mb-1">Standard Items:</p>
-                                            <p className="text-xs line-clamp-2 italic opacity-70">{contract.items}</p>
+                                        <div className="mt-3 pt-3 border-t border-white/10 max-h-[150px] overflow-y-auto !scrollbar-thin !scrollbar-thumb-white/10">
+                                            <p className="text-xs text-muted-foreground mb-2">Standard Items:</p>
+                                            <div className="text-xs space-y-1">
+                                                {formatContractItems(contract.items)}
+                                            </div>
                                         </div>
                                     </div>
 
@@ -257,7 +264,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                                             <div className="p-2 rounded bg-red-500/10 text-red-500"><X className="w-4 h-4" /></div>
                                             <div>
                                                 <h4 className="font-bold text-sm">{contract.customer}</h4>
-                                                <p className="text-xs text-muted-foreground font-mono max-w-[200px] truncate">{contract.items}</p>
+                                                <div className="text-xs text-muted-foreground font-mono max-w-[200px] truncate">{formatContractItems(contract.items)}</div>
                                             </div>
                                         </div>
                                         <div className="text-left md:text-right mt-2 md:mt-0 w-full md:w-auto flex justify-between md:block">
@@ -277,10 +284,46 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                 </Card>
             </TabsContent>
 
-            {/* OVERVIEW TAB */}
             <TabsContent value="overview" className="space-y-6">
-                {/* Gamification Card */}
-                {currentUser && <GamificationCard user={currentUser} />}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch mb-6">
+                    {/* Gamification Card */}
+                    <div className="lg:col-span-2 h-full">
+                        {currentUser && <GamificationCard user={currentUser} />}
+                    </div>
+
+                    {/* Live Salary Card */}
+                    <Card className="glass-card relative overflow-hidden border-orange-500/20 bg-gradient-to-br from-black/60 to-orange-950/20 h-full flex flex-col justify-between">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm text-muted-foreground font-medium uppercase tracking-wider flex items-center justify-between">
+                                <span>Earnings Overview</span>
+                                <DollarSign className="w-4 h-4 text-orange-400" />
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="mb-4">
+                                <p className="text-3xl font-bold text-white mb-1">${totalUnpaid.toLocaleString()}</p>
+                                <p className="text-xs text-muted-foreground">Available to claim (Includes Unpaid)</p>
+                            </div>
+                            
+                            <div className="space-y-2 pt-3 border-t border-white/5">
+                                <p className="text-xs font-semibold text-white/70 mb-2">TODAY'S GENERATION</p>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Base Salary</span>
+                                    <span className="font-mono text-white">${(todaySalary?.baseSalaryEarned || 0).toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Sales Bonus</span>
+                                    <span className="font-mono text-green-400">+${(todaySalary?.salesCommissionEarned || 0).toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Food Bonus</span>
+                                    <span className="font-mono text-blue-400">+${(todaySalary?.foodCommissionEarned || 0).toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
@@ -583,4 +626,27 @@ function formatDuration(startTime: string | number) {
     const hours = Math.floor(diff / 3600000);
     const minutes = Math.floor((diff % 3600000) / 60000);
     return `${hours}h ${minutes}m`;
+}
+
+function formatContractItems(itemsStr: string) {
+    if (!itemsStr) return null;
+    
+    // Ensure newlines before "1.", "2."
+    let formatted = itemsStr.replace(/(\d+\.\s)/g, '\n$1');
+    // Ensure newlines before common summary keywords
+    formatted = formatted.replace(/(Subtotal:|Discount|Delivery Total:|Total:)/g, '\n$1');
+    // Remove "RECURRING ITEMS:" if it's there tightly coupled
+    formatted = formatted.replace(/RECURRING ITEMS:\s*/i, '');
+    
+    return formatted.split('\n').map((line, i) => {
+        const trimmed = line.trim();
+        if (!trimmed) return null;
+        
+        // Highlight keywords
+        if (trimmed.match(/^(Subtotal|Discount|Delivery Total|Total)/)) {
+           return <div key={i} className="text-accent font-semibold mt-1">{trimmed}</div>;
+        }
+        
+        return <div key={i} className="text-white/80">{trimmed}</div>;
+    });
 }

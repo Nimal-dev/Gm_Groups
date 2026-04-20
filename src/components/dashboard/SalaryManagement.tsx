@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -22,6 +22,27 @@ export function PayrollManagement({ employees }: PayrollManagementProps) {
 
     // Filter only active employees
     const activeEmployees = employees.filter(e => e.status === 'Active');
+
+    // Make calculateTotal function readily available
+    const getPayableAmount = (emp: any) => {
+        return emp.unpaidSalary || 0;
+    };
+
+    // Initialize inputs when data loads
+    useEffect(() => {
+        setInputs(prev => {
+            let changed = false;
+            const next = { ...prev };
+            activeEmployees.forEach(emp => {
+                const payable = getPayableAmount(emp);
+                if (!next[emp.userId] && payable > 0) {
+                    next[emp.userId] = { amount: payable.toString(), note: 'Salary' };
+                    changed = true;
+                }
+            });
+            return changed ? next : prev;
+        });
+    }, [employees]);
 
     const handleCopy = (text: string, id: string) => {
         navigator.clipboard.writeText(text);
@@ -93,8 +114,9 @@ export function PayrollManagement({ employees }: PayrollManagementProps) {
                                         <TableHead className="w-[20%]">Employee</TableHead>
                                         <TableHead className="w-[15%]">Rank</TableHead>
                                         <TableHead className="w-[20%]">Bank Account</TableHead>
-                                        <TableHead className="w-[20%]">Amount ($)</TableHead>
-                                        <TableHead className="w-[20%]">Note</TableHead>
+                                        <TableHead className="w-[15%]">Total Payable ($)</TableHead>
+                                        <TableHead className="w-[15%]">Amount ($)</TableHead>
+                                        <TableHead className="w-[15%]">Note</TableHead>
                                         <TableHead className="w-[10%] text-right">Action</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -144,6 +166,9 @@ export function PayrollManagement({ employees }: PayrollManagementProps) {
                                                             </Button>
                                                         )}
                                                     </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="font-mono text-green-400 font-bold">${getPayableAmount(emp).toLocaleString()}</span>
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="relative">
@@ -231,6 +256,11 @@ export function PayrollManagement({ employees }: PayrollManagementProps) {
                                             )}
                                         </Button>
                                     )}
+                                </div>
+
+                                <div className="flex items-center justify-between p-2 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                                    <span className="text-sm text-orange-200">Total Payable:</span>
+                                    <span className="font-mono font-bold text-green-400">${getPayableAmount(emp).toLocaleString()}</span>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-2">
