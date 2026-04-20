@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useActionState } from 'react';
+import { useState, useActionState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { discordLogin, mpinLogin } from '@/actions/auth';
 import { Button } from '@/components/ui/button';
@@ -10,12 +10,15 @@ import { Label } from '@/components/ui/label';
 import { Lock, Home, UserRound, KeyRound, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFormStatus } from 'react-dom';
+import { InputOTP } from '@/components/ui/input-otp';
 
 export default function LoginPage() {
     const [loginMethod, setLoginMethod] = useState<'mpin' | 'discord'>('mpin');
 
     // @ts-ignore
     const [state, dispatch] = useActionState(mpinLogin, undefined);
+    const [mpin, setMpin] = useState('');
+    const formRef = useRef<HTMLFormElement>(null);
 
     const containerVariants: any = {
         hidden: { opacity: 0, y: 20 },
@@ -34,6 +37,12 @@ export default function LoginPage() {
         hidden: { opacity: 0, x: -10 },
         visible: { opacity: 1, x: 0 }
     };
+
+    useEffect(() => {
+        if (loginMethod === 'mpin' && mpin.length === 4) {
+            formRef.current?.requestSubmit();
+        }
+    }, [mpin, loginMethod]);
 
     return (
         <div className="flex h-screen w-full items-center justify-center bg-[url('/gm_wallpaper.jpg')] bg-cover bg-center md:bg-black/90 relative overflow-hidden">
@@ -109,7 +118,7 @@ export default function LoginPage() {
                                         exit={{ opacity: 0, x: 20 }}
                                         transition={{ duration: 0.2, ease: "easeInOut" }}
                                     >
-                                        <form action={dispatch} className="space-y-4">
+                                        <form ref={formRef} action={dispatch} className="space-y-4">
                                             <div className="space-y-4">
                                                 <div className="space-y-1.5 relative group">
                                                     <Label htmlFor="loginId" className="text-xs text-white/70 uppercase tracking-wider pl-1">Login ID</Label>
@@ -125,18 +134,14 @@ export default function LoginPage() {
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="space-y-1.5 relative group">
+                                                <div className="space-y-3 relative group">
                                                     <Label htmlFor="mpin" className="text-xs text-white/70 uppercase tracking-wider pl-1">Secure MPIN</Label>
-                                                    <div className="relative">
-                                                        <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-accent transition-colors" />
-                                                        <Input
-                                                            id="mpin"
-                                                            name="mpin"
-                                                            type="password"
+                                                    <div className="relative flex justify-center py-2">
+                                                        <input type="hidden" name="mpin" value={mpin} />
+                                                        <InputOTP 
+                                                            value={mpin}
+                                                            onChange={setMpin}
                                                             maxLength={4}
-                                                            required
-                                                            placeholder="••••"
-                                                            className="pl-10 text-center tracking-[0.5em] font-mono text-lg bg-black/30 border-white/10 focus-visible:ring-accent focus-visible:border-accent text-white h-11 transition-all group-hover:border-white/20"
                                                         />
                                                     </div>
                                                 </div>
