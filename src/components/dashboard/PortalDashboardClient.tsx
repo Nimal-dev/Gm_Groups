@@ -151,7 +151,7 @@ export function PortalDashboardClient({
                         </TabsTrigger>
                         <TabsTrigger value="recurring" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Recurring Orders</TabsTrigger>
                         <TabsTrigger value="food" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Food Log</TabsTrigger>
-                        <TabsTrigger value="inventory" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Inventory</TabsTrigger>
+                        {/* <TabsTrigger value="inventory" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Inventory</TabsTrigger> */}
                         <TabsTrigger value="raw" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Raw Request</TabsTrigger>
                         <TabsTrigger value="logs" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Duty Logs</TabsTrigger>
                         {isAdmin && (
@@ -309,9 +309,9 @@ export function PortalDashboardClient({
                     <FoodLogForm />
                 </TabsContent>
 
-                <TabsContent value="inventory" className="space-y-6">
+                {/* <TabsContent value="inventory" className="space-y-6">
                     <InventoryManager currentUser={currentUser} />
-                </TabsContent>
+                </TabsContent> */}
 
                 <TabsContent value="raw" className="space-y-6">
                     <RawRequestForm currentUser={currentUser} />

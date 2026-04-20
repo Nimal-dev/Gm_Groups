@@ -167,7 +167,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                     <TabsTrigger value="recurring" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Recurring Orders</TabsTrigger>
                     <TabsTrigger value="foodlog" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Food Log</TabsTrigger>
                     <TabsTrigger value="saleslog" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Sales Log</TabsTrigger>
-                    <TabsTrigger value="inventory" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Inventory</TabsTrigger>
+{/* <TabsTrigger value="inventory" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Inventory</TabsTrigger> */}
                     <TabsTrigger value="calculator" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent text-primary/80 font-bold">Calculator</TabsTrigger>
                     <TabsTrigger value="reports" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Reports</TabsTrigger>
                 </TabsList>
@@ -514,10 +514,11 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                 <SalesLogForm />
             </TabsContent>
 
-            {/* INVENTORY TAB */}
+            {/* INVENTORY TAB - DISABLED
             <TabsContent value="inventory" className="space-y-6">
                 <InventoryManager currentUser={currentUser} />
             </TabsContent>
+            */}
 
             {/* CALCULATOR TAB */}
             <TabsContent value="calculator" className="space-y-6">

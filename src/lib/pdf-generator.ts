@@ -7,7 +7,7 @@ export interface ReportOptions {
     includeBankLedger: boolean;
     includeSalaries: boolean;
     includeDutyLogs: boolean;
-    includeInventory: boolean;
+    includeInventory?: boolean;
 }
 
 /**
@@ -152,6 +152,7 @@ export async function generateShopPDF(data: FullReportData, reportTo: string, re
         currentY = (doc as any).lastAutoTable.finalY + 15;
     }
 
+    /* 
     // --- 5. Inventory Snapshot ---
     if (options.includeInventory) {
         if (currentY > 250) { doc.addPage(); currentY = 20; }
@@ -173,6 +174,7 @@ export async function generateShopPDF(data: FullReportData, reportTo: string, re
         });
         currentY = (doc as any).lastAutoTable.finalY + 15;
     }
+    */
 
     // --- Footer / Signatures ---
     if (currentY > 250) {

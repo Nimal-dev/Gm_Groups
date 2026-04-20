@@ -63,7 +63,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
         includeBankLedger: true,
         includeSalaries: true,
         includeDutyLogs: true,
-        includeInventory: true
+        includeInventory: false
     });
 
     // Invoice Form
@@ -498,14 +498,14 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                                             />
                                             <Label htmlFor="inc-duty" className="text-xs cursor-pointer">Staff Activity (Duty Logs)</Label>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        {/* <div className="flex items-center space-x-2">
                                             <Checkbox 
                                                 id="inc-inv" 
                                                 checked={reportOptions.includeInventory} 
                                                 onCheckedChange={(checked) => setReportOptions(prev => ({ ...prev, includeInventory: !!checked }))}
                                             />
                                             <Label htmlFor="inc-inv" className="text-xs cursor-pointer">Inventory Snapshot</Label>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             )}

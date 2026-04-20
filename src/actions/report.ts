@@ -159,17 +159,18 @@ export async function generateFullShopReportData(startDate: Date, endDate: Date)
         }).lean();
         const totalSalaries = salaryLogs.reduce((sum, log) => sum + log.amount, 0);
 
-        // 4. Inventory (from Bot API)
+        /* 
         let inventoryItems = [];
         try {
-            const invResponse = await fetchBot('/api/inventory');
-            if (invResponse.ok) {
-                const invData = await invResponse.json();
+            const invRes = await fetchBot('/api/inventory', { method: 'GET' });
+            if (invRes.ok) {
+                const invData = await invRes.json();
                 inventoryItems = invData.items || [];
             }
         } catch (e) {
-            console.error("Failed to fetch inventory for report:", e);
+            console.error("Report Generator: Inventory Fetch Error", e);
         }
+        */
 
         // 5. HR Metrics
         const membersAdded = await Employee.countDocuments({ joinedAt: { $gte: start, $lte: end } });
@@ -193,7 +194,7 @@ export async function generateFullShopReportData(startDate: Date, endDate: Date)
                     totalSalaries,
                     netProfit: totalIncome - totalExpense - totalSalaries
                 },
-                inventory: inventoryItems,
+                inventory: [], // Commented out: inventoryItems,
                 hr: {
                     membersAdded,
                     membersRemoved: 0,
