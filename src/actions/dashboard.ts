@@ -31,7 +31,7 @@ const fetchDashboardData = unstable_cache(
                     .lean(),
 
                 Employee.find({ status: 'Active' })
-                    .select('userId username rank status joinedAt bankAccountNo loginId mpin')
+                    .select('userId username rank status joinedAt bankAccountNo loginId mpin unpaidSalary')
                     .sort({ rank: 1, username: 1 })
                     .lean(),
 
