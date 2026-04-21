@@ -54,6 +54,7 @@ import { Clock, RefreshCw, Users, ShoppingCart, Package, DollarSign, Activity, L
 import { OrderRow } from '@/components/dashboard/OrderRowShared';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 interface PortalDashboardClientProps {
     currentUser: any;
@@ -87,6 +88,8 @@ export function PortalDashboardClient({
     const highPriorityOrders = activeOrders.filter((o: any) => ['Pending', 'In Progress', 'Processing'].includes(o.status));
     const activeContracts = recurringOrders.filter((o: any) => o.status === 'Active');
     const endedContracts = recurringOrders.filter((o: any) => o.status === 'Ended');
+    const { toast } = useToast();
+
     // Calculate User's Salary
     const [todaySalary, setTodaySalary] = useState<any>(dailySalaries.find((ds: any) => ds.userId === currentUser?.userId) || null);
     const [totalUnpaid, setTotalUnpaid] = useState<number>(currentUser?.unpaidSalary || 0);
@@ -101,7 +104,16 @@ export function PortalDashboardClient({
     }, [earningsCooldown]);
 
     const handleRefreshEarnings = async () => {
-        if (earningsCooldown > 0 || isRefreshingEarnings) return;
+        if (earningsCooldown > 0) {
+            toast({ 
+                title: 'Please Wait', 
+                description: `Refresh is on cooldown for ${earningsCooldown} more seconds.`, 
+                variant: 'destructive',
+                className: 'border-orange-500/50 bg-orange-500/10 text-orange-500' 
+            });
+            return;
+        }
+        if (isRefreshingEarnings) return;
 
         setIsRefreshingEarnings(true);
         try {
@@ -110,7 +122,7 @@ export function PortalDashboardClient({
             if (res.success) {
                 setTodaySalary(res.todaySalary);
                 setTotalUnpaid(res.unpaidSalary || 0);
-                setEarningsCooldown(60); // 60 seconds cooldown
+                setEarningsCooldown(30); // 30 seconds cooldown
             }
         } catch (err) {
             console.error("Failed to refresh earnings", err);
@@ -137,10 +149,9 @@ export function PortalDashboardClient({
                                 <Button 
                                     variant="ghost" 
                                     size="icon" 
-                                    className="h-6 w-6 opacity-50 hover:opacity-100" 
+                                    className={`h-6 w-6 transition-all ${earningsCooldown > 0 ? 'opacity-30 cursor-not-allowed hover:bg-transparent' : 'opacity-50 hover:opacity-100'}`} 
                                     onClick={handleRefreshEarnings}
-                                    disabled={isRefreshingEarnings || earningsCooldown > 0}
-                                    title={earningsCooldown > 0 ? `Wait ${earningsCooldown}s` : "Refresh Earnings"}
+                                    title={earningsCooldown > 0 ? `Wait ${earningsCooldown}s to refresh` : "Refresh Earnings"}
                                 >
                                     <RefreshCw className={`w-3 h-3 ${isRefreshingEarnings ? 'animate-spin' : ''}`} />
                                 </Button>

@@ -109,8 +109,46 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
     const endedContracts = recurringOrders.filter((o: any) => o.status === 'Ended');
 
     // Calculate User's Salary
-    const todaySalary = dailySalaries.find((ds: any) => ds.userId === currentUser?.userId);
-    const totalUnpaid = currentUser?.unpaidSalary || 0;
+    const [todaySalary, setTodaySalary] = useState<any>(dailySalaries.find((ds: any) => ds.userId === currentUser?.userId) || null);
+    const [totalUnpaid, setTotalUnpaid] = useState<number>(currentUser?.unpaidSalary || 0);
+
+    const [isRefreshingEarnings, setIsRefreshingEarnings] = useState(false);
+    const [earningsCooldown, setEarningsCooldown] = useState(0);
+
+    useEffect(() => {
+        if (earningsCooldown > 0) {
+            const timer = setTimeout(() => setEarningsCooldown(earningsCooldown - 1), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [earningsCooldown]);
+
+    const handleRefreshEarnings = async () => {
+        if (earningsCooldown > 0) {
+            toast({ 
+                title: 'Please Wait', 
+                description: `Refresh is on cooldown for ${earningsCooldown} more seconds.`, 
+                variant: 'destructive',
+                className: 'border-orange-500/50 bg-orange-500/10 text-orange-500' 
+            });
+            return;
+        }
+        if (isRefreshingEarnings) return;
+
+        setIsRefreshingEarnings(true);
+        try {
+            const mod = await import('@/actions/dashboard');
+            const res = await mod.getEmployeeEarnings(currentUser?.userId);
+            if (res.success) {
+                setTodaySalary(res.todaySalary);
+                setTotalUnpaid(res.unpaidSalary || 0);
+                setEarningsCooldown(30); 
+            }
+        } catch (err) {
+            console.error("Failed to refresh earnings", err);
+        } finally {
+            setIsRefreshingEarnings(false);
+        }
+    };
 
     const handleEndContract = async (contractId: string) => {
         if (!confirm('Are you sure you want to end this recurring contract? This action cannot be undone.')) return;
@@ -296,7 +334,18 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                         <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm text-muted-foreground font-medium uppercase tracking-wider flex items-center justify-between">
-                                <span>Earnings Overview</span>
+                                <span className="flex items-center gap-2">
+                                    Earnings Overview
+                                    <Button 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        className={`h-6 w-6 transition-all ${earningsCooldown > 0 ? 'opacity-30 cursor-not-allowed hover:bg-transparent' : 'opacity-50 hover:opacity-100'}`} 
+                                        onClick={handleRefreshEarnings}
+                                        title={earningsCooldown > 0 ? `Wait ${earningsCooldown}s to refresh` : "Refresh Earnings"}
+                                    >
+                                        <RefreshCw className={`w-3 h-3 ${isRefreshingEarnings ? 'animate-spin' : ''}`} />
+                                    </Button>
+                                </span>
                                 <DollarSign className="w-4 h-4 text-orange-400" />
                             </CardTitle>
                         </CardHeader>
