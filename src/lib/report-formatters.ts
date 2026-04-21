@@ -337,7 +337,7 @@ ${separator}
 `.replace(/^\n/, '');
 }
 
-export function formatRecurringContract(data: any, clientName: string, clientRep: string, providerName: string) {
+export function formatRecurringContract(data: any, clientName: string, clientRep: string, providerName: string, discount: number = 0) {
     const fmt = (n: number) => `$ ${n.toLocaleString('en-US', { minimumFractionDigits: 0 })}`;
     const center = (str: string, width: number = 80) => {
         const padding = Math.max(0, Math.floor((width - str.length) / 2));
@@ -359,7 +359,8 @@ export function formatRecurringContract(data: any, clientName: string, clientRep
         return `${(i + 1).toString().padEnd(3)} ${(item.description.substring(0, 30)).padEnd(30)} ${(item.quantity.toString()).padEnd(8)} ${fmt(item.price).padEnd(12)} ${fmt(total)}`;
     }).join('\n');
 
-    const recurringCost = subtotal;
+    const discountAmount = (subtotal * discount) / 100;
+    const recurringCost = subtotal - discountAmount;
     const totalPayablePerCycle = recurringCost + data.deliveryFee;
 
     // Auto-calculate security deposit if 0 (2x cycle)
@@ -403,6 +404,8 @@ TOTALS   Total Qty: ${totalQty.toString().padEnd(10)}            ${fmt(subtotal)
 4. FINANCIAL SUMMARY & PAYMENT TERMS
 A. PRICING
 ${separator}
+${tableRow("Item Subtotal", fmt(subtotal))}
+${discount > 0 ? tableRow(`Discount (${discount}%)`, `-${fmt(discountAmount)}`) : ''}
 ${tableRow("Recurring Cost Per Cycle", fmt(recurringCost))}
 ${tableRow("Delivery/Handling Fee", fmt(data.deliveryFee))}
 ${separator}
@@ -421,10 +424,6 @@ C. BILLING & PAYMENT SCHEDULE: Select the agreed payment method for the recurrin
 [${data.paymentMethod === 'Pay-on-Collection' ? 'X' : ' '}] Pay-on-Collection: Payment must be cleared in full at the time of pickup/handover each week.
 
 [${data.paymentMethod === 'Weekly Invoice' ? 'X' : ' '}] Weekly Invoice: Invoice generated on Monday; Due by Friday of the same week.
-
-D. LATE FEES
-
-A late fee of ${fmt(data.lateFee)} applies to any payment overdue by more than 3 days.
 
 5. TERMS & CONDITIONS
 1. Order Modifications: Permanent changes to the Standing Order must be requested 7 days in advance. Temporary changes for a specific week require 48 hours notice.

@@ -14,7 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
-import { CalendarIcon, Package, User, DollarSign, RefreshCw, Send, X, Check, Truck, Loader2, Info, ShieldCheck, LayoutGrid, List, Plus, Trash2 } from 'lucide-react';
+import { CalendarIcon, Package, User, DollarSign, RefreshCw, Send, X, Check, Truck, Loader2, Info, ShieldCheck, LayoutGrid, List, Plus, Trash2, Activity } from 'lucide-react';
 // Import Kanban Board Component
 import { KanbanBoard } from '@/components/dashboard/KanbanBoard';
 import { useToast } from '@/hooks/use-toast';
@@ -715,18 +715,24 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <Label>Discount (%)</Label>
-                                                <Input type="number" placeholder="0" value={recurringForm.discount} onChange={e => setRecurringForm({ ...recurringForm, discount: e.target.value })} />
+                                                <Label className="flex items-center gap-1.5"><DollarSign className="w-3.5 h-3.5 text-red-400" /> Discount (%)</Label>
+                                                <Input 
+                                                    type="number" 
+                                                    placeholder="Enter discount percentage (e.g. 10)" 
+                                                    value={recurringForm.discount} 
+                                                    onChange={e => setRecurringForm({ ...recurringForm, discount: e.target.value })} 
+                                                    className="bg-black/40 border-white/10"
+                                                />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>Security Deposit ($)</Label>
+                                                <Label className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-orange-400" /> Security Deposit ($)</Label>
                                                 <Input
                                                     type="number"
-                                                    placeholder={recurringForm.isAutoDeposit ? "Auto-calculated" : "Custom amount"}
+                                                    placeholder={recurringForm.isAutoDeposit ? "Auto-calculated (2x)" : "Enter custom amount"}
                                                     value={recurringForm.isAutoDeposit ? recurringTotals.autoDeposit : recurringForm.securityDeposit}
                                                     onChange={e => !recurringForm.isAutoDeposit && setRecurringForm({ ...recurringForm, securityDeposit: e.target.value })}
                                                     disabled={recurringForm.isAutoDeposit}
-                                                    className={recurringForm.isAutoDeposit ? "bg-black/20 text-muted-foreground cursor-not-allowed" : ""}
+                                                    className={recurringForm.isAutoDeposit ? "bg-black/20 text-muted-foreground cursor-not-allowed border-white/5" : "bg-black/40 border-white/10"}
                                                 />
                                             </div>
                                         </div>
@@ -743,23 +749,32 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                             </Label>
                                         </div>
 
-                                        <div className="p-4 bg-black/40 rounded-lg border border-green-500/10 space-y-2 shadow-inner">
+                                        <div className="p-4 bg-black/40 rounded-lg border border-green-500/20 space-y-3 shadow-inner">
                                             <div className="flex justify-between items-center text-sm">
-                                                <span className="text-muted-foreground">Contract Subtotal:</span>
-                                                <span className="font-mono text-white">${recurringTotals.subtotal.toLocaleString()}</span>
+                                                <span className="text-muted-foreground">Base Total Amount:</span>
+                                                <span className="font-mono text-white font-medium">${recurringTotals.subtotal.toLocaleString()}</span>
                                             </div>
                                             {recurringTotals.discountAmount > 0 && (
-                                                <div className="flex justify-between items-center text-sm">
-                                                    <span className="text-muted-foreground">Discount ({recurringForm.discount}%):</span>
-                                                    <span className="font-mono text-red-400">-${recurringTotals.discountAmount.toLocaleString()}</span>
+                                                <div className="flex justify-between items-center text-sm py-1 px-2 bg-red-400/5 rounded border border-red-400/10">
+                                                    <span className="text-red-400/80 flex items-center gap-1">
+                                                        <Activity className="w-3 h-3" /> Discount ({recurringForm.discount}%):
+                                                    </span>
+                                                    <span className="font-mono text-red-400 font-bold">-${recurringTotals.discountAmount.toLocaleString()}</span>
                                                 </div>
                                             )}
-                                            <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                                                <span className="font-bold text-green-400">AMOUNT PER DELIVERY:</span>
-                                                <span className="font-bold text-xl text-green-400 font-mono">${recurringTotals.deliveryAmount.toLocaleString()}</span>
+                                            <div className="flex justify-between items-center pt-3 border-t border-white/10">
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-green-400 text-xs uppercase tracking-wider">Final Amount</span>
+                                                    <span className="text-[10px] text-muted-foreground">Per Delivery</span>
+                                                </div>
+                                                <span className="font-bold text-2xl text-green-400 font-mono drop-shadow-[0_0_8px_rgba(74,222,128,0.3)]">
+                                                    ${recurringTotals.deliveryAmount.toLocaleString()}
+                                                </span>
                                             </div>
-                                            <div className="flex justify-between items-center text-sm">
-                                                <span className="text-muted-foreground">Security Deposit:</span>
+                                            <div className="flex justify-between items-center text-xs pt-1 border-t border-white/5 opacity-80">
+                                                <span className="text-muted-foreground flex items-center gap-1">
+                                                    <ShieldCheck className="w-3 h-3" /> Security Deposit:
+                                                </span>
                                                 <span className="font-mono text-orange-400">${recurringTotals.finalDeposit.toLocaleString()}</span>
                                             </div>
                                         </div>

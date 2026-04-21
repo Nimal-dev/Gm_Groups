@@ -34,8 +34,8 @@ const RecurringFormSchema = z.object({
     collectionTime: z.string().min(1, "Time required"),
     deliveryFee: z.number().min(0),
     securityDeposit: z.number().min(0),
-    lateFee: z.number().min(0),
     paymentMethod: z.enum(["Pay-on-Collection", "Weekly Invoice"]),
+    discount: z.number().min(0).max(100).optional(),
     items: z.array(ItemSchema)
 });
 type RecurringFormValues = z.infer<typeof RecurringFormSchema>;
@@ -126,10 +126,10 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
             frequency: "Weekly",
             collectionDay: "Monday",
             collectionTime: "10:30PM",
-            deliveryFee: 100000,
+            deliveryFee: 0,
             securityDeposit: 0,
-            lateFee: 50000000,
             paymentMethod: "Weekly Invoice",
+            discount: 0,
             items: []
         }
     });
@@ -202,7 +202,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                 const isValid = await recurringForm.trigger();
                 if (!isValid) throw new Error("Please correct contract errors.");
                 const data = recurringForm.getValues();
-                reportText = formatRecurringContract(data, reportTo, clientRep, reportFrom);
+                reportText = formatRecurringContract(data, reportTo, clientRep, reportFrom, data.discount || 0);
             }
             else if (reportType === 'Full Shop Report') {
                 const isValid = await reportForm.trigger();
@@ -402,12 +402,13 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                             <div className="grid grid-cols-2 gap-4 border-t border-white/10 pt-4">
                                 <div className="space-y-2">
                                     <Label>Delivery Fee</Label>
-                                    <Input type="number" {...recurringForm.register('deliveryFee', { valueAsNumber: true })} className="glass-input" />
+                                    <Input type="number" placeholder="0" {...recurringForm.register('deliveryFee', { valueAsNumber: true })} className="glass-input" />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label>Late Fee</Label>
-                                    <Input type="number" {...recurringForm.register('lateFee', { valueAsNumber: true })} className="glass-input" />
-                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Discount (%)</Label>
+                                <Input type="number" placeholder="0" {...recurringForm.register('discount', { valueAsNumber: true })} className="glass-input" />
                             </div>
 
                             <div className="space-y-2">
@@ -427,6 +428,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                                 </div>
                                 <Input
                                     type="number"
+                                    placeholder="0"
                                     {...recurringForm.register('securityDeposit', { valueAsNumber: true })}
                                     className={`glass-input ${autoCalcDeposit ? 'opacity-70' : ''}`}
                                     readOnly={autoCalcDeposit}
