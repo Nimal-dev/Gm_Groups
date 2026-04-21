@@ -267,3 +267,28 @@ export async function getLiveActiveStaff() {
         return { success: false, error: error.message };
     }
 }
+
+export async function getEmployeeEarnings(userId: string) {
+    if (!userId) return { success: false, error: 'No user ID provided' };
+    try {
+        await connectToDatabase();
+        const employee = await Employee.findOne({ userId }).select('unpaidSalary').lean();
+        const dailySalary = await DailySalary.findOne({ 
+            userId,
+            date: new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }) 
+        }).lean();
+
+        return { 
+            success: true, 
+            unpaidSalary: employee?.unpaidSalary || 0,
+            todaySalary: dailySalary ? {
+                ...dailySalary,
+                _id: dailySalary._id.toString(),
+                lastUpdated: dailySalary.lastUpdated ? new Date(dailySalary.lastUpdated).toISOString() : null
+            } : null
+        };
+    } catch (error: any) {
+        console.error('Earnings Fetch Error:', error);
+        return { success: false, error: error.message };
+    }
+}

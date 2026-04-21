@@ -329,100 +329,112 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
 
             {/* Dialog Form */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="glass-card border-white/10 w-[95vw] max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>{editingEmployee ? 'Edit Employee' : 'Add Employee'}</DialogTitle>
-                        <DialogDescription>
-                            {editingEmployee ? 'Update employee details.' : 'Add a new member to the roster.'}
-                        </DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="space-y-2">
-                            <Label>User ID (Discord)</Label>
-                            <Input
-                                {...form.register('userId')}
-                                placeholder="123456789..."
-                                disabled={!!editingEmployee} // Cannot change ID on edit
-                                className="bg-black/20 border-white/10"
-                            />
-                            {form.formState.errors.userId && <p className="text-xs text-destructive">{form.formState.errors.userId.message}</p>}
+                <DialogContent className="glass-card border-white/10 w-[95vw] max-w-[425px] max-h-[90vh] flex flex-col p-0 overflow-hidden">
+                    <div className="p-6 pb-2">
+                        <DialogHeader>
+                            <DialogTitle>{editingEmployee ? 'Edit Employee' : 'Add Employee'}</DialogTitle>
+                            <DialogDescription>
+                                {editingEmployee ? 'Update employee details.' : 'Add a new member to the roster.'}
+                            </DialogDescription>
+                        </DialogHeader>
+                    </div>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 flex flex-col min-h-0">
+                        <ScrollArea className="flex-1 px-6">
+                            <div className="space-y-4 pb-6">
+                                <div className="space-y-2">
+                                    <Label>User ID (Discord)</Label>
+                                    <Input
+                                        {...form.register('userId')}
+                                        placeholder="123456789..."
+                                        disabled={!!editingEmployee} // Cannot change ID on edit
+                                        className="bg-black/20 border-white/10"
+                                    />
+                                    {form.formState.errors.userId && <p className="text-xs text-destructive">{form.formState.errors.userId.message}</p>}
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Username</Label>
+                                    <Input
+                                        {...form.register('username')}
+                                        placeholder="Discord Username"
+                                        className="bg-black/20 border-white/10"
+                                    />
+                                    {form.formState.errors.username && <p className="text-xs text-destructive">{form.formState.errors.username.message}</p>}
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Nickname (Display Name)</Label>
+                                    <Input
+                                        {...form.register('nickname')}
+                                        placeholder="Dante Valestro"
+                                        className="bg-black/20 border-white/10"
+                                    />
+                                    {form.formState.errors.nickname && <p className="text-xs text-destructive">{form.formState.errors.nickname.message}</p>}
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Login ID (For Mobile Login)</Label>
+                                    <Input
+                                        {...form.register('loginId')}
+                                        placeholder="Custom ID (Alphabets/Numbers)"
+                                        className="bg-black/20 border-white/10 font-mono"
+                                    />
+                                    {form.formState.errors.loginId && <p className="text-xs text-destructive">{form.formState.errors.loginId.message}</p>}
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>MPIN (Mobile Login)</Label>
+                                    <Input
+                                        {...form.register('mpin')}
+                                        placeholder="4-digit PIN (e.g., 1234)"
+                                        maxLength={10}
+                                        className="bg-black/20 border-white/10 font-mono"
+                                        onInput={(e) => {
+                                            const val = e.currentTarget.value.replace(/[^0-9]/g, '');
+                                            e.currentTarget.value = val;
+                                        }}
+                                    />
+                                    {form.formState.errors.mpin && <p className="text-xs text-destructive">{form.formState.errors.mpin.message}</p>}
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Rank</Label>
+                                    <Input
+                                        {...form.register('rank')}
+                                        placeholder="Trainee, Manager..."
+                                        className="bg-black/20 border-white/10"
+                                    />
+                                    {form.formState.errors.rank && <p className="text-xs text-destructive">{form.formState.errors.rank.message}</p>}
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Bank Account No.</Label>
+                                    <Input
+                                        {...form.register('bankAccountNo')}
+                                        placeholder="Account Number"
+                                        className="bg-black/20 border-white/10"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Status</Label>
+                                    <Select
+                                        onValueChange={(val: any) => form.setValue('status', val)}
+                                        defaultValue={form.getValues('status')}
+                                    >
+                                        <SelectTrigger className="bg-black/20 border-white/10">
+                                            <SelectValue placeholder="Select status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Active">Active</SelectItem>
+                                            <SelectItem value="Inactive">Inactive</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                        </ScrollArea>
+                        <div className="p-6 pt-2 border-t border-white/5">
+                            <DialogFooter>
+                                <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+                                <Button type="submit" disabled={isLoading} className="bg-accent text-white">
+                                    {isLoading && <Loader2 className="w-4 h4 mr-2 animate-spin" />}
+                                    Save Changes
+                                </Button>
+                            </DialogFooter>
                         </div>
-                        <div className="space-y-2">
-                            <Label>Username</Label>
-                            <Input
-                                {...form.register('username')}
-                                placeholder="Discord Username"
-                                className="bg-black/20 border-white/10"
-                            />
-                            {form.formState.errors.username && <p className="text-xs text-destructive">{form.formState.errors.username.message}</p>}
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Nickname (Display Name)</Label>
-                            <Input
-                                {...form.register('nickname')}
-                                placeholder="Dante Valestro"
-                                className="bg-black/20 border-white/10"
-                            />
-                            {form.formState.errors.nickname && <p className="text-xs text-destructive">{form.formState.errors.nickname.message}</p>}
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Login ID (For Mobile Login)</Label>
-                            <Input
-                                {...form.register('loginId')}
-                                placeholder="Custom ID (Alphabets/Numbers)"
-                                className="bg-black/20 border-white/10 font-mono"
-                            />
-                            {form.formState.errors.loginId && <p className="text-xs text-destructive">{form.formState.errors.loginId.message}</p>}
-                        </div>
-                        <div className="space-y-2">
-                            <Label>MPIN (Mobile Login)</Label>
-                            <Input
-                                {...form.register('mpin')}
-                                placeholder="4-digit PIN (e.g., 1234)"
-                                maxLength={10}
-                                className="bg-black/20 border-white/10 font-mono"
-                            />
-                            {form.formState.errors.mpin && <p className="text-xs text-destructive">{form.formState.errors.mpin.message}</p>}
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Rank</Label>
-                            <Input
-                                {...form.register('rank')}
-                                placeholder="Trainee, Manager..."
-                                className="bg-black/20 border-white/10"
-                            />
-                            {form.formState.errors.rank && <p className="text-xs text-destructive">{form.formState.errors.rank.message}</p>}
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Bank Account No.</Label>
-                            <Input
-                                {...form.register('bankAccountNo')}
-                                placeholder="Account Number"
-                                className="bg-black/20 border-white/10"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Status</Label>
-                            <Select
-                                onValueChange={(val: any) => form.setValue('status', val)}
-                                defaultValue={form.getValues('status')}
-                            >
-                                <SelectTrigger className="bg-black/20 border-white/10">
-                                    <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Active">Active</SelectItem>
-                                    <SelectItem value="Inactive">Inactive</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <DialogFooter className="mt-4">
-                            <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                            <Button type="submit" disabled={isLoading} className="bg-accent text-white">
-                                {isLoading && <Loader2 className="w-4 h4 mr-2 animate-spin" />}
-                                Save Changes
-                            </Button>
-                        </DialogFooter>
                     </form>
                 </DialogContent>
             </Dialog>
