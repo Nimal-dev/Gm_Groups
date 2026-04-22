@@ -92,8 +92,8 @@ export default function LoginPage() {
 
                     <CardContent className="space-y-5 relative z-10">
 
-                        {/* Method Toggle */}
-                        <div className="flex p-1 bg-black/40 rounded-lg border border-white/5 mb-6">
+                        {/* Method Toggle - Hidden as only MPIN is allowed for now */}
+                        {/* <div className="flex p-1 bg-black/40 rounded-lg border border-white/5 mb-6">
                             <button
                                 onClick={() => setLoginMethod('mpin')}
                                 className={`flex-1 text-xs font-medium py-2 rounded-md transition-all ${loginMethod === 'mpin' ? 'bg-accent text-white shadow-lg' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
@@ -106,11 +106,11 @@ export default function LoginPage() {
                             >
                                 Discord OAuth
                             </button>
-                        </div>
+                        </div> */}
 
                         <div className="min-h-[180px]">
                             <AnimatePresence mode="wait">
-                                {loginMethod === 'mpin' ? (
+                                {loginMethod === 'mpin' && (
                                     <motion.div
                                         key="mpin-form"
                                         initial={{ opacity: 0, x: -20 }}
@@ -157,7 +157,9 @@ export default function LoginPage() {
                                             <MpinSubmitButton />
                                         </form>
                                     </motion.div>
-                                ) : (
+                                )}
+                                {/* Discord auth commented out for now
+                                {loginMethod === 'discord' && (
                                     <motion.div
                                         key="discord-form"
                                         initial={{ opacity: 0, x: 20 }}
@@ -173,7 +175,7 @@ export default function LoginPage() {
                                             <DiscordButton />
                                         </form>
                                     </motion.div>
-                                )}
+                                )} */}
                             </AnimatePresence>
                         </div>
 
