@@ -339,7 +339,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                         </DialogHeader>
                     </div>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 flex flex-col min-h-0">
-                        <ScrollArea className="flex-1 px-6">
+                        <div className="flex-1 overflow-y-auto px-6">
                             <div className="space-y-4 pb-6">
                                 <div className="space-y-2">
                                     <Label>User ID (Discord)</Label>
@@ -425,7 +425,7 @@ export function EmployeeManagement({ employees }: EmployeeManagementProps) {
                                     </Select>
                                 </div>
                             </div>
-                        </ScrollArea>
+                        </div>
                         <div className="p-6 pt-2 border-t border-white/5">
                             <DialogFooter>
                                 <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
