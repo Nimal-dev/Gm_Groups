@@ -74,13 +74,13 @@ export const MENU_ITEMS: MenuItem[] = [
         name: 'Ramen',
         category: 'Food',
         batchSize: 15,
-        prepTime: '50s',
+        prepTime: '30s',
         finishedWeight: 6.0,
         ingredients: [
-            { materialId: 'pork_broth', quantity: 60 },
-            { materialId: 'ramen_noodles', quantity: 60 },
-            { materialId: 'egg', quantity: 60 },
-            { materialId: 'chashu_pork', quantity: 60 },
+            { materialId: 'pork_broth', quantity: 45 },
+            { materialId: 'ramen_noodles', quantity: 45 },
+            { materialId: 'egg', quantity: 45 },
+            { materialId: 'chashu_pork', quantity: 45 },
         ]
     },
     {
@@ -88,7 +88,7 @@ export const MENU_ITEMS: MenuItem[] = [
         name: 'Dragon Roll',
         category: 'Food',
         batchSize: 15,
-        prepTime: '73s',
+        prepTime: '30s',
         finishedWeight: 3.8,
         ingredients: [
             { materialId: 'sushi_rice', quantity: 30 },
@@ -104,7 +104,7 @@ export const MENU_ITEMS: MenuItem[] = [
         name: 'Garden Salad',
         category: 'Food',
         batchSize: 9,
-        prepTime: '6s',
+        prepTime: '15s',
         finishedWeight: 1.8,
         ingredients: [
             { materialId: 'lettuce', quantity: 18 },
@@ -130,15 +130,15 @@ export const MENU_ITEMS: MenuItem[] = [
         id: 'virgin_mojito',
         name: 'Virgin Mojito',
         category: 'Beverage',
-        batchSize: 3,
+        batchSize: 15,
         prepTime: '10s',
         finishedWeight: 0.5,
         ingredients: [
-            { materialId: 'lime', quantity: 9 },
-            { materialId: 'fresh_mint', quantity: 9 },
-            { materialId: 'sugar', quantity: 6 },
-            { materialId: 'carbonated_water', quantity: 6 },
-            { materialId: 'glass_cup', quantity: 3 },
+            { materialId: 'lime', quantity: 45 },
+            { materialId: 'fresh_mint', quantity: 45 },
+            { materialId: 'sugar', quantity: 30 },
+            { materialId: 'carbonated_water', quantity: 30 },
+            { materialId: 'glass_cup', quantity: 15 },
         ]
     },
     {
