@@ -84,7 +84,8 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
         intervalDays: '7',
         deliveryDetails: '',
         securityDeposit: '',
-        isAutoDeposit: true
+        isAutoDeposit: true,
+        deliveryDay: 'Monday'
     });
 
     const [pendingCount, setPendingCount] = useState(0);
@@ -172,7 +173,8 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
             items: itemsText,
             amount: recurringTotals.deliveryAmount.toString(),
             intervalDays: parseInt(recurringForm.intervalDays),
-            securityDeposit: recurringTotals.finalDeposit
+            securityDeposit: recurringTotals.finalDeposit,
+            deliveryDay: recurringForm.deliveryDay
         });
         setLoading(false);
         if (res.success) {
@@ -187,7 +189,8 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                 intervalDays: '7',
                 deliveryDetails: '',
                 securityDeposit: '',
-                isAutoDeposit: true
+                isAutoDeposit: true,
+                deliveryDay: 'Monday'
             });
         } else {
             toast({ variant: 'destructive', title: 'Error', description: res.error });
@@ -378,55 +381,133 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                     {/* ACTIVE CONTRACTS TAB */}
                     <TabsContent value="contracts" className="space-y-4">
                         <ScrollArea className="h-[600px] pr-4">
-                            <div className="space-y-3">
-                                {recurringOrders && recurringOrders.length > 0 ? recurringOrders.map((contract: any) => (
-                                    <div key={contract._id} className="p-4 rounded-lg bg-green-500/5 border border-green-500/20 hover:border-green-500/40 transition-all">
-                                        <div className="flex flex-col md:flex-row justify-between gap-4">
-                                            <div className="flex-1 space-y-2">
-                                                <div className="flex items-center gap-2">
-                                                    <Badge className="bg-green-500 text-black hover:bg-green-600">Active Contract</Badge>
-                                                    <span className="font-bold text-lg">{contract.customer}</span>
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm text-muted-foreground">
-                                                    <span className="flex items-center gap-2"><User className="w-3 h-3 text-accent" /> Rep: {contract.clientRep || 'N/A'}</span>
-                                                    <span className="flex items-center gap-2"><DollarSign className="w-3 h-3 text-green-400" /> {contract.amount} / delivery</span>
-                                                    <span className="flex items-center gap-2"><ShieldCheck className="w-3 h-3 text-orange-400" /> Deposit: {contract.securityDeposit ? `$${contract.securityDeposit}` : 'N/A'}</span>
-                                                    <span className="flex items-center gap-2"><RefreshCw className="w-3 h-3 text-blue-400" /> Every {contract.intervalDays} Days</span>
-                                                    <span className="flex items-center gap-2"><CalendarIcon className="w-3 h-3" /> Started: {contract.startDate}</span>
-                                                </div>
+                            <div className="space-y-8">
+                                {(() => {
+                                    if (!recurringOrders || recurringOrders.length === 0) {
+                                        return <div className="text-center py-10 text-muted-foreground">No active recurring contracts.</div>;
+                                    }
+
+                                    const groups: Record<string, any[]> = {
+                                        'Monday': [], 'Tuesday': [], 'Wednesday': [], 'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': [], 'Unassigned': []
+                                    };
+                                    
+                                    recurringOrders.forEach((contract: any) => {
+                                        const day = contract.deliveryDay || 'Unassigned';
+                                        if (groups[day]) {
+                                            groups[day].push(contract);
+                                        } else {
+                                            groups['Unassigned'].push(contract);
+                                        }
+                                    });
+
+                                    return Object.entries(groups).filter(([_, contracts]) => contracts.length > 0).map(([day, contracts]) => (
+                                        <div key={day} className="space-y-3">
+                                            <div className="flex items-center gap-2 mb-2 pb-2 border-b border-white/10">
+                                                <CalendarIcon className="w-5 h-5 text-accent" />
+                                                <h3 className="text-lg font-bold text-white tracking-wide">{day}</h3>
+                                                <Badge variant="outline" className="ml-2 bg-white/5">{contracts.length} Orders</Badge>
                                             </div>
-                                            <div className="flex items-start">
-                                                <Dialog>
-                                                    <DialogTrigger asChild>
-                                                        <Button size="sm" variant="outline" className="border-red-500/50 hover:bg-red-500/10 text-red-400">
-                                                            End Contract
-                                                        </Button>
-                                                    </DialogTrigger>
-                                                    <DialogContent className="glass-card">
-                                                        <DialogHeader>
-                                                            <DialogTitle>End Contract?</DialogTitle>
-                                                            <DialogDescription>
-                                                                This will stop future automated orders for <strong>{contract.customer}</strong>.
-                                                            </DialogDescription>
-                                                        </DialogHeader>
-                                                        <div className="flex justify-end gap-2 mt-4">
-                                                            <Button variant="ghost">Cancel</Button>
-                                                            {/* Implement End Contract Handler if needed, or simple display for now */}
-                                                            <Button variant="destructive" onClick={() => handleEndContract(contract._id)} disabled={loading}>
-                                                                {loading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null} Confirm End
-                                                            </Button>
+                                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                                                {contracts.map((contract: any) => (
+                                                    <div key={contract._id} className="group relative p-5 rounded-xl bg-gradient-to-br from-black/60 to-black/40 border border-white/5 hover:border-green-500/30 shadow-lg hover:shadow-green-500/10 transition-all duration-300">
+                                                        {/* Top Ribbon */}
+                                                        <div className="absolute top-0 right-0 px-3 py-1 bg-green-500/20 text-green-400 text-[10px] font-bold uppercase tracking-widest rounded-bl-lg rounded-tr-xl border-b border-l border-green-500/30">
+                                                            Active
                                                         </div>
-                                                    </DialogContent>
-                                                </Dialog>
+
+                                                        <div className="flex flex-col gap-4">
+                                                            {/* Header section */}
+                                                            <div className="flex flex-col md:flex-row justify-between gap-2 mt-1">
+                                                                <div>
+                                                                    <h4 className="font-bold text-xl text-white group-hover:text-green-400 transition-colors flex items-center gap-2">
+                                                                        {contract.customer}
+                                                                    </h4>
+                                                                    <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-1">
+                                                                        <User className="w-3.5 h-3.5 text-accent" /> {contract.clientRep || 'No Rep Assigned'}
+                                                                    </p>
+                                                                </div>
+                                                                <div className="flex items-center gap-2 bg-green-500/10 px-3 py-1.5 rounded-lg border border-green-500/20 h-fit w-fit">
+                                                                    <DollarSign className="w-4 h-4 text-green-400" />
+                                                                    <span className="font-mono text-lg font-bold text-green-400">{contract.amount}</span>
+                                                                    <span className="text-[10px] text-green-400/70 uppercase tracking-wide">/ delivery</span>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Details Grid */}
+                                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3 py-3 border-y border-white/5">
+                                                                <div className="flex items-center gap-2 text-sm">
+                                                                    <div className="p-1.5 rounded bg-purple-500/10 border border-purple-500/30 shadow-[0_0_8px_rgba(168,85,247,0.2)]">
+                                                                        <CalendarIcon className="w-3.5 h-3.5 text-purple-400" />
+                                                                    </div>
+                                                                    <div className="flex flex-col">
+                                                                        <span className="text-[10px] text-purple-400/80 uppercase tracking-widest font-bold">Delivery Day</span>
+                                                                        <span className="font-bold text-purple-400 drop-shadow-[0_0_2px_rgba(168,85,247,0.5)]">{contract.deliveryDay || 'Unassigned'}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex items-center gap-2 text-sm">
+                                                                    <div className="p-1.5 rounded bg-orange-500/10 border border-orange-500/20">
+                                                                        <ShieldCheck className="w-3.5 h-3.5 text-orange-400" />
+                                                                    </div>
+                                                                    <div className="flex flex-col">
+                                                                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Deposit</span>
+                                                                        <span className="font-medium text-orange-400/90">{contract.securityDeposit ? `$${contract.securityDeposit}` : 'None'}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex items-center gap-2 text-sm">
+                                                                    <div className="p-1.5 rounded bg-blue-500/10 border border-blue-500/20">
+                                                                        <RefreshCw className="w-3.5 h-3.5 text-blue-400" />
+                                                                    </div>
+                                                                    <div className="flex flex-col">
+                                                                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Frequency</span>
+                                                                        <span className="font-medium text-blue-400/90">Every {contract.intervalDays} Days</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Items Section */}
+                                                            <div className="bg-black/50 p-3 rounded-lg border border-white/5">
+                                                                <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                                                    <Package className="w-3 h-3" /> Order Details
+                                                                </p>
+                                                                <div className="text-xs font-mono text-white/80 whitespace-pre-wrap max-h-[120px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
+                                                                    {contract.items}
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            {/* Footer Actions */}
+                                                            <div className="flex items-center justify-between pt-1">
+                                                                <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                                                    <CalendarIcon className="w-3 h-3" /> Started {contract.startDate}
+                                                                </span>
+                                                                <Dialog>
+                                                                    <DialogTrigger asChild>
+                                                                        <Button size="sm" variant="ghost" className="h-8 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors">
+                                                                            <X className="w-3 h-3 mr-1" /> Terminate
+                                                                        </Button>
+                                                                    </DialogTrigger>
+                                                                    <DialogContent className="glass-card">
+                                                                        <DialogHeader>
+                                                                            <DialogTitle className="text-red-400 flex items-center gap-2"><X className="w-5 h-5"/> Terminate Contract</DialogTitle>
+                                                                            <DialogDescription>
+                                                                                This will permanently stop future automated orders for <strong className="text-white">{contract.customer}</strong>. Are you sure?
+                                                                            </DialogDescription>
+                                                                        </DialogHeader>
+                                                                        <div className="flex justify-end gap-2 mt-4">
+                                                                            <Button variant="ghost" className="hover:bg-white/5 border border-white/10">Cancel</Button>
+                                                                            <Button variant="destructive" onClick={() => handleEndContract(contract._id)} disabled={loading} className="bg-red-600 hover:bg-red-700 shadow-lg shadow-red-500/20">
+                                                                                {loading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null} Confirm Termination
+                                                                            </Button>
+                                                                        </div>
+                                                                    </DialogContent>
+                                                                </Dialog>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
-                                        <div className="mt-3 text-xs font-mono bg-black/30 p-2 rounded text-muted-foreground">
-                                            {contract.items}
-                                        </div>
-                                    </div>
-                                )) : (
-                                    <div className="text-center py-10 text-muted-foreground">No active recurring contracts.</div>
-                                )}
+                                    ));
+                                })()}
                             </div>
                         </ScrollArea>
                     </TabsContent>
@@ -779,12 +860,12 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div className="space-y-2 flex flex-col">
                                             <Label>Start Date</Label>
                                             <Popover>
                                                 <PopoverTrigger asChild>
-                                                    <Button variant={"outline"} className={`w-full justify-start text-left font-normal ${!recurringForm.startDate && "text-muted-foreground"}`}>
+                                                    <Button variant={"outline"} className={`w-full justify-start text-left font-normal ${!recurringForm.startDate && "text-muted-foreground"} bg-black/40 border-white/10 hover:bg-white/5`}>
                                                         <CalendarIcon className="mr-2 h-4 w-4" />
                                                         {recurringForm.startDate ? recurringForm.startDate : <span>Pick a date</span>}
                                                     </Button>
@@ -805,9 +886,20 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                             </Popover>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Frequency (Days)</Label>
+                                            <Label>Delivery Day</Label>
+                                            <Select value={recurringForm.deliveryDay} onValueChange={v => setRecurringForm({ ...recurringForm, deliveryDay: v })}>
+                                                <SelectTrigger className="bg-black/40 border-white/10"><SelectValue /></SelectTrigger>
+                                                <SelectContent>
+                                                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                                                        <SelectItem key={day} value={day}>{day}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Frequency</Label>
                                             <Select value={recurringForm.intervalDays} onValueChange={v => setRecurringForm({ ...recurringForm, intervalDays: v })}>
-                                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                                <SelectTrigger className="bg-black/40 border-white/10"><SelectValue /></SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="1">Daily</SelectItem>
                                                     <SelectItem value="3">Every 3 Days</SelectItem>

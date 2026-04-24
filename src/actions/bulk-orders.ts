@@ -37,7 +37,7 @@ export async function createCitizenOrder(data: { to: string, amount: string, eve
     }
 }
 
-export async function createRecurringOrder(data: { customer: string, clientRep?: string, securityDeposit?: number, items: string, amount: string, startDate: string, intervalDays: number, deliveryDetails: string }) {
+export async function createRecurringOrder(data: { customer: string, clientRep?: string, securityDeposit?: number, items: string, amount: string, startDate: string, intervalDays: number, deliveryDetails: string, deliveryDay?: string }) {
     const session = await auth();
     const user = session?.user;
 
@@ -65,6 +65,38 @@ export async function createRecurringOrder(data: { customer: string, clientRep?:
         return { success: true, message: result.message };
     } catch (error: any) {
         console.error('Create Recurring Order Error:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function updateRecurringOrder(contractId: string, data: { customer: string, clientRep?: string, securityDeposit?: number, items: string, amount: string, startDate: string, intervalDays: number, deliveryDay?: string }) {
+    const session = await auth();
+    const user = session?.user;
+
+    if (!user) return { success: false, error: 'Unauthorized' };
+
+    try {
+        const payload = {
+            contractId,
+            ...data,
+            updatedBy: user.name || 'Web User'
+        };
+
+        const { fetchBot } = await import('@/lib/bot-api');
+        const res = await fetchBot('/api/bulk-order/recurring/update', {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            cache: 'no-store'
+        });
+
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to update recurring order');
+
+        revalidateTag('dashboard-data'); // Force refresh
+        await logActivity('Update Recurring Order', `Updated Recurring Order for ${data.customer}.`);
+        return { success: true, message: result.message };
+    } catch (error: any) {
+        console.error('Update Recurring Order Error:', error);
         return { success: false, error: error.message };
     }
 }

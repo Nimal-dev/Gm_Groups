@@ -299,6 +299,10 @@ export function PortalDashboardClient({
                                                     <span>Start Date:</span>
                                                     <span className="text-white">{contract.startDate}</span>
                                                 </div>
+                                                <div className="flex justify-between items-center pt-2 mt-2 border-t border-white/5">
+                                                    <span className="text-purple-400 font-bold uppercase tracking-wider text-[10px]">Delivery Day:</span>
+                                                    <span className="text-purple-400 font-bold bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/30">{contract.deliveryDay || 'Unassigned'}</span>
+                                                </div>
                                             </div>
 
                                             <div className="mt-3 pt-3 border-t border-white/10 max-h-[150px] overflow-y-auto !scrollbar-thin !scrollbar-thumb-white/10">

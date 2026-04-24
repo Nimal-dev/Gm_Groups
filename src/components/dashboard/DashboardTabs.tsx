@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { endRecurringOrder } from '@/actions/bulk-orders';
+import { endRecurringOrder, updateRecurringOrder } from '@/actions/bulk-orders';
 
 import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -11,7 +11,12 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Users, Clock, ShoppingCart, DollarSign, Activity, RefreshCw, X, Loader2 } from 'lucide-react';
+import { Users, Clock, ShoppingCart, DollarSign, Activity, RefreshCw, X, Loader2, Edit } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DutyControl } from '@/components/dashboard/DutyControl';
 import { OrderRow } from '@/components/dashboard/OrderRowShared';
 
@@ -247,6 +252,10 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                                                 <span>Start Date:</span>
                                                 <span className="text-white">{contract.startDate}</span>
                                             </div>
+                                            <div className="flex justify-between items-center pt-2 mt-2 border-t border-white/5">
+                                                <span className="text-purple-400 font-bold uppercase tracking-wider text-[10px]">Delivery Day:</span>
+                                                <span className="text-purple-400 font-bold bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/30">{contract.deliveryDay || 'Unassigned'}</span>
+                                            </div>
                                         </div>
 
                                         <div className="mt-3 pt-3 border-t border-white/10 max-h-[150px] overflow-y-auto !scrollbar-thin !scrollbar-thumb-white/10">
@@ -258,13 +267,14 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                                     </div>
 
                                     {canManageBulk && (
-                                        <div className="mt-4 pt-4 border-t border-white/10 flex justify-end">
+                                        <div className="mt-4 pt-4 border-t border-white/10 flex gap-2 justify-end">
+                                            <EditContractDialog contract={contract} onUpdate={() => { router.refresh(); }} />
                                             <Button
                                                 variant="destructive"
                                                 size="sm"
                                                 onClick={() => handleEndContract(contract._id)}
                                                 disabled={loadingMap[contract._id]}
-                                                className="w-full text-xs h-8"
+                                                className="flex-1 text-xs h-8"
                                             >
                                                 {loadingMap[contract._id] ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <X className="w-3 h-3 mr-2" />} End Contract
                                             </Button>
@@ -699,4 +709,163 @@ function formatContractItems(itemsStr: string) {
         
         return <div key={i} className="text-white/80">{trimmed}</div>;
     });
+}
+
+function EditContractDialog({ contract, onUpdate }: { contract: any, onUpdate: () => void }) {
+    const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const { toast } = useToast();
+
+    // Remove the trailing " Days" from intervalDays if it exists, or just use the number
+    const initialFreq = contract.intervalDays ? contract.intervalDays.toString() : '7';
+
+    const [formData, setFormData] = useState({
+        customer: contract.customer || '',
+        clientRep: contract.clientRep || '',
+        amount: contract.amount ? contract.amount.toString() : '',
+        securityDeposit: contract.securityDeposit ? contract.securityDeposit.toString() : '',
+        startDate: contract.startDate || '',
+        intervalDays: initialFreq,
+        deliveryDay: contract.deliveryDay || 'Unassigned',
+        items: contract.items || ''
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleSelectChange = (name: string, value: string) => {
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async () => {
+        if (!formData.customer || !formData.amount || !formData.startDate || !formData.items) {
+            toast({ title: 'Error', description: 'Please fill out all required fields.', variant: 'destructive' });
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const payload = {
+                customer: formData.customer,
+                clientRep: formData.clientRep,
+                amount: formData.amount,
+                securityDeposit: formData.securityDeposit ? parseFloat(formData.securityDeposit) : 0,
+                startDate: formData.startDate,
+                intervalDays: parseInt(formData.intervalDays, 10),
+                deliveryDay: formData.deliveryDay === 'Unassigned' ? '' : formData.deliveryDay,
+                items: formData.items
+            };
+
+            const res = await updateRecurringOrder(contract._id, payload);
+            if (res.success) {
+                toast({ title: 'Contract Updated', description: 'The recurring contract has been updated successfully.', className: 'bg-green-600 border-none' });
+                setOpen(false);
+                onUpdate();
+            } else {
+                throw new Error(res.error);
+            }
+        } catch (error: any) {
+            toast({ title: 'Error', description: error.message, variant: 'destructive' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="flex-1 text-xs h-8 bg-blue-500/10 border-blue-500/50 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300">
+                    <Edit className="w-3 h-3 mr-2" /> Edit
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[700px] bg-black/60 backdrop-blur-2xl border-white/10 shadow-2xl text-white max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle className="text-xl text-blue-400 flex items-center gap-2">
+                        <Edit className="w-5 h-5" /> Edit Recurring Contract
+                    </DialogTitle>
+                </DialogHeader>
+
+                <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label className="text-zinc-400 text-xs uppercase tracking-wider">Customer Name *</Label>
+                            <Input name="customer" value={formData.customer} onChange={handleChange} className="bg-black/50 border-white/10 text-white placeholder:text-white/30" placeholder="E.g., XMD" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-zinc-400 text-xs uppercase tracking-wider">Client Rep</Label>
+                            <Input name="clientRep" value={formData.clientRep} onChange={handleChange} className="bg-black/50 border-white/10 text-white placeholder:text-white/30" placeholder="Rep Name" />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label className="text-zinc-400 text-xs uppercase tracking-wider">Amount per Order *</Label>
+                            <Input name="amount" value={formData.amount} onChange={handleChange} className="bg-black/50 border-white/10 text-white font-mono placeholder:text-white/30" placeholder="E.g., 5000" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-zinc-400 text-xs uppercase tracking-wider">Security Deposit</Label>
+                            <Input name="securityDeposit" value={formData.securityDeposit} onChange={handleChange} className="bg-black/50 border-white/10 text-white font-mono placeholder:text-white/30" placeholder="E.g., 10000" />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                            <Label className="text-zinc-400 text-xs uppercase tracking-wider">Start Date *</Label>
+                            <Input name="startDate" value={formData.startDate} onChange={handleChange} className="bg-black/50 border-white/10 text-white placeholder:text-white/30" placeholder="DD/MM/YYYY" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-zinc-400 text-xs uppercase tracking-wider">Frequency *</Label>
+                            <Select value={formData.intervalDays} onValueChange={(v) => handleSelectChange('intervalDays', v)}>
+                                <SelectTrigger className="bg-black/50 border-white/10 text-white"><SelectValue /></SelectTrigger>
+                                <SelectContent className="bg-black/80 backdrop-blur-xl border-white/10 text-white">
+                                    <SelectItem value="1" className="hover:bg-white/10 focus:bg-white/10">Daily</SelectItem>
+                                    <SelectItem value="3" className="hover:bg-white/10 focus:bg-white/10">Every 3 Days</SelectItem>
+                                    <SelectItem value="7" className="hover:bg-white/10 focus:bg-white/10">Every 7 Days</SelectItem>
+                                    <SelectItem value="14" className="hover:bg-white/10 focus:bg-white/10">Every 14 Days</SelectItem>
+                                    <SelectItem value="30" className="hover:bg-white/10 focus:bg-white/10">Monthly</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-zinc-400 text-xs uppercase tracking-wider">Delivery Day</Label>
+                            <Select value={formData.deliveryDay} onValueChange={(v) => handleSelectChange('deliveryDay', v)}>
+                                <SelectTrigger className="bg-black/50 border-white/10 text-purple-400"><SelectValue /></SelectTrigger>
+                                <SelectContent className="bg-black/80 backdrop-blur-xl border-white/10 text-white">
+                                    <SelectItem value="Unassigned" className="text-muted-foreground hover:bg-white/10 focus:bg-white/10">Unassigned</SelectItem>
+                                    <SelectItem value="Monday" className="hover:bg-white/10 focus:bg-white/10">Monday</SelectItem>
+                                    <SelectItem value="Tuesday" className="hover:bg-white/10 focus:bg-white/10">Tuesday</SelectItem>
+                                    <SelectItem value="Wednesday" className="hover:bg-white/10 focus:bg-white/10">Wednesday</SelectItem>
+                                    <SelectItem value="Thursday" className="hover:bg-white/10 focus:bg-white/10">Thursday</SelectItem>
+                                    <SelectItem value="Friday" className="hover:bg-white/10 focus:bg-white/10">Friday</SelectItem>
+                                    <SelectItem value="Saturday" className="hover:bg-white/10 focus:bg-white/10">Saturday</SelectItem>
+                                    <SelectItem value="Sunday" className="hover:bg-white/10 focus:bg-white/10">Sunday</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label className="text-zinc-400 text-xs uppercase tracking-wider flex justify-between">
+                            <span>Contract Items & Details *</span>
+                            <span className="text-[10px] text-orange-400 opacity-70 border border-orange-500/30 px-1 rounded bg-orange-500/10">Use text formatting carefully</span>
+                        </Label>
+                        <Textarea 
+                            name="items" 
+                            value={formData.items} 
+                            onChange={handleChange} 
+                            className="bg-black/50 border-white/10 text-white font-mono text-sm min-h-[150px] whitespace-pre-wrap !scrollbar-thin" 
+                        />
+                    </div>
+                </div>
+
+                <DialogFooter className="border-t border-zinc-800 pt-4">
+                    <Button variant="ghost" onClick={() => setOpen(false)} disabled={loading}>Cancel</Button>
+                    <Button onClick={handleSubmit} disabled={loading} className="bg-blue-600 hover:bg-blue-700 text-white">
+                        {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Save Changes
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
 }
