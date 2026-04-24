@@ -200,7 +200,15 @@ export function PortalDashboardClient({
                                 </span>
                             )}
                         </TabsTrigger>
-                        <TabsTrigger value="recurring" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Recurring Orders</TabsTrigger>
+                        <TabsTrigger value="recurring" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent relative">
+                            Recurring Orders
+                            {activeContracts.length > 0 && (
+                                <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                </span>
+                            )}
+                        </TabsTrigger>
                         <TabsTrigger value="food" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Food Log</TabsTrigger>
                         {/* <TabsTrigger value="inventory" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Inventory</TabsTrigger> */}
                         <TabsTrigger value="raw" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Raw Request</TabsTrigger>

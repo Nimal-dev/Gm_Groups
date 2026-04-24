@@ -2,17 +2,17 @@ export const SALES_ITEMS = {
     'food': {
         label: '🍔 Food Items',
         items: [
-            { id: 'bbq_ribs', name: 'BBQ Ribs', price: 24000 },
-            { id: 'dragon_roll', name: 'Dragon Roll', price: 42800 },
-            { id: 'ramen', name: 'Ramen', price: 46000 },
+            { id: 'bbq_ribs', name: 'BBQ Ribs', price: 26400 },
+            { id: 'dragon_roll', name: 'Dragon Roll', price: 47000 },
+            { id: 'ramen', name: 'Ramen', price: 50000 },
             { id: 'garden_salad', name: 'Garden Salad', price: 10000 },
         ]
     },
     'drinks': {
         label: '🍹 Drinks',
         items: [
-            { id: 'matcha_milk_tea', name: 'Matcha Milk Tea', price: 50000 },
-            { id: 'virgin_mojito', name: 'Virgin Mojito', price: 24000 },
+            { id: 'matcha_milk_tea', name: 'Matcha Milk Tea', price: 55000 },
+            { id: 'virgin_mojito', name: 'Virgin Mojito', price: 25800 },
             { id: 'smoothie', name: 'Smoothie', price: 40000 },
         ]
     },

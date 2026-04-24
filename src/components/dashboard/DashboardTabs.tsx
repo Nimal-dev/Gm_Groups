@@ -207,7 +207,15 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                         </>
                     )}
 
-                    <TabsTrigger value="recurring" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Recurring Orders</TabsTrigger>
+                    <TabsTrigger value="recurring" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent relative">
+                        Recurring Orders
+                        {activeContracts.length > 0 && (
+                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                            </span>
+                        )}
+                    </TabsTrigger>
                     <TabsTrigger value="foodlog" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Food Log</TabsTrigger>
                     <TabsTrigger value="saleslog" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Sales Log</TabsTrigger>
 {/* <TabsTrigger value="inventory" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Inventory</TabsTrigger> */}
