@@ -89,9 +89,15 @@ export async function generateReportData(startDate: Date, endDate: Date): Promis
             );
 
             if (t.transactionType === 'WITHDRAW' || isTransferOut) {
-                totalExpense += t.amount;
                 const memoLower = (t.memo || '').toLowerCase();
                 const toLower = (t.transferredTo || '').toLowerCase();
+                
+                // Skip salary transfers because we calculate totalSalaries directly from SalaryLogs
+                if (memoLower.includes('salary')) {
+                    return; // Skip this iteration
+                }
+
+                totalExpense += t.amount;
                 
                 if (
                     memoLower.includes('mlb') || memoLower.includes('ykz') || 
@@ -178,9 +184,18 @@ export async function generateFullShopReportData(startDate: Date, endDate: Date)
 
         transactions.forEach((t: any) => {
             const isTransferOut = t.transactionType === 'TRANSFER' && (
-                t.memo && t.memo.toLowerCase().includes('transfer to')
+                (t.memo && t.memo.toLowerCase().includes('transfer to')) ||
+                (t.transferredTo && t.transferredTo.length > 0)
             );
             if (t.transactionType === 'WITHDRAW' || isTransferOut) {
+                const memoLower = (t.memo || '').toLowerCase();
+                const toLower = (t.transferredTo || '').toLowerCase();
+                
+                // Skip salary transfers to avoid double-counting with totalSalaries
+                if (memoLower.includes('salary')) {
+                    return; // Skip this iteration
+                }
+                
                 totalExpense += t.amount;
             } else {
                 totalIncome += t.amount;
