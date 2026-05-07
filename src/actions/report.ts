@@ -18,6 +18,10 @@ interface ReportData {
     netProfit: number;
     membersAdded: number;
     membersRemoved: number; // Placeholder
+    totalSalaries: number;
+    rawMaterialsExpense: number;
+    miscellaneousExpense: number;
+    miscellaneousDetails: { memo: string; amount: number; date?: string }[];
 }
 
 export interface FullReportData {
@@ -65,25 +69,51 @@ export async function generateReportData(startDate: Date, endDate: Date): Promis
 
         const transactions = await BankTransaction.find(bankParams).lean();
 
+        // Fetch Salary Logs
+        const salaryLogs = await SalaryLog.find({
+            date: { $gte: start, $lte: end }
+        }).lean();
+        const totalSalaries = salaryLogs.reduce((sum: number, log: any) => sum + log.amount, 0);
+
         let totalIncome = 0;
         let totalExpense = 0;
+        let rawMaterialsExpense = 0;
+        let miscellaneousExpense = 0;
+        let miscellaneousDetails: { memo: string; amount: number; date?: string }[] = [];
 
         transactions.forEach((t: any) => {
             // Expenses: WITHDRAW or TRANSFER (Outgoing to someone)
-            // Check 'memo' string for "transfer to". Ignore 'transferredTo' field as it might exist for incoming too.
             const isTransferOut = t.transactionType === 'TRANSFER' && (
-                t.memo && t.memo.toLowerCase().includes('transfer to')
+                (t.memo && t.memo.toLowerCase().includes('transfer to')) ||
+                (t.transferredTo && t.transferredTo.length > 0)
             );
 
             if (t.transactionType === 'WITHDRAW' || isTransferOut) {
                 totalExpense += t.amount;
+                const memoLower = (t.memo || '').toLowerCase();
+                const toLower = (t.transferredTo || '').toLowerCase();
+                
+                if (
+                    memoLower.includes('mlb') || memoLower.includes('ykz') || 
+                    toLower.includes('mlb') || toLower.includes('ykz') ||
+                    toLower.includes('6838311307') || toLower.includes('9144066578')
+                ) {
+                    rawMaterialsExpense += t.amount;
+                } else {
+                    miscellaneousExpense += t.amount;
+                    miscellaneousDetails.push({
+                        memo: t.memo || t.transferredTo || t.transactionType,
+                        amount: t.amount,
+                        date: t.date ? new Date(t.date).toISOString() : undefined
+                    });
+                }
             } else {
                 // Income: DEPOSIT or TRANSFER (Incoming/Internal without specific destination)
                 totalIncome += t.amount;
             }
         });
 
-        const netProfit = totalIncome - totalExpense;
+        const netProfit = totalIncome - totalExpense - totalSalaries;
 
         // Fetch Members Added
         const employeesAdded = await Employee.countDocuments({
@@ -99,7 +129,11 @@ export async function generateReportData(startDate: Date, endDate: Date): Promis
                 totalExpense,
                 netProfit,
                 membersAdded: employeesAdded,
-                membersRemoved: 0 // System does not track removal date yet
+                membersRemoved: 0, // System does not track removal date yet
+                totalSalaries,
+                rawMaterialsExpense,
+                miscellaneousExpense,
+                miscellaneousDetails
             }
         };
     } catch (error: any) {

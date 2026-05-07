@@ -69,6 +69,10 @@ export function formatReport(type: string, data: any, to: string, from: string, 
     const periodStart = new Date(data.startDate).toLocaleDateString('en-GB');
     const periodEnd = new Date(data.endDate).toLocaleDateString('en-GB');
 
+    const miscRows = data.miscellaneousDetails && data.miscellaneousDetails.length > 0
+        ? data.miscellaneousDetails.map((m: any) => `    - ${(m.memo || 'Unknown').substring(0, 30).padEnd(30)} | ${padStart(fmt(m.amount), 20)}`).join('\n')
+        : '    - No miscellaneous expenses                            | ' + padStart('$ 0.00', 20);
+
     return `
 ${center('KOI CAFE')}
 ${center(`${type.toUpperCase()} PERFORMANCE REVIEW`)}
@@ -86,7 +90,15 @@ FINANCIAL OVERVIEW
  Metric                   | Amount
 --------------------------|-----------------------------------------------------
  Total Revenue            | ${padStart(fmt(data.totalIncome), 20)}
- Total Operational Costs  | ${padStart(fmt(data.totalExpense), 20)}
+ Total Operational Costs  | ${padStart(fmt(data.totalExpense + (data.totalSalaries || 0)), 20)}
+ 
+ Breakdown of Costs:
+  - Salary Payouts        | ${padStart(fmt(data.totalSalaries || 0), 20)}
+  - Raw Materials         | ${padStart(fmt(data.rawMaterialsExpense || 0), 20)}
+  - Miscellaneous         | ${padStart(fmt(data.miscellaneousExpense || 0), 20)}
+  
+ Miscellaneous Details:
+${miscRows}
 --------------------------|-----------------------------------------------------
  NET OPERATIONAL PROFIT   | ${padStart(fmt(data.netProfit), 20)}
 --------------------------------------------------------------------------------
