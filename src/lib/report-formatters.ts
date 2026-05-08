@@ -94,7 +94,8 @@ FINANCIAL OVERVIEW
  
  Breakdown of Costs:
   - Salary Payouts        | ${padStart(fmt(data.totalSalaries || 0), 20)}
-  - Raw Materials         | ${padStart(fmt(data.rawMaterialsExpense || 0), 20)}
+  - Raw Materials (YKZ)   | ${padStart(fmt(data.ykzRawMaterials || 0), 20)}
+  - Raw Materials (MLB)   | ${padStart(fmt(data.mlbRawMaterials || 0), 20)}
   - Miscellaneous         | ${padStart(fmt(data.miscellaneousExpense || 0), 20)}
   
  Miscellaneous Details:

@@ -20,6 +20,8 @@ interface ReportData {
     membersRemoved: number; // Placeholder
     totalSalaries: number;
     rawMaterialsExpense: number;
+    ykzRawMaterials: number;
+    mlbRawMaterials: number;
     miscellaneousExpense: number;
     miscellaneousDetails: { memo: string; amount: number; date?: string }[];
 }
@@ -78,6 +80,8 @@ export async function generateReportData(startDate: Date, endDate: Date): Promis
         let totalIncome = 0;
         let totalExpense = 0;
         let rawMaterialsExpense = 0;
+        let ykzRawMaterials = 0;
+        let mlbRawMaterials = 0;
         let miscellaneousExpense = 0;
         let miscellaneousDetails: { memo: string; amount: number; date?: string }[] = [];
 
@@ -99,12 +103,13 @@ export async function generateReportData(startDate: Date, endDate: Date): Promis
 
                 totalExpense += t.amount;
                 
-                if (
-                    memoLower.includes('mlb') || memoLower.includes('ykz') || 
-                    toLower.includes('mlb') || toLower.includes('ykz') ||
-                    toLower.includes('6838311307') || toLower.includes('9144066578')
-                ) {
+                const isYKZ = memoLower.includes('ykz') || toLower.includes('ykz') || toLower.includes('6838311307');
+                const isMLB = memoLower.includes('mlb') || toLower.includes('mlb') || toLower.includes('9144066578');
+
+                if (isYKZ || isMLB) {
                     rawMaterialsExpense += t.amount;
+                    if (isYKZ) ykzRawMaterials += t.amount;
+                    if (isMLB) mlbRawMaterials += t.amount;
                 } else {
                     miscellaneousExpense += t.amount;
                     miscellaneousDetails.push({
@@ -138,6 +143,8 @@ export async function generateReportData(startDate: Date, endDate: Date): Promis
                 membersRemoved: 0, // System does not track removal date yet
                 totalSalaries,
                 rawMaterialsExpense,
+                ykzRawMaterials,
+                mlbRawMaterials,
                 miscellaneousExpense,
                 miscellaneousDetails
             }
