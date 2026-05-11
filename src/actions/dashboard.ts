@@ -10,6 +10,7 @@ import BankBalanceLog from '@/models/BankBalanceLog';
 import RecurringOrder from '@/models/RecurringOrder';
 import DailySalary from '@/models/DailySalary';
 import { unstable_cache } from 'next/cache';
+import { getLocalStartOfMonth } from '@/lib/date-utils';
 
 // Internal data fetching function
 const fetchDashboardData = unstable_cache(
@@ -107,7 +108,7 @@ const fetchDashboardData = unstable_cache(
             }));
 
             // Fetch Bank Stats (Current Month) - Aggregation is efficient
-            const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+            const startOfMonth = getLocalStartOfMonth();
 
             const bankData = await BankTransaction.aggregate([
                 { $match: { date: { $gte: startOfMonth } } },

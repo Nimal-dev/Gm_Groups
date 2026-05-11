@@ -1,4 +1,5 @@
 import { calculateBulkOrderSurcharge } from './pricing-utils';
+import { formatLocalDate } from './date-utils';
 
 export function formatInvoice(items: { description: string; quantity: number; price: number }[], discountStr: string, to: string, from: string) {
     const fmt = (n: number) => `$ ${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -65,9 +66,10 @@ export function formatReport(type: string, data: any, to: string, from: string, 
         return ' '.repeat(padding) + str;
     };
 
-    const generatedDate = new Date().toLocaleDateString('en-GB');
-    const periodStart = new Date(data.startDate).toLocaleDateString('en-GB');
-    const periodEnd = new Date(data.endDate).toLocaleDateString('en-GB');
+    const generatedDate = formatLocalDate(new Date());
+    const periodStart = formatLocalDate(data.startDate);
+    const periodEnd = formatLocalDate(data.endDate);
+
 
     const miscRows = data.miscellaneousDetails && data.miscellaneousDetails.length > 0
         ? data.miscellaneousDetails.map((m: any) => `    - ${(m.memo || 'Unknown').substring(0, 30).padEnd(30)} | ${padStart(fmt(m.amount), 20)}`).join('\n')
@@ -475,9 +477,9 @@ export function formatSalesReport(data: any, to: string, from: string, aiAnalysi
         return ' '.repeat(padding) + str;
     };
 
-    const generatedDate = new Date().toLocaleDateString('en-GB');
-    const periodStart = new Date(data.startDate).toLocaleDateString('en-GB');
-    const periodEnd = new Date(data.endDate).toLocaleDateString('en-GB');
+    const generatedDate = formatLocalDate(new Date());
+    const periodStart = formatLocalDate(data.startDate);
+    const periodEnd = formatLocalDate(data.endDate);
 
     const formatMins = (ms: number) => Math.round(ms / 60000);
 

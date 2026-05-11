@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { formatLocalDate } from '@/lib/date-utils';
 
 // Shared Schema
 const ItemSchema = z.object({
@@ -215,7 +216,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                 
                 // Text representation for Discord/Clipboard
                 reportText = `KOI CAFE - FULL SHOP REPORT\n` +
-                             `Period: ${new Date(result.data.startDate).toLocaleDateString()} - ${new Date(result.data.endDate).toLocaleDateString()}\n` +
+                             `Period: ${formatLocalDate(result.data.startDate)} - ${formatLocalDate(result.data.endDate)}\n` +
                              `---------------------------\n` +
                              `Opening: $${result.data.financials.openingBalance.toLocaleString()}\n` +
                              `Closing: $${result.data.financials.closingBalance.toLocaleString()}\n` +

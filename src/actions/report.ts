@@ -9,6 +9,7 @@ import DutyLog from '@/models/DutyLog';
 import SalesLog from '@/models/SalesLog';
 import { fetchBot } from '@/lib/bot-api';
 import Groq from 'groq-sdk';
+import { getLocalPeriodRange, formatLocalDate } from '@/lib/date-utils';
 
 interface ReportData {
     startDate: string;
@@ -52,17 +53,8 @@ export async function generateReportData(startDate: Date, endDate: Date): Promis
     try {
         await connectToDatabase();
 
-        // Ensure dates are valid Date objects (handling strings if passed)
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-
-        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-            return { success: false, error: 'Invalid Date Range provided.' };
-        }
-
-        // Set Time to start/end of day
-        start.setHours(0, 0, 0, 0);
-        end.setHours(23, 59, 59, 999);
+        // Ensure dates are handled as LOCAL boundaries to match the dashboard
+        const { start, end } = getLocalPeriodRange(startDate, endDate);
 
         // Fetch Bank Transactions
         const bankParams = {
@@ -164,13 +156,7 @@ export async function generateFullShopReportData(startDate: Date, endDate: Date)
     try {
         await connectToDatabase();
 
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-            return { success: false, error: 'Invalid Date Range.' };
-        }
-        start.setHours(0, 0, 0, 0);
-        end.setHours(23, 59, 59, 999);
+        const { start, end } = getLocalPeriodRange(startDate, endDate);
 
         // 1. Bank Balances (Opening/Closing)
         // Find the log closest to start date (opening)
@@ -296,13 +282,7 @@ export async function generateSalesReportData(startDate: Date, endDate: Date): P
     try {
         await connectToDatabase();
 
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-            return { success: false, error: 'Invalid Date Range provided.' };
-        }
-        start.setHours(0, 0, 0, 0);
-        end.setHours(23, 59, 59, 999);
+        const { start, end } = getLocalPeriodRange(startDate, endDate);
 
         // Optimize for Free Tier: Use MongoDB Aggregation instead of in-memory maps
         const salesStats = await SalesLog.aggregate([

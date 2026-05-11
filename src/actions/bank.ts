@@ -2,6 +2,7 @@
 
 import connectToDatabase from '@/lib/db';
 import BankTransaction from '@/models/BankTransaction';
+import { getLocalPeriodRange } from '@/lib/date-utils';
 
 interface BankLogFilter {
     type?: string;
@@ -39,17 +40,10 @@ export async function getBankLogs(filter: BankLogFilter) {
 
         // Filter by Date
         if (filter.dateRange?.from || filter.dateRange?.to) {
+            const { start, end } = getLocalPeriodRange(filter.dateRange.from || new Date(), filter.dateRange.to || new Date());
             query.date = {};
-            if (filter.dateRange.from) {
-                const from = new Date(filter.dateRange.from);
-                from.setHours(0, 0, 0, 0);
-                query.date.$gte = from;
-            }
-            if (filter.dateRange.to) {
-                const to = new Date(filter.dateRange.to);
-                to.setHours(23, 59, 59, 999);
-                query.date.$lte = to;
-            }
+            if (filter.dateRange.from) query.date.$gte = start;
+            if (filter.dateRange.to) query.date.$lte = end;
         }
 
         // Parallel execution for count and data
