@@ -123,7 +123,8 @@ const fetchDashboardData = unstable_cache(
                                             {
                                                 $and: [
                                                     { $eq: ["$transactionType", "TRANSFER"] },
-                                                    { $eq: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] }
+                                                    { $eq: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] },
+                                                    { $or: [{ $eq: ["$transferredTo", null] }, { $eq: ["$transferredTo", ""] }] }
                                                 ]
                                             }
                                         ]
@@ -142,7 +143,12 @@ const fetchDashboardData = unstable_cache(
                                             {
                                                 $and: [
                                                     { $eq: ["$transactionType", "TRANSFER"] },
-                                                    { $ne: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] }
+                                                    {
+                                                        $or: [
+                                                            { $ne: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] },
+                                                            { $and: [{ $ne: ["$transferredTo", null] }, { $ne: ["$transferredTo", ""] }] }
+                                                        ]
+                                                    }
                                                 ]
                                             }
                                         ]

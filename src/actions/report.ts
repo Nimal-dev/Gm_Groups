@@ -86,16 +86,21 @@ export async function generateReportData(startDate: Date, endDate: Date): Promis
         let miscellaneousDetails: { memo: string; amount: number; date?: string }[] = [];
 
         transactions.forEach((t: any) => {
-            // Expenses: WITHDRAW or TRANSFER (Outgoing to someone)
+            // ONLY process financial transactions
+            if (t.transactionType !== 'DEPOSIT' && t.transactionType !== 'WITHDRAW' && t.transactionType !== 'TRANSFER') {
+                return;
+            }
+
+            const memoLower = (t.memo || '').toLowerCase();
+            const toLower = (t.transferredTo || '').toLowerCase();
+            
+            // Define expense (Out)
             const isTransferOut = t.transactionType === 'TRANSFER' && (
-                (t.memo && t.memo.toLowerCase().includes('transfer to')) ||
+                memoLower.includes('transfer to') ||
                 (t.transferredTo && t.transferredTo.length > 0)
             );
 
             if (t.transactionType === 'WITHDRAW' || isTransferOut) {
-                const memoLower = (t.memo || '').toLowerCase();
-                const toLower = (t.transferredTo || '').toLowerCase();
-                
                 // Skip salary transfers because we calculate totalSalaries directly from SalaryLogs
                 if (memoLower.includes('salary')) {
                     return; // Skip this iteration
@@ -119,7 +124,7 @@ export async function generateReportData(startDate: Date, endDate: Date): Promis
                     });
                 }
             } else {
-                // Income: DEPOSIT or TRANSFER (Incoming/Internal without specific destination)
+                // Income: DEPOSIT or incoming TRANSFER
                 totalIncome += t.amount;
             }
         });
@@ -190,14 +195,20 @@ export async function generateFullShopReportData(startDate: Date, endDate: Date)
         let totalExpense = 0;
 
         transactions.forEach((t: any) => {
+            // ONLY process financial transactions
+            if (t.transactionType !== 'DEPOSIT' && t.transactionType !== 'WITHDRAW' && t.transactionType !== 'TRANSFER') {
+                return;
+            }
+
+            const memoLower = (t.memo || '').toLowerCase();
+            const toLower = (t.transferredTo || '').toLowerCase();
+
             const isTransferOut = t.transactionType === 'TRANSFER' && (
-                (t.memo && t.memo.toLowerCase().includes('transfer to')) ||
+                memoLower.includes('transfer to') ||
                 (t.transferredTo && t.transferredTo.length > 0)
             );
+
             if (t.transactionType === 'WITHDRAW' || isTransferOut) {
-                const memoLower = (t.memo || '').toLowerCase();
-                const toLower = (t.transferredTo || '').toLowerCase();
-                
                 // Skip salary transfers to avoid double-counting with totalSalaries
                 if (memoLower.includes('salary')) {
                     return; // Skip this iteration
@@ -205,6 +216,7 @@ export async function generateFullShopReportData(startDate: Date, endDate: Date)
                 
                 totalExpense += t.amount;
             } else {
+                // Income: DEPOSIT or incoming TRANSFER
                 totalIncome += t.amount;
             }
         });

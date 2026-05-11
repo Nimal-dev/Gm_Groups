@@ -92,8 +92,9 @@ export async function getBankLogs(filter: BankLogFilter) {
                                         {
                                             $and: [
                                                 { $eq: ["$transactionType", "TRANSFER"] },
-                                                // Only consider INCOMING if it does NOT have "transfer to"
-                                                { $eq: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] }
+                                                // Not an expense -> Income
+                                                { $eq: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] },
+                                                { $or: [{ $eq: ["$transferredTo", null] }, { $eq: ["$transferredTo", ""] }] }
                                             ]
                                         }
                                     ]
@@ -112,8 +113,12 @@ export async function getBankLogs(filter: BankLogFilter) {
                                         {
                                             $and: [
                                                 { $eq: ["$transactionType", "TRANSFER"] },
-                                                // Only consider OUTGOING if it HAS "transfer to"
-                                                { $ne: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] }
+                                                {
+                                                    $or: [
+                                                        { $ne: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] },
+                                                        { $and: [{ $ne: ["$transferredTo", null] }, { $ne: ["$transferredTo", ""] }] }
+                                                    ]
+                                                }
                                             ]
                                         }
                                     ]
