@@ -49,7 +49,7 @@ export interface FullReportData {
     dutyLogs: any[];
 }
 
-export async function generateReportData(startDate: Date, endDate: Date): Promise<{ success: boolean; data?: ReportData; error?: string }> {
+export async function generateReportData(startDate: string | Date, endDate: string | Date): Promise<{ success: boolean; data?: ReportData; error?: string }> {
     try {
         await connectToDatabase();
 
@@ -152,7 +152,7 @@ export async function generateReportData(startDate: Date, endDate: Date): Promis
     }
 }
 
-export async function generateFullShopReportData(startDate: Date, endDate: Date): Promise<{ success: boolean; data?: FullReportData; error?: string }> {
+export async function generateFullShopReportData(startDate: string | Date, endDate: string | Date): Promise<{ success: boolean; data?: FullReportData; error?: string }> {
     try {
         await connectToDatabase();
 
@@ -278,7 +278,7 @@ export interface SalesReportData {
     aiAnalysis: string;
 }
 
-export async function generateSalesReportData(startDate: Date, endDate: Date): Promise<{ success: boolean; data?: SalesReportData; error?: string }> {
+export async function generateSalesReportData(startDate: string | Date, endDate: string | Date): Promise<{ success: boolean; data?: SalesReportData; error?: string }> {
     try {
         await connectToDatabase();
 

@@ -209,7 +209,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                 const isValid = await reportForm.trigger();
                 if (!isValid) throw new Error("Please correct date errors.");
                 const data = reportForm.getValues();
-                const result = await generateFullShopReportData(new Date(data.startDate), new Date(data.endDate));
+                const result = await generateFullShopReportData(data.startDate, data.endDate);
                 if (!result.success || !result.data) throw new Error(result.error || 'Failed to fetch shop data');
                 
                 setFullReportData(result.data);
@@ -229,7 +229,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                 const isValid = await reportForm.trigger();
                 if (!isValid) throw new Error("Please correct date errors.");
                 const data = reportForm.getValues();
-                const result = await generateSalesReportData(new Date(data.startDate), new Date(data.endDate));
+                const result = await generateSalesReportData(data.startDate, data.endDate);
                 if (!result.success || !result.data) throw new Error(result.error || 'Failed to fetch sales data');
                 
                 reportText = formatSalesReport(result.data, reportTo, reportFrom, result.data.aiAnalysis);
@@ -238,7 +238,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                 const isValid = await reportForm.trigger();
                 if (!isValid) throw new Error("Please correct date errors.");
                 const data = reportForm.getValues();
-                const result = await generateReportData(new Date(data.startDate), new Date(data.endDate));
+                const result = await generateReportData(data.startDate, data.endDate);
                 if (!result.success || !result.data) throw new Error(result.error || 'Unknown error occurred');
                 reportText = formatReport(reportType, result.data, reportTo, reportFrom, data.membersRemoved || '0');
             }
