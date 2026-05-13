@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Plus, Trash2, Calculator, ArrowRight, Package, Scale,
     DollarSign, ShoppingCart, Info, Building2, Layers,
-    CheckCircle2, AlertCircle, X, Search
+    CheckCircle2, AlertCircle, X, Search, Loader2
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -22,6 +22,43 @@ export function FoodPrepCalculator() {
     const [selections, setSelections] = useState<{ id: string; targetQuantity: number }[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [partnerPreference, setPartnerPreference] = useState<'YKZ' | 'MLB' | 'BOTH'>('BOTH');
+    
+    // Live Pricing State
+    const [loadingPrices, setLoadingPrices] = useState(true);
+    const [livePrices, setLivePrices] = useState<{ ykz: Record<string, number>, mlb: Record<string, number> }>({ ykz: {}, mlb: {} });
+
+    useEffect(() => {
+        const fetchInventories = async () => {
+            setLoadingPrices(true);
+            try {
+                const mod = await import('@/actions/vendor');
+                const [ykzRes, mlbRes] = await Promise.all([
+                    mod.getVendorInventory('YKZ'),
+                    mod.getVendorInventory('MLB')
+                ]);
+                
+                const newLivePrices = { ykz: {} as Record<string, number>, mlb: {} as Record<string, number> };
+                
+                if (ykzRes.success && ykzRes.items) {
+                    ykzRes.items.forEach((item: any) => {
+                        newLivePrices.ykz[item.itemName] = item.price;
+                    });
+                }
+                
+                if (mlbRes.success && mlbRes.items) {
+                    mlbRes.items.forEach((item: any) => {
+                        newLivePrices.mlb[item.itemName] = item.price;
+                    });
+                }
+                
+                setLivePrices(newLivePrices);
+            } catch (error) {
+                console.error("Failed to fetch live prices", error);
+            }
+            setLoadingPrices(false);
+        };
+        fetchInventories();
+    }, []);
 
     const filteredMenuItems = useMemo(() => {
         return MENU_ITEMS.filter(item =>
@@ -43,7 +80,7 @@ export function FoodPrepCalculator() {
         setSelections(selections.filter(s => s.id !== itemId));
     };
 
-    const results = useMemo(() => calculateRequirements(selections), [selections]);
+    const results = useMemo(() => calculateRequirements(selections, livePrices), [selections, livePrices]);
 
     const totals = useMemo(() => {
         return results.reduce((acc, curr) => ({
@@ -77,6 +114,11 @@ export function FoodPrepCalculator() {
                         <CardDescription>Select menu items and target quantities.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                        {loadingPrices && (
+                            <div className="flex items-center text-xs text-emerald-400 bg-emerald-500/10 p-2 rounded">
+                                <Loader2 className="w-3 h-3 mr-2 animate-spin" /> Fetching live market prices...
+                            </div>
+                        )}
                         <div className="relative">
                             <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                             <Input

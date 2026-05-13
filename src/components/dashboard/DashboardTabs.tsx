@@ -65,6 +65,18 @@ const SalesLogForm = dynamic(() => import('@/components/dashboard/SalesLogForm')
     loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Sales Log...</div>,
     ssr: false
 });
+const VendorManagement = dynamic(() => import('@/components/dashboard/VendorManagement').then(mod => mod.VendorManagement), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Vendors...</div>,
+    ssr: false
+});
+const RawMaterialStatusesTab = dynamic(() => import('@/components/dashboard/RawMaterialStatusesTab'), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Order Status...</div>,
+    ssr: false
+});
+const MaterialsBillsTab = dynamic(() => import('@/components/dashboard/MaterialsBillsTab'), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Bills...</div>,
+    ssr: false
+});
 
 import { LeaveManagementCard } from '@/components/dashboard/LeaveManagementCard';
 
@@ -204,6 +216,8 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                             <TabsTrigger value="bank" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Bank Logs</TabsTrigger>
                             <TabsTrigger value="payroll" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Payroll</TabsTrigger>
                             <TabsTrigger value="finances" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Salary History</TabsTrigger>
+                            <TabsTrigger value="vendors" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Vendors</TabsTrigger>
+                            <TabsTrigger value="bills" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Materials Bill</TabsTrigger>
                         </>
                     )}
 
@@ -220,6 +234,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                     <TabsTrigger value="saleslog" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Sales Log</TabsTrigger>
 {/* <TabsTrigger value="inventory" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Inventory</TabsTrigger> */}
                     <TabsTrigger value="calculator" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent text-primary/80 font-bold">Calculator</TabsTrigger>
+                    <TabsTrigger value="orderstatus" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Raw Material Status</TabsTrigger>
                     <TabsTrigger value="reports" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Reports</TabsTrigger>
                 </TabsList>
             </div>
@@ -595,6 +610,27 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
             {/* REPORTS TAB - For everyone now (restricted inside) */}
             <TabsContent value="reports" className="space-y-6">
                 <ReportsGenerator userRole={userRole} />
+            </TabsContent>
+
+            {/* VENDOR MANAGEMENT TAB - Admin Only */}
+            {isAdmin && (
+                <>
+                    <TabsContent value="vendors" className="space-y-6">
+                        <VendorManagement />
+                    </TabsContent>
+                    <TabsContent value="bills" className="space-y-6">
+                        <MaterialsBillsTab />
+                    </TabsContent>
+                </>
+            )}
+
+            {/* ORDER STATUS TAB - Everyone */}
+            <TabsContent value="orderstatus" className="space-y-6">
+                <RawMaterialStatusesTab 
+                    userId={currentUser?.userId || currentUser?.id} 
+                    userName={currentUser?.username || currentUser?.ingameName} 
+                    userRole={currentUser?.role || 'staff'}
+                />
             </TabsContent>
         </Tabs >
     );

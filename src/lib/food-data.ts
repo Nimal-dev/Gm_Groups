@@ -169,7 +169,10 @@ export const MENU_ITEMS: MenuItem[] = [
     }
 ];
 
-export function calculateRequirements(selectedItems: { id: string; targetQuantity: number }[]) {
+export function calculateRequirements(
+    selectedItems: { id: string; targetQuantity: number }[],
+    livePrices?: { ykz: Record<string, number>, mlb: Record<string, number> }
+) {
     const rawRequirements: Record<string, { materialId: string; quantity: number; weight: number; ykzCost: number; mlbCost: number }> = {};
 
     selectedItems.forEach(item => {
@@ -184,8 +187,12 @@ export function calculateRequirements(selectedItems: { id: string; targetQuantit
 
             const neededQty = ing.quantity * batches;
             const weight = material.weight * neededQty;
-            const ykzCost = material.ykzRate * neededQty;
-            const mlbCost = material.mlbRate * neededQty;
+            
+            const ykzRate = livePrices?.ykz?.[material.name] ?? material.ykzRate;
+            const mlbRate = livePrices?.mlb?.[material.name] ?? material.mlbRate;
+
+            const ykzCost = ykzRate * neededQty;
+            const mlbCost = mlbRate * neededQty;
 
             if (rawRequirements[ing.materialId]) {
                 rawRequirements[ing.materialId].quantity += neededQty;

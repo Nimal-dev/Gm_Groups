@@ -58,7 +58,7 @@ function RawRequestForm() {
     const isSubmitting = form.formState.isSubmitting;
 
     const onSubmit = async (data: RawRequestFormValues) => {
-        const result = await submitRawRequest(data);
+        const result = await submitRawRequest({ ...data, userId: '' });
         if (result.success) {
             setSuccess(true);
             toast({

@@ -59,3 +59,33 @@ export async function portalMpinLogin(prevState: any, formData: FormData) {
         throw error;
     }
 }
+
+export async function vendorMpinLogin(prevState: any, formData: FormData) {
+    try {
+        console.log('Attempting Vendor MPIN login for Vendor ID:', formData.get('vendorId'), 'MPIN length:', formData.get('mpin')?.toString()?.length);
+        await signIn('vendor-mpin', {
+            vendorId: formData.get('vendorId'),
+            mpin: formData.get('mpin'),
+            redirectTo: '/vendor-dashboard'
+        });
+        console.log('Vendor MPIN login succeeded (should redirect now)');
+    } catch (error: any) {
+        console.error('Vendor MPIN Login caught an error:', error?.constructor?.name, error?.message, error?.type);
+        if (error?.constructor?.name === 'NEXT_REDIRECT') {
+            console.log('It is a NEXT_REDIRECT, throwing it back');
+            throw error;
+        }
+        if ((error instanceof Error && error.name === 'AuthError') || error?.type) {
+            console.error('AuthError during Vendor MPIN login:', error.type);
+            switch (error.type) {
+                case 'CredentialsSignin':
+                    return { error: 'Invalid Vendor ID or MPIN.' };
+                case 'CallbackRouteError':
+                    return { error: 'Invalid credentials' };
+                default:
+                    return { error: `Auth Error: ${error.type}` };
+            }
+        }
+        throw error;
+    }
+}

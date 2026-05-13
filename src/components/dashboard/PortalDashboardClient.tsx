@@ -46,6 +46,10 @@ const AdminEmployeeTable = dynamic(() => import('@/components/dashboard/AdminEmp
     loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Leaderboard...</div>,
     ssr: false
 });
+const RawMaterialStatusesTab = dynamic(() => import('@/components/dashboard/RawMaterialStatusesTab'), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Order Status...</div>,
+    ssr: false
+});
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -223,6 +227,7 @@ export function PortalDashboardClient({
                             </>
                         )}
                         <TabsTrigger value="reports" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Reports</TabsTrigger>
+                        <TabsTrigger value="orderstatus" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Order Status</TabsTrigger>
                     </TabsList>
                 </div>
 
@@ -382,6 +387,10 @@ export function PortalDashboardClient({
 
                 <TabsContent value="reports" className="space-y-6">
                     <ReportsGenerator userRole={userRole} />
+                </TabsContent>
+
+                <TabsContent value="orderstatus" className="space-y-6">
+                    <RawMaterialStatusesTab userId={currentUser?.userId} userName={currentUser?.username} />
                 </TabsContent>
 
                 <TabsContent value="logs" className="space-y-6 h-auto min-h-[500px] lg:h-[800px]">

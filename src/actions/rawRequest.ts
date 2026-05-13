@@ -8,6 +8,7 @@ export async function submitRawRequest(data: {
     urgency: string;
     items: string;
     datetime: string;
+    userId: string;
     notes?: string;
 }) {
     const { fetchBot } = await import('@/lib/bot-api');

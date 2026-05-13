@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, UtensilsCrossed, LayoutDashboard } from "lucide-react";
+import { ChevronDown, UtensilsCrossed, LayoutDashboard, Store } from "lucide-react";
 
 export function Header() {
   const { scrollY } = useScroll();
@@ -55,6 +55,13 @@ export function Header() {
           <Link href="/dashboard" className="flex items-center gap-2">
             <LayoutDashboard className="w-4 h-4" />
             <span className="hidden lg:inline">Dashboard</span>
+          </Link>
+        </Button>
+
+        <Button variant="ghost" asChild className="flex text-white hover:bg-white/10 rounded-full">
+          <Link href="/vendor-dashboard" className="flex items-center gap-2">
+            <Store className="w-4 h-4 text-emerald-400" />
+            <span className="hidden lg:inline">Vendor Portal</span>
           </Link>
         </Button>
 

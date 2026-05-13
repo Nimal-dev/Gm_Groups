@@ -43,6 +43,7 @@ export default async function DashboardPage() {
     if (!currentUser) {
         console.warn(`User ${session.user.name} (${session.user.id}) not found in Employee DB, using fallback.`);
         currentUser = {
+            userId: session.user.id,
             username: session.user.name,
             xp: 0,
             level: 1,

@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { submitRawRequest } from '@/actions/rawRequest';
-import { User, Building2, AlertCircle, Receipt, MessageSquare, CalendarClock, CheckCircle2, Loader2, Box } from 'lucide-react';
+import { getVendorInventory } from '@/actions/vendor';
+import { User, Building2, AlertCircle, Receipt, MessageSquare, CalendarClock, CheckCircle2, Loader2, Box, Info, Tag } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -28,6 +30,25 @@ type RawRequestFormValues = z.infer<typeof RawRequestSchema>;
 export function RawRequestForm({ currentUser }: { currentUser?: any }) {
     const { toast } = useToast();
     const [success, setSuccess] = useState(false);
+    const [inventory, setInventory] = useState<any[]>([]);
+    const [invLoading, setInvLoading] = useState(false);
+
+    useEffect(() => {
+        setInvLoading(true);
+        getVendorInventory().then(res => {
+            if (res.success) setInventory(res.items);
+            setInvLoading(false);
+        });
+    }, []);
+
+    // Group inventory by itemName
+    const comparison: Record<string, { MLB?: number; YKZ?: number; unit?: string }> = {};
+    inventory.forEach(item => {
+        const name = item.itemName.toLowerCase();
+        const displayName = item.itemName;
+        if (!comparison[displayName]) comparison[displayName] = { unit: item.unit };
+        comparison[displayName][item.vendorRole as 'MLB' | 'YKZ'] = item.price;
+    });
 
     const form = useForm<RawRequestFormValues>({
         resolver: zodResolver(RawRequestSchema),
@@ -44,7 +65,10 @@ export function RawRequestForm({ currentUser }: { currentUser?: any }) {
     const isSubmitting = form.formState.isSubmitting;
 
     const onSubmit = async (data: RawRequestFormValues) => {
-        const result = await submitRawRequest(data);
+        const result = await submitRawRequest({
+            ...data,
+            userId: currentUser?.userId || currentUser?.id || ''
+        });
 
         if (result.success) {
             setSuccess(true);
@@ -206,6 +230,44 @@ export function RawRequestForm({ currentUser }: { currentUser?: any }) {
                                             </FormItem>
                                         )}
                                     />
+                                </div>
+
+                                {/* Vendor Price Comparison */}
+                                <div className="space-y-3">
+                                    <Label className="flex items-center gap-2 text-white/80 font-medium">
+                                        <Tag className="w-4 h-4 text-emerald-400" /> Vendor Price Comparison
+                                        {invLoading && <Loader2 className="w-3 h-3 animate-spin ml-auto opacity-50" />}
+                                    </Label>
+                                    
+                                    <div className="bg-black/40 border border-white/5 rounded-xl overflow-hidden">
+                                        <div className="grid grid-cols-4 bg-white/5 p-2 text-[10px] uppercase tracking-wider font-bold text-muted-foreground border-b border-white/5">
+                                            <div className="col-span-1">Item</div>
+                                            <div className="text-center">MLB</div>
+                                            <div className="text-center">YKZ</div>
+                                            <div className="text-right">Unit</div>
+                                        </div>
+                                        <div className="max-h-[120px] overflow-y-auto !scrollbar-thin">
+                                            {Object.keys(comparison).length === 0 && !invLoading ? (
+                                                <p className="text-center py-4 text-xs text-muted-foreground italic">No pricing data available.</p>
+                                            ) : (
+                                                Object.entries(comparison).map(([name, prices]) => (
+                                                    <div key={name} className="grid grid-cols-4 p-2 text-xs border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors">
+                                                        <div className="truncate font-medium text-white/90">{name}</div>
+                                                        <div className={`text-center font-mono ${prices.MLB && prices.YKZ && (prices.MLB ?? Infinity) < (prices.YKZ ?? Infinity) ? 'text-green-400 font-bold' : 'text-muted-foreground'}`}>
+                                                            {prices.MLB ? `$${prices.MLB.toLocaleString()}` : '—'}
+                                                        </div>
+                                                        <div className={`text-center font-mono ${prices.MLB && prices.YKZ && (prices.YKZ ?? Infinity) < (prices.MLB ?? Infinity) ? 'text-green-400 font-bold' : 'text-muted-foreground'}`}>
+                                                            {prices.YKZ ? `$${prices.YKZ.toLocaleString()}` : '—'}
+                                                        </div>
+                                                        <div className="text-right text-[10px] text-muted-foreground">{prices.unit}</div>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                    <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                        <Info className="w-3 h-3" /> Select the partner that offers the best value for your required items.
+                                    </p>
                                 </div>
 
                                 <FormField

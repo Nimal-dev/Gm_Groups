@@ -5,6 +5,7 @@ import Credentials from 'next-auth/providers/credentials';
 import { authConfig } from './auth.config';
 import connectToDatabase from '@/lib/db';
 import Employee from '@/models/Employee';
+import VendorUser from '@/models/VendorUser';
 
 /**
  * NextAuth Configuration
@@ -53,81 +54,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         maxAge: 7 * 24 * 60 * 60, // 7 Days
     },
     callbacks: {
-        /**
-         * JWT Callback
-         * Persists user role and name into the JWT token.
-         * Handles Token Rotation.
-         */
-        async jwt({ token, user, account, profile }) {
-            // Initial Sign In
-            if (account && user) {
-                if (account.provider === 'credentials') {
-                    return {
-                        accessToken: 'mpin-auth',
-                        refreshToken: null,
-                        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 Days
-                        user: {
-                            ...user,
-                            id: user.id,
-                            name: user.name,
-                            role: user.role,
-                        }
-                    };
-                }
-
-                return {
-                    accessToken: account.access_token,
-                    refreshToken: account.refresh_token,
-                    expiresAt: Date.now() + (account.expires_in as number * 1000),
-                    user: {
-                        ...user,
-                        id: (profile?.id as string) || user.id, // CRITICAL FIX: Force use of Discord ID
-                        name: user.name, // Explicitly update token name from DB
-                        role: user.role,
-                    }
-                };
-            }
-
-            // Return previous token if the access token has not expired yet
-            if (Date.now() < (token.expiresAt as number)) {
-                return token;
-            }
-
-            if (token.accessToken === 'mpin-auth') {
-                // MPIN sessions inherently don't use Discord OAuth refresh tokens
-                return token;
-            }
-
-            // Access token has expired, try to update it
-            return await refreshAccessToken(token);
-        },
-        /**
-         * Session Callback
-         * Populates the client-side session object with role and name from the token.
-         */
-        async session({ session, token }) {
-            // Check if rotation failed
-            if (token.error) {
-                // @ts-ignore
-                session.error = token.error;
-            }
-
-            if (session.user && token.user) {
-                // @ts-ignore
-                session.user = {
-                    ...session.user,
-                    ...token.user as any
-                };
-                // Ensure ID is set correctly
-                // @ts-ignore
-                session.user.id = (token.user as any).id;
-            }
-            // Pass accessToken to session for API use
-            // @ts-ignore
-            session.accessToken = token.accessToken;
-
-            return session;
-        },
+        ...authConfig.callbacks,
         /**
          * SignIn Callback
          * Validates the Discord user against the Employee database.
@@ -181,6 +108,9 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             if (account?.provider === 'credentials') {
                 return true;
             }
+            if (account?.provider === 'vendor-mpin') {
+                return true;
+            }
             return false; // Deny other non-Discord login attempts
         },
     },
@@ -204,9 +134,9 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                 await connectToDatabase();
                 const loginIdStr = String(credentials.loginId).trim();
 
-                const employee = await Employee.findOne({ 
-                    loginId: { $regex: new RegExp('^' + loginIdStr + '$', 'i') }, 
-                    status: 'Active' 
+                const employee = await Employee.findOne({
+                    loginId: { $regex: new RegExp('^' + loginIdStr + '$', 'i') },
+                    status: 'Active'
                 });
 
                 if (!employee) {
@@ -221,7 +151,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
                 // Map Rank to Website Role
                 const rank = employee.rank.toLowerCase();
-                let role = 'staff'; 
+                let role = 'staff';
 
                 if (rank.includes('owner') || rank.includes('boss') || rank.includes('management') || rank.includes('manager') || rank.includes('lawyer')) {
                     role = 'admin';
@@ -235,51 +165,45 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     role: role,
                 } as any;
             }
+        }),
+        Credentials({
+            id: 'vendor-mpin',
+            name: 'Vendor MPIN Login',
+            credentials: {
+                vendorId: { label: "Vendor ID", type: "text" },
+                mpin: { label: "MPIN", type: "password" }
+            },
+            async authorize(credentials) {
+                if (!credentials?.vendorId || !credentials?.mpin) {
+                    throw new Error('Missing credentials');
+                }
+
+                await connectToDatabase();
+                const vendorIdStr = String(credentials.vendorId).trim();
+
+                const vendor = await VendorUser.findOne({
+                    vendorId: { $regex: new RegExp('^' + vendorIdStr + '$', 'i') }
+                });
+
+                if (!vendor) {
+                    console.warn(`[Auth] No vendor found for Vendor ID: ${vendorIdStr}`);
+                    throw new Error('Invalid Vendor ID or MPIN');
+                }
+
+                if (vendor.mpin !== credentials.mpin) {
+                    console.warn(`[Auth] MPIN mismatch for Vendor ID: ${vendorIdStr}`);
+                    throw new Error('Invalid Vendor ID or MPIN');
+                }
+
+                const role = `vendor_${vendor.role.toLowerCase()}`; // vendor_mlb or vendor_ykz
+
+                return {
+                    id: vendor._id.toString(),
+                    name: vendor.name,
+                    role: role,
+                    vendorId: vendor.vendorId,
+                } as any;
+            }
         })
     ],
 });
-
-/**
- * Takes a token, and returns a new token with updated
- * `accessToken` and `expiresAt`. If an error occurs,
- * returns the old token and an error property
- */
-async function refreshAccessToken(token: any) {
-    try {
-        const url = 'https://discord.com/api/oauth2/token';
-        const body = new URLSearchParams({
-            client_id: process.env.AUTH_DISCORD_ID!,
-            client_secret: process.env.AUTH_DISCORD_SECRET!,
-            grant_type: 'refresh_token',
-            refresh_token: token.refreshToken,
-        });
-
-        const response = await fetch(url, {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            method: 'POST',
-            body: body,
-        });
-
-        const refreshedTokens = await response.json();
-
-        if (!response.ok) {
-            throw refreshedTokens;
-        }
-
-        return {
-            ...token,
-            accessToken: refreshedTokens.access_token,
-            expiresAt: Date.now() + refreshedTokens.expires_in * 1000,
-            refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
-        };
-    } catch (error) {
-        console.error('RefreshAccessTokenError', error);
-
-        return {
-            ...token,
-            error: 'RefreshAccessTokenError',
-        };
-    }
-}
