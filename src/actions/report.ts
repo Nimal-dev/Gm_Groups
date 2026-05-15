@@ -37,6 +37,11 @@ export interface FullReportData {
         totalExpense: number;
         totalSalaries: number;
         netProfit: number;
+        rawMaterialsExpense: number;
+        ykzRawMaterials: number;
+        mlbRawMaterials: number;
+        miscellaneousExpense: number;
+        miscellaneousDetails: { memo: string; amount: number; date?: string }[];
     };
     inventory: { itemName: string; quantity: number }[];
     hr: {
@@ -179,6 +184,11 @@ export async function generateFullShopReportData(startDate: string | Date, endDa
 
         let totalIncome = 0;
         let totalExpense = 0;
+        let rawMaterialsExpense = 0;
+        let ykzRawMaterials = 0;
+        let mlbRawMaterials = 0;
+        let miscellaneousExpense = 0;
+        let miscellaneousDetails: { memo: string; amount: number; date?: string }[] = [];
 
         transactions.forEach((t: any) => {
             // ONLY process financial transactions
@@ -201,6 +211,22 @@ export async function generateFullShopReportData(startDate: string | Date, endDa
                 }
                 
                 totalExpense += t.amount;
+
+                const isYKZ = memoLower.includes('ykz') || toLower.includes('ykz') || toLower.includes('6838311307');
+                const isMLB = memoLower.includes('mlb') || toLower.includes('mlb') || toLower.includes('9144066578');
+
+                if (isYKZ || isMLB) {
+                    rawMaterialsExpense += t.amount;
+                    if (isYKZ) ykzRawMaterials += t.amount;
+                    if (isMLB) mlbRawMaterials += t.amount;
+                } else {
+                    miscellaneousExpense += t.amount;
+                    miscellaneousDetails.push({
+                        memo: t.memo || t.transferredTo || t.transactionType,
+                        amount: t.amount,
+                        date: t.date ? new Date(t.date).toISOString() : undefined
+                    });
+                }
             } else {
                 // Income: DEPOSIT or incoming TRANSFER
                 totalIncome += t.amount;
@@ -232,7 +258,8 @@ export async function generateFullShopReportData(startDate: string | Date, endDa
 
         // 6. Duty Logs
         const dutyLogs = await DutyLog.find({
-            startTime: { $gte: start.getTime(), $lte: end.getTime() }
+            startTime: { $gte: start.getTime(), $lte: end.getTime() },
+            isValid: true
         }).sort({ startTime: -1 }).lean();
 
         return {
@@ -246,7 +273,12 @@ export async function generateFullShopReportData(startDate: string | Date, endDa
                     totalIncome,
                     totalExpense,
                     totalSalaries,
-                    netProfit: totalIncome - totalExpense - totalSalaries
+                    netProfit: totalIncome - totalExpense - totalSalaries,
+                    rawMaterialsExpense,
+                    ykzRawMaterials,
+                    mlbRawMaterials,
+                    miscellaneousExpense,
+                    miscellaneousDetails
                 },
                 inventory: [], // Commented out: inventoryItems,
                 hr: {
@@ -254,9 +286,9 @@ export async function generateFullShopReportData(startDate: string | Date, endDa
                     membersRemoved: 0,
                     totalEmployees
                 },
-                allTransactions: transactions,
-                allSalaries: salaryLogs,
-                dutyLogs
+                allTransactions: JSON.parse(JSON.stringify(transactions)),
+                allSalaries: JSON.parse(JSON.stringify(salaryLogs)),
+                dutyLogs: JSON.parse(JSON.stringify(dutyLogs))
             }
         };
 

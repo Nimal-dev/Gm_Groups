@@ -83,6 +83,48 @@ export async function generateShopPDF(data: FullReportData, reportTo: string, re
             }
         });
         currentY = (doc as any).lastAutoTable.finalY + 15;
+
+        // --- 1b. Operational Expense Breakdown ---
+        if (currentY > 230) { doc.addPage(); currentY = 20; }
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text(`${(sectionNum-1)}.1 OPERATIONAL EXPENSE BREAKDOWN`, 14, currentY);
+
+        const expenseBreakdown = [
+            ['Category / Item', 'Amount'],
+            ['Raw Materials (Total)', fmt(data.financials.rawMaterialsExpense || 0)],
+            ['   • MLB Orders', fmt(data.financials.mlbRawMaterials || 0)],
+            ['   • YKZ Orders', fmt(data.financials.ykzRawMaterials || 0)],
+            ['Miscellaneous Expenses', fmt(data.financials.miscellaneousExpense || 0)],
+            ...(data.financials.miscellaneousDetails || []).map(m => [
+                `   • ${m.memo.substring(0, 50)}${m.memo.length > 50 ? '...' : ''}`, 
+                fmt(m.amount)
+            ])
+        ];
+
+        (doc as any).autoTable({
+            startY: currentY + 5,
+            head: [expenseBreakdown[0]],
+            body: expenseBreakdown.slice(1),
+            theme: 'grid',
+            headStyles: { fillColor: [107, 114, 128] },
+            styles: { fontSize: 9 },
+            columnStyles: { 1: { halign: 'right' } },
+            didParseCell: function(cellData: any) {
+                // Bold the headers for Raw Materials and Misc
+                if (cellData.row.index === 0 || cellData.row.index === 3) {
+                    cellData.cell.styles.fontStyle = 'bold';
+                    cellData.cell.styles.fillColor = [243, 244, 246];
+                }
+                // Italicize the sub-items
+                if (cellData.row.index === 1 || cellData.row.index === 2 || cellData.row.index > 3) {
+                    cellData.cell.styles.fontStyle = 'italic';
+                    cellData.cell.styles.textColor = [75, 85, 99];
+                    if (cellData.row.index > 3) cellData.cell.styles.fontSize = 8;
+                }
+            }
+        });
+        currentY = (doc as any).lastAutoTable.finalY + 15;
     }
 
     // --- 2. Detailed Bank Ledger ---
@@ -103,7 +145,32 @@ export async function generateShopPDF(data: FullReportData, reportTo: string, re
             theme: 'grid',
             headStyles: { fillColor: [31, 41, 55] },
             styles: { fontSize: 8 },
-            columnStyles: { 2: { halign: 'right' } }
+            columnStyles: { 2: { halign: 'right' } },
+            didParseCell: function(cellData: any) {
+                if (cellData.section === 'body' && cellData.column.index === 2 && data.allTransactions.length > 0) {
+                    const t = data.allTransactions[cellData.row.index];
+                    if (t) {
+                        const type = (t.transactionType || '').toUpperCase();
+                        const memoLower = (t.memo || t.transferredTo || '').toLowerCase();
+                        
+                        const isTransferOut = type === 'TRANSFER' && (
+                            memoLower.includes('transfer to') ||
+                            (t.transferredTo && t.transferredTo.length > 0)
+                        );
+                        
+                        const isTransferIn = type === 'TRANSFER' && (
+                            memoLower.includes('transfer from') || 
+                            memoLower.includes('received')
+                        );
+
+                        if (type === 'WITHDRAW' || isTransferOut) {
+                            cellData.cell.styles.textColor = [153, 27, 27]; // Red
+                        } else if (type === 'DEPOSIT' || isTransferIn || memoLower.includes('income')) {
+                            cellData.cell.styles.textColor = [22, 101, 52]; // Green
+                        }
+                    }
+                }
+            }
         });
         currentY = (doc as any).lastAutoTable.finalY + 15;
     }
