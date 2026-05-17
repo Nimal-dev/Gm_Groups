@@ -15,7 +15,7 @@ export const BATCH_SIZES: Record<string, number> = {
     'Dragon Roll': 15,
     'Garden Salad': 9,
     'Matcha Milk Tea': 15,
-    'Virgin Mojito': 3,
+    'Virgin Mojito': 15,
     'Smoothie': 15,
     'Shrimp Tempura': 15
 };
