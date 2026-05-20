@@ -1011,7 +1011,43 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
                                             <tr key={idx} className="hover:bg-white/5 transition-colors">
                                                 <td className="px-4 py-3 font-semibold text-zinc-200">{item.itemName}</td>
                                                 <td className="px-4 py-3 text-center text-zinc-400 font-mono">x{item.quantity}</td>
-                                                <td className="px-4 py-3 text-right text-zinc-400 font-mono">${item.price?.toLocaleString()}</td>
+                                                <td className="px-4 py-3 text-right">
+                                                    {!selectedOrder?.billSent ? (
+                                                        <div className="flex items-center justify-end bg-black/40 rounded border border-white/10 px-2 h-7 w-20 ml-auto">
+                                                            <span className="text-[10px] text-muted-foreground mr-0.5">$</span>
+                                                            <input 
+                                                                type="number"
+                                                                value={item.price || 0}
+                                                                onChange={(e) => {
+                                                                    const newPrice = parseFloat(e.target.value) || 0;
+                                                                    // Update selectedOrder items
+                                                                    const updatedItems = [...selectedOrder.items];
+                                                                    updatedItems[idx] = { ...updatedItems[idx], price: newPrice };
+                                                                    const newGrandTotal = updatedItems.reduce((sum, it) => sum + (it.price * it.quantity), 0);
+                                                                    
+                                                                    const newSelectedOrder = {
+                                                                        ...selectedOrder,
+                                                                        items: updatedItems,
+                                                                        grandTotal: newGrandTotal
+                                                                    };
+                                                                    setSelectedOrder(newSelectedOrder);
+
+                                                                    // Sync back to orders list
+                                                                    const updatedOrders = orders.map(o => {
+                                                                        if (o._id === selectedOrder._id) {
+                                                                            return newSelectedOrder;
+                                                                        }
+                                                                        return o;
+                                                                    });
+                                                                    setOrders(updatedOrders);
+                                                                }}
+                                                                className="bg-transparent border-none text-right w-14 text-xs font-mono text-emerald-400 focus:outline-none focus:ring-0 p-0"
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-zinc-400 font-mono">${item.price?.toLocaleString()}</span>
+                                                    )}
+                                                </td>
                                                 <td className="px-4 py-3 text-right font-mono text-white">${(item.price * item.quantity).toLocaleString()}</td>
                                             </tr>
                                         ))}
