@@ -106,7 +106,7 @@ export async function generateReportData(startDate: string | Date, endDate: stri
                 totalExpense += t.amount;
                 
                 const isYKZ = memoLower.includes('ykz') || toLower.includes('ykz') || toLower.includes('6838311307');
-                const isMLB = memoLower.includes('mlb') || toLower.includes('mlb') || toLower.includes('9144066578');
+                const isMLB = memoLower.includes('mlb') || toLower.includes('mlb') || toLower.includes('7732894620');
 
                 if (isYKZ || isMLB) {
                     rawMaterialsExpense += t.amount;
@@ -213,7 +213,7 @@ export async function generateFullShopReportData(startDate: string | Date, endDa
                 totalExpense += t.amount;
 
                 const isYKZ = memoLower.includes('ykz') || toLower.includes('ykz') || toLower.includes('6838311307');
-                const isMLB = memoLower.includes('mlb') || toLower.includes('mlb') || toLower.includes('9144066578');
+                const isMLB = memoLower.includes('mlb') || toLower.includes('mlb') || toLower.includes('7732894620');
 
                 if (isYKZ || isMLB) {
                     rawMaterialsExpense += t.amount;
