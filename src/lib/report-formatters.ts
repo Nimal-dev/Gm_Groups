@@ -75,6 +75,38 @@ export function formatReport(type: string, data: any, to: string, from: string, 
         ? data.miscellaneousDetails.map((m: any) => `    - ${(m.memo || 'Unknown').substring(0, 30).padEnd(30)} | ${padStart(fmt(m.amount), 20)}`).join('\n')
         : '    - No miscellaneous expenses                            | ' + padStart('$ 0.00', 20);
 
+    let salesSection = '';
+    if (data.salesData) {
+        const sales = data.salesData;
+        const formatMins = (ms: number) => Math.round(ms / 60000);
+        const itemsRows = sales.itemsReport.slice(0, 15).map((item: any, i: number) => {
+            const name = item.name.substring(0, 30).padEnd(32);
+            const qty = item.quantity.toString().padStart(8);
+            const st = fmt(item.subtotal).padStart(15);
+            return ` ${(i + 1).toString().padStart(2)}. ${name}${qty}${st}`;
+        }).join('\n');
+
+        salesSection = `
+SALES OVERVIEW
+--------------------------------------------------------------------------------
+ Metric                   | Value
+--------------------------|-----------------------------------------------------
+ Total Sales Revenue      | ${padStart(fmt(sales.totalSalesAmount), 20)}
+ Avg Daily Revenue        | ${padStart(fmt(sales.avgAmountPerDay), 20)}
+ Avg Daily Transactions   | ${padStart(sales.avgSalesPerDay.toFixed(1), 20)}
+ Total Shop Uptime (mins) | ${padStart(formatMins(sales.totalUptimeMs).toString(), 20)}
+ Avg Daily Uptime (mins)  | ${padStart(formatMins(sales.avgUptimePerDayMs).toString(), 20)}
+--------------------------------------------------------------------------------
+
+TOP ITEMS SOLD
+--------------------------------------------------------------------------------
+ Rank Item Name                        Quantity       Subtotal
+--------------------------------------------------------------------------------
+${itemsRows || ' No sales data recorded in this period.'}
+--------------------------------------------------------------------------------
+`;
+    }
+
     return `
 ${center('KOI CAFE')}
 ${center(`${type.toUpperCase()} PERFORMANCE REVIEW`)}
@@ -113,7 +145,7 @@ HUMAN RESOURCES SUMMARY
  New Members              | ${padStart(data.membersAdded.toString(), 20)}
  Members Removed          | ${padStart(membersRemoved || '0', 20)}
 --------------------------------------------------------------------------------
-
+${salesSection ? `${salesSection}\n` : ''}
 CERTIFICATION
 --------------------------------------------------------------------------------
 I hereby certify that the information provided in this report is accurate and

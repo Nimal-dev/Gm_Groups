@@ -25,6 +25,7 @@ interface ReportData {
     mlbRawMaterials: number;
     miscellaneousExpense: number;
     miscellaneousDetails: { memo: string; amount: number; date?: string }[];
+    salesData?: Omit<SalesReportData, 'aiAnalysis'>;
 }
 
 export interface FullReportData {
@@ -133,6 +134,18 @@ export async function generateReportData(startDate: string | Date, endDate: stri
             joinedAt: { $gte: start, $lte: end }
         });
 
+        // Fetch Sales Report Data (without AI analysis)
+        let salesData: Omit<SalesReportData, 'aiAnalysis'> | undefined = undefined;
+        try {
+            const salesResult = await generateSalesReportData(startDate, endDate, true);
+            if (salesResult.success && salesResult.data) {
+                const { aiAnalysis, ...rest } = salesResult.data;
+                salesData = rest;
+            }
+        } catch (e) {
+            console.error('Failed to fetch sales data for report:', e);
+        }
+
         return {
             success: true,
             data: {
@@ -148,7 +161,8 @@ export async function generateReportData(startDate: string | Date, endDate: stri
                 ykzRawMaterials,
                 mlbRawMaterials,
                 miscellaneousExpense,
-                miscellaneousDetails
+                miscellaneousDetails,
+                salesData
             }
         };
     } catch (error: any) {
@@ -310,7 +324,7 @@ export interface SalesReportData {
     aiAnalysis: string;
 }
 
-export async function generateSalesReportData(startDate: string | Date, endDate: string | Date): Promise<{ success: boolean; data?: SalesReportData; error?: string }> {
+export async function generateSalesReportData(startDate: string | Date, endDate: string | Date, skipAi: boolean = false): Promise<{ success: boolean; data?: SalesReportData; error?: string }> {
     try {
         await connectToDatabase();
 
@@ -382,9 +396,10 @@ export async function generateSalesReportData(startDate: string | Date, endDate:
 
         // AI Analysis
         let aiAnalysisText = "";
-        try {
-            const formatMins = (ms: number) => Math.round(ms / 60000);
-            const prompt = `Analyze the following sales data for a coffee/food shop from ${start.toLocaleDateString()} to ${end.toLocaleDateString()}.
+        if (!skipAi) {
+            try {
+                const formatMins = (ms: number) => Math.round(ms / 60000);
+                const prompt = `Analyze the following sales data for a coffee/food shop from ${start.toLocaleDateString()} to ${end.toLocaleDateString()}.
 Data:
 - Total Sales Amount: $${totalSalesAmount.toLocaleString()}
 - Average Daily Sales Count (Transactions): ${avgSalesPerDay.toFixed(1)}
@@ -402,15 +417,16 @@ Business Strategies Context:
 Task:
 Write a highly positive, professional Markdown report emphasizing the success of this period. Focus ONLY on the good outcomes and achievements. Since this is an official report, frame the metrics as a direct result of our highly effective strategies (in-restaurant, bulk, and acquisition teams). Even if the numbers are low, praise the operational consistency, uptime, and the hard work of the team. Do NOT mention any missing data, inaccuracies, low performance, or loopholes. Produce a polished 2-3 paragraph presentation that highlights this period as a definitive success.`;
 
-            const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-            const completion = await groq.chat.completions.create({
-                messages: [{ role: "user", content: prompt }],
-                model: "llama-3.3-70b-versatile",
-            });
-            aiAnalysisText = completion.choices[0]?.message?.content || "AI Analysis unavailable.";
-        } catch (aiErr) {
-            console.error("AI Generation Error:", aiErr);
-            aiAnalysisText = "AI Analysis is currently unavailable due to an error fetching insights.";
+                const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+                const completion = await groq.chat.completions.create({
+                    messages: [{ role: "user", content: prompt }],
+                    model: "llama-3.3-70b-versatile",
+                });
+                aiAnalysisText = completion.choices[0]?.message?.content || "AI Analysis unavailable.";
+            } catch (aiErr) {
+                console.error("AI Generation Error:", aiErr);
+                aiAnalysisText = "AI Analysis is currently unavailable due to an error fetching insights.";
+            }
         }
 
 
