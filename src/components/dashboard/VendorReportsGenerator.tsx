@@ -137,7 +137,7 @@ Generated via GM Dashboard
                         <Card className="glass-card bg-emerald-500/5 border-emerald-500/20">
                             <CardContent className="p-4">
                                 <p className="text-xs text-emerald-400 uppercase tracking-wider font-semibold">Grand Total</p>
-                                <p className="text-2xl font-bold text-white mt-1">$${reportData.grandTotalAmount.toLocaleString()}</p>
+                                <p className="text-2xl font-bold text-white mt-1">${reportData.grandTotalAmount.toLocaleString()}</p>
                             </CardContent>
                         </Card>
                         <Card className="glass-card bg-blue-500/5 border-blue-500/20">
@@ -196,10 +196,10 @@ Generated via GM Dashboard
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell className="text-right font-mono text-emerald-400">
-                                                    $${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </TableCell>
                                                 <TableCell className="text-right font-mono font-bold text-white">
-                                                    $${item.totalPrice.toLocaleString()}
+                                                    ${item.totalPrice.toLocaleString()}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
