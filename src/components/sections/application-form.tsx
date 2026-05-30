@@ -16,6 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 const ApplicationSchema = z.object({
     realName: z.string().min(1, "Real name is required").max(50),
+    age: z.string().min(1, "Age is required").max(3),
     cityName: z.string().min(1, "In-Game name is required").max(50),
     affiliations: z.string().min(1, "Affiliations are required").max(100),
     experience: z.string().min(10, "Please provide more detail about your experience").max(1000),
@@ -33,6 +34,7 @@ export function ApplicationForm() {
         resolver: zodResolver(ApplicationSchema),
         defaultValues: {
             realName: '',
+            age: '',
             cityName: '',
             affiliations: '',
             experience: '',
@@ -142,6 +144,28 @@ export function ApplicationForm() {
 
                                 <FormField
                                     control={form.control}
+                                    name="age"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="flex items-center gap-2 text-white/80">
+                                                <UserCircle className="w-4 h-4 text-orange-400" /> Age
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Your Age"
+                                                    {...field}
+                                                    className="bg-black/20 border-white/10 focus:border-orange-500/50 focus:ring-orange-500/20 text-white placeholder:text-white/20 h-12"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <FormField
+                                    control={form.control}
                                     name="cityName"
                                     render={({ field }) => (
                                         <FormItem>
@@ -159,27 +183,27 @@ export function ApplicationForm() {
                                         </FormItem>
                                     )}
                                 />
-                            </div>
 
-                            <FormField
-                                control={form.control}
-                                name="affiliations"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="flex items-center gap-2 text-white/80">
-                                            <Building2 className="w-4 h-4 text-purple-400" /> Current Affiliations
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Gang / XPD / XMD / Club (or 'None')"
-                                                {...field}
-                                                className="bg-black/20 border-white/10 focus:border-purple-500/50 focus:ring-purple-500/20 text-white placeholder:text-white/20 h-12"
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                <FormField
+                                    control={form.control}
+                                    name="affiliations"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="flex items-center gap-2 text-white/80">
+                                                <Building2 className="w-4 h-4 text-purple-400" /> Current Affiliations
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Gang / XPD / XMD / Club (or 'None')"
+                                                    {...field}
+                                                    className="bg-black/20 border-white/10 focus:border-purple-500/50 focus:ring-purple-500/20 text-white placeholder:text-white/20 h-12"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
 
                             <FormField
                                 control={form.control}
@@ -187,7 +211,7 @@ export function ApplicationForm() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="flex items-center gap-2 text-white/80">
-                                            <BookHeart className="w-4 h-4 text-pink-400" /> Motivation & Experience
+                                            <BookHeart className="w-4 h-4 text-pink-400" /> Why do you want to join?
                                         </FormLabel>
                                         <FormControl>
                                             <Textarea

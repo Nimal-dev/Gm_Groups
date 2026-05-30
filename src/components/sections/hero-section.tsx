@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronDown } from "lucide-react";
+import { discordApplyLogin } from "@/actions/auth";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import gm_wp from "../../../public/gm_wallpaper.jpg";
@@ -83,15 +84,15 @@ export function HeroSection() {
           transition={{ duration: 0.8, delay: 0.8 }}
           className="flex flex-col sm:flex-row gap-6"
         >
-          <Button
-            asChild
-            size="lg"
-            className="h-16 px-10 text-lg font-black bg-primary hover:bg-white text-black rounded-none skew-x-[-12deg] transition-all duration-300 group"
-          >
-            <Link href="/apply" className="flex items-center gap-2">
-              <span className="skew-x-[12deg]">JOIN GM</span>
-            </Link>
-          </Button>
+          <form action={discordApplyLogin}>
+            <Button
+              type="submit"
+              size="lg"
+              className="h-16 px-10 text-lg font-black bg-primary hover:bg-white text-black rounded-none skew-x-[-12deg] transition-all duration-300 group"
+            >
+              <span className="skew-x-[12deg] flex items-center gap-2">JOIN GM</span>
+            </Button>
+          </form>
 
           <Button
             asChild

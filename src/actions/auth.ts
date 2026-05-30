@@ -11,6 +11,10 @@ export async function discordLogin() {
     await signIn('discord');
 }
 
+export async function discordApplyLogin() {
+    await signIn('discord', { redirectTo: '/apply' });
+}
+
 export async function mpinLogin(prevState: any, formData: FormData) {
     try {
         console.log('Attempting MPIN login for Login ID:', formData.get('loginId'));
