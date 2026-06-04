@@ -26,13 +26,19 @@ export default function MaterialsBillsTab() {
     const [bills, setBills] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pagination, setPagination] = useState<any>({ page: 1, limit: 10, total: 0, totalPages: 1 });
     const { toast } = useToast();
 
-    const fetchBills = async () => {
+    const fetchBills = async (page: number = 1) => {
         setLoading(true);
-        const res = await getAdminBills();
+        const res = await getAdminBills(page, 10);
         if (res.success) {
             setBills(res.bills);
+            if (res.pagination) {
+                setPagination(res.pagination);
+            }
+            setCurrentPage(page);
         } else {
             toast({ title: 'Error', description: res.error, variant: 'destructive' });
         }
@@ -40,7 +46,7 @@ export default function MaterialsBillsTab() {
     };
 
     useEffect(() => {
-        fetchBills();
+        fetchBills(1);
     }, []);
 
     const handleMarkAsPaid = async (billId: string) => {
@@ -52,14 +58,14 @@ export default function MaterialsBillsTab() {
                 description: 'Bill marked as paid and status updated.',
                 className: 'bg-green-600 border-none'
             });
-            fetchBills();
+            fetchBills(currentPage);
         } else {
             toast({ title: 'Error', description: res.error, variant: 'destructive' });
         }
         setActionLoading(null);
     };
 
-    if (loading) {
+    if (loading && bills.length === 0) {
         return (
             <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">
                 <div className="flex flex-col items-center gap-4">
@@ -80,19 +86,19 @@ export default function MaterialsBillsTab() {
                         </CardTitle>
                         <CardDescription>Review and manage invoices sent by raw material vendors.</CardDescription>
                     </div>
-                    <Button variant="outline" size="sm" onClick={fetchBills} disabled={loading} className="border-white/10 hover:bg-white/5">
+                    <Button variant="outline" size="sm" onClick={() => fetchBills(currentPage)} disabled={loading} className="border-white/10 hover:bg-white/5">
                         <Loader2 className={`w-3 h-3 mr-2 ${loading ? 'animate-spin' : ''}`} /> Refresh
                     </Button>
                 </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-col justify-between">
                 {bills.length === 0 ? (
                     <div className="text-center py-20 text-muted-foreground border-2 border-dashed border-white/5 rounded-xl">
                         <AlertCircle className="w-12 h-12 mx-auto mb-4 opacity-20" />
                         <p>No material bills received yet.</p>
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-4">
+                    <div className={`flex flex-col gap-4 transition-opacity duration-200 ${loading ? 'opacity-50 pointer-events-none' : ''}`}>
                         {bills.map((bill) => (
                             <BillItem 
                                 key={bill._id} 
@@ -101,6 +107,35 @@ export default function MaterialsBillsTab() {
                                 loading={actionLoading === bill._id} 
                             />
                         ))}
+                    </div>
+                )}
+
+                {/* Pagination Controls */}
+                {pagination && pagination.totalPages > 1 && (
+                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/10">
+                        <div className="text-xs text-muted-foreground">
+                            Page {currentPage} of {pagination.totalPages} | Total: {pagination.total} Bills
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => fetchBills(currentPage - 1)}
+                                disabled={currentPage <= 1 || loading}
+                                className="h-8 w-8 p-0 border-white/10 hover:bg-white/5 disabled:opacity-30"
+                            >
+                                &lt;
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => fetchBills(currentPage + 1)}
+                                disabled={currentPage >= pagination.totalPages || loading}
+                                className="h-8 w-8 p-0 border-white/10 hover:bg-white/5 disabled:opacity-30"
+                            >
+                                &gt;
+                            </Button>
+                        </div>
                     </div>
                 )}
             </CardContent>

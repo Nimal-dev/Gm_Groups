@@ -211,15 +211,24 @@ export async function createVendorBill(payload: {
     }
 }
 
-export async function getAdminBills() {
+export async function getAdminBills(page: number = 1, limit: number = 10) {
     try {
-        const response = await fetchBot('/api/admin/bills', { method: 'GET', cache: 'no-store' });
+        const response = await fetchBot(`/api/admin/bills?page=${page}&limit=${limit}`, { method: 'GET', cache: 'no-store' });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
-        return { success: true, bills: data.bills };
+        return { 
+            success: true, 
+            bills: data.bills,
+            pagination: data.pagination || { page: 1, limit: 10, total: data.bills.length, totalPages: 1 }
+        };
     } catch (error: any) {
         console.error('Get Admin Bills Error:', error);
-        return { success: false, error: error.message, bills: [] };
+        return { 
+            success: false, 
+            error: error.message, 
+            bills: [],
+            pagination: { page: 1, limit: 10, total: 0, totalPages: 0 }
+        };
     }
 }
 
