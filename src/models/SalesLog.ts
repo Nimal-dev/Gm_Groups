@@ -12,6 +12,9 @@ export interface ISalesLog extends Document {
     items: ISalesLogItem[];
     discount: number;
     total: number;
+    date?: string;
+    commissionRate?: number;
+    commissionEarned?: number;
     createdAt: Date;
 }
 
@@ -27,8 +30,14 @@ const SalesLogSchema: Schema = new Schema({
     items: [SalesLogItemSchema],
     discount: { type: Number, default: 0 },
     total: { type: Number, required: true },
+    date: { type: String },
+    commissionRate: { type: Number, default: 0.05 },
+    commissionEarned: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now }
 });
+
+// Indexes
+SalesLogSchema.index({ userId: 1, date: 1 });
 
 // Force delete model if it exists to prevent caching issues during dev
 if (mongoose.models && mongoose.models.SalesLog) {
