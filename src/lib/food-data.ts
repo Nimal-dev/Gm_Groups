@@ -65,8 +65,8 @@ export const MENU_ITEMS: MenuItem[] = [
         prepTime: '10s',
         finishedWeight: 1.1,
         ingredients: [
-            { materialId: 'pork_rib', quantity: 9 },
-            { materialId: 'bbq_sauce', quantity: 9 },
+            { materialId: 'pork_rib', quantity: 15 },
+            { materialId: 'bbq_sauce', quantity: 15 },
         ]
     },
     {
@@ -77,10 +77,10 @@ export const MENU_ITEMS: MenuItem[] = [
         prepTime: '30s',
         finishedWeight: 6.0,
         ingredients: [
-            { materialId: 'pork_broth', quantity: 45 },
-            { materialId: 'ramen_noodles', quantity: 45 },
-            { materialId: 'egg', quantity: 45 },
-            { materialId: 'chashu_pork', quantity: 45 },
+            { materialId: 'pork_broth', quantity: 60 },
+            { materialId: 'ramen_noodles', quantity: 60 },
+            { materialId: 'egg', quantity: 60 },
+            { materialId: 'chashu_pork', quantity: 60 },
         ]
     },
     {
@@ -93,10 +93,10 @@ export const MENU_ITEMS: MenuItem[] = [
         ingredients: [
             { materialId: 'sushi_rice', quantity: 30 },
             { materialId: 'nori_sheets', quantity: 60 },
-            { materialId: 'shrimp', quantity: 3 }, // Based on recipe: 3 Shrimp Tempura = 3 Shrimp + 3 Batter
-            { materialId: 'tempura_batter', quantity: 3 },
-            { materialId: 'avocado', quantity: 9 },
-            { materialId: 'eel_sauce', quantity: 3 },
+            { materialId: 'shrimp', quantity: 15 }, // Based on recipe: 15 Shrimp Tempura = 15 Shrimp + 15 Batter
+            { materialId: 'tempura_batter', quantity: 15 },
+            { materialId: 'avocado', quantity: 45 },
+            { materialId: 'eel_sauce', quantity: 15 },
         ]
     },
     {
@@ -136,8 +136,8 @@ export const MENU_ITEMS: MenuItem[] = [
         ingredients: [
             { materialId: 'lime', quantity: 45 },
             { materialId: 'fresh_mint', quantity: 45 },
-            { materialId: 'sugar', quantity: 30 },
-            { materialId: 'carbonated_water', quantity: 30 },
+            { materialId: 'sugar', quantity: 45 },
+            { materialId: 'carbonated_water', quantity: 45 },
             { materialId: 'glass_cup', quantity: 15 },
         ]
     },
