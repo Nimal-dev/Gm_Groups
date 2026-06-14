@@ -110,7 +110,7 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
             discountAmount,
             discountedBase,
             surcharge: surchargeInfo.surcharge,
-            total: citizenForm.isAutoFine ? surchargeInfo.total : (parseFloat(citizenForm.customTotal) || 0),
+            total: citizenForm.isAutoFine ? surchargeInfo.total : (citizenForm.customTotal !== '' ? (parseFloat(citizenForm.customTotal) || 0) : discountedBase),
             surchargeMsg: surchargeInfo.msg,
             surchargeType: surchargeInfo.type
         };
@@ -633,8 +633,13 @@ export function BulkOrderManager({ activeOrders, recurringOrders = [], userRole 
                                         {!citizenForm.isAutoFine && (
                                             <div className="space-y-2 p-3 bg-orange-500/5 border border-orange-500/20 rounded-lg">
                                                 <Label className="text-orange-400">Custom Total Amount ($)</Label>
-                                                <Input required type="number" placeholder="Overwrite total price" value={citizenForm.customTotal} onChange={e => setCitizenForm({ ...citizenForm, customTotal: e.target.value })} />
-                                                <p className="text-[10px] text-orange-400/70">Manual total will override subtotal + surcharge.</p>
+                                                <Input 
+                                                    type="number" 
+                                                    placeholder={`Auto-calculated ($${citizenTotals.discountedBase.toLocaleString()})`} 
+                                                    value={citizenForm.customTotal} 
+                                                    onChange={e => setCitizenForm({ ...citizenForm, customTotal: e.target.value })} 
+                                                />
+                                                <p className="text-[10px] text-orange-400/70">Leave empty to use subtotal minus discount. Manual total will override.</p>
                                             </div>
                                         )}
 

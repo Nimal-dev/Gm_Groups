@@ -278,3 +278,18 @@ export async function getVendorBills(role: string) {
         return { success: false, error: error.message, bills: [] };
     }
 }
+
+export async function cancelVendorBill(orderId: string) {
+    try {
+        const response = await fetchBot('/api/vendor/bills/cancel', {
+            method: 'POST',
+            body: JSON.stringify({ orderId }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error);
+        return { success: true };
+    } catch (error: any) {
+        console.error('Cancel Vendor Bill Error:', error);
+        return { success: false, error: error.message };
+    }
+}

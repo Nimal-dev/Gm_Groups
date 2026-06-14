@@ -232,8 +232,27 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
         } catch (err: any) {
             toast({ title: 'Error', description: err.message, variant: 'destructive' });
         }
+    const handleCancelBill = async (orderId: string): Promise<boolean> => {
+        setUpdatingOrder(orderId);
+        let success = false;
+        try {
+            const mod = await import('@/actions/vendor');
+            const res = await mod.cancelVendorBill(orderId);
+            if (res.success) {
+                toast({ title: 'Bill Cancelled', description: 'The bill has been cancelled and can be resent.', className: 'bg-green-600 border-none' });
+                fetchOrders();
+                fetchBills();
+                success = true;
+            } else {
+                throw new Error(res.error);
+            }
+        } catch (err: any) {
+            toast({ title: 'Error', description: err.message, variant: 'destructive' });
+        }
         setUpdatingOrder(null);
+        return success;
     };
+
 
     const activeOrders = orders.filter(o => !['Cancelled', 'Payment Complete'].includes(o.status));
     const pastOrders = orders.filter(o => ['Cancelled', 'Payment Complete'].includes(o.status));
@@ -424,9 +443,20 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
                                              )}
 
                                              {order.billSent && (
-                                                 <Badge variant="outline" className="text-blue-400 border-blue-500/30 bg-blue-500/5">
-                                                     Bill Sent
-                                                 </Badge>
+                                                 <div className="flex items-center gap-2">
+                                                     <Badge variant="outline" className="text-blue-400 border-blue-500/30 bg-blue-500/5">
+                                                         Bill Sent
+                                                     </Badge>
+                                                     <Button 
+                                                         size="sm" 
+                                                         variant="ghost" 
+                                                         onClick={() => handleCancelBill(order._id)}
+                                                         disabled={updatingOrder === order._id}
+                                                         className="text-[10px] h-7 px-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/10 flex items-center gap-1"
+                                                     >
+                                                         <X className="w-3 h-3" /> Cancel Bill
+                                                     </Button>
+                                                 </div>
                                              )}
 
                                              {!['Delivered', 'Payment Complete', 'Cancelled'].includes(order.status) && (
@@ -1071,18 +1101,36 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
                         )}
 
                         {/* Bill Settlement Link Info */}
-                        <div className="bg-zinc-900/50 p-4 rounded-xl border border-white/5 flex items-center justify-between text-xs">
-                            <span className="text-zinc-500 font-bold uppercase tracking-wider text-[10px]">Billing Status</span>
-                            <Badge 
-                                variant="outline"
-                                className={`text-[10px] py-0 px-2 font-bold ${
-                                    selectedOrder?.billSent 
-                                        ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' 
-                                        : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
-                                }`}
-                            >
-                                {selectedOrder?.billSent ? 'Bill Invoiced & Sent' : 'Unbilled / Pending Delivery'}
-                            </Badge>
+                        <div className="bg-zinc-900/50 p-4 rounded-xl border border-white/5 flex flex-col gap-2 text-xs">
+                            <div className="flex items-center justify-between">
+                                <span className="text-zinc-500 font-bold uppercase tracking-wider text-[10px]">Billing Status</span>
+                                <Badge 
+                                    variant="outline"
+                                    className={`text-[10px] py-0 px-2 font-bold ${
+                                        selectedOrder?.billSent 
+                                            ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' 
+                                            : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                                    }`}
+                                >
+                                    {selectedOrder?.billSent ? 'Bill Invoiced & Sent' : 'Unbilled / Pending Delivery'}
+                                </Badge>
+                            </div>
+                            {selectedOrder?.billSent && (
+                                <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    onClick={async () => {
+                                        const success = await handleCancelBill(selectedOrder._id);
+                                        if (success) {
+                                            setSelectedOrder((prev: any) => prev ? { ...prev, billSent: false } : null);
+                                        }
+                                    }}
+                                    disabled={updatingOrder === selectedOrder?._id}
+                                    className="w-full text-[10px] h-7 text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/10 flex items-center justify-center gap-1 mt-1"
+                                >
+                                    <X className="w-3 h-3" /> Cancel Sent Bill
+                                </Button>
+                            )}
                         </div>
                     </div>
 
@@ -1099,4 +1147,4 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
         </div>
     );
 }
-
+}
