@@ -232,6 +232,8 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
         } catch (err: any) {
             toast({ title: 'Error', description: err.message, variant: 'destructive' });
         }
+        setUpdatingOrder(null);
+    };
     const handleCancelBill = async (orderId: string): Promise<boolean> => {
         setUpdatingOrder(orderId);
         let success = false;
@@ -1146,5 +1148,4 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
             </Sheet>
         </div>
     );
-}
 }
