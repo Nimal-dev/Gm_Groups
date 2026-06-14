@@ -61,7 +61,7 @@ export const MENU_ITEMS: MenuItem[] = [
         id: 'bbq_ribs',
         name: 'BBQ Ribs',
         category: 'Food',
-        batchSize: 3,
+        batchSize: 5,
         prepTime: '10s',
         finishedWeight: 1.1,
         ingredients: [

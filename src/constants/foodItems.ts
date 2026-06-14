@@ -10,7 +10,7 @@ export const ITEM_CATEGORIES = {
 };
 
 export const BATCH_SIZES: Record<string, number> = {
-    'BBQ Ribs': 3,
+    'BBQ Ribs': 5,
     'Ramen': 15,
     'Dragon Roll': 15,
     'Garden Salad': 9,
