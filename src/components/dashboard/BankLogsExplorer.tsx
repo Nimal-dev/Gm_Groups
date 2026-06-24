@@ -62,8 +62,10 @@ export function BankLogsExplorer({ userRole = 'staff' }: BankLogsExplorerProps) 
             memo: '',
             date: localISOTime,
             transferredTo: '',
-            transferredFrom: '',
             newBalance: ''
+        });
+        setFormError('');
+        setIsAddModalOpen(true);
     };
 
     const handleAddTransactionSubmit = async (e: React.FormEvent) => {
