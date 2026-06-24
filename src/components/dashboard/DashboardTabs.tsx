@@ -537,9 +537,8 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
             {
                 isAdmin && (
                     <>
-                        {/* BANK LOGS TAB */}
                         <TabsContent value="bank" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
-                            <BankLogsExplorer key="paginated-view" />
+                            <BankLogsExplorer key="paginated-view" userRole={userRole} />
                         </TabsContent>
 
                         {/* FINANCES TAB */}

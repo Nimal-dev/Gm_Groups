@@ -2,7 +2,9 @@
 
 import connectToDatabase from '@/lib/db';
 import BankTransaction from '@/models/BankTransaction';
+import BankBalanceLog from '@/models/BankBalanceLog';
 import { getLocalPeriodRange } from '@/lib/date-utils';
+import { revalidatePath } from 'next/cache';
 
 interface BankLogFilter {
     type?: string;
@@ -152,5 +154,103 @@ export async function getBankLogs(filter: BankLogFilter) {
             stats: { totalIncome: 0, totalExpense: 0, count: 0 },
             pagination: { page: 1, pageSize: 20, total: 0, totalPages: 0 }
         };
+    }
+}
+
+export async function addManualTransaction(data: {
+    accountName: string;
+    accountNumber: string;
+    transactionType: 'TRANSFER' | 'DEPOSIT' | 'WITHDRAW' | 'BALANCE_UPDATE';
+    amount: number;
+    memo?: string;
+    date?: string;
+    transferredTo?: string;
+    transferredFrom?: string;
+    newBalance?: number;
+}) {
+    try {
+        const session = await auth();
+        if (!session?.user || (session.user.role !== 'admin' && session.user.role !== 'staff')) {
+            throw new Error('Unauthorized Access');
+        }
+
+        if (data.transactionType !== 'BALANCE_UPDATE' && (!data.amount || data.amount <= 0)) {
+            throw new Error('Amount must be a positive number');
+        }
+
+        await connectToDatabase();
+
+        const {
+            accountName,
+            accountNumber,
+            transactionType,
+            amount,
+            memo = '',
+            date,
+            transferredTo,
+            transferredFrom,
+            newBalance: manualNewBalance
+        } = data;
+
+        const txDate = date ? new Date(date) : new Date();
+        const txId = `MAN-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+        const COMPANY_ACCOUNT_NUMBER = '3571970372';
+        let calculatedNewBalance: number | undefined = undefined;
+
+        if (accountNumber === COMPANY_ACCOUNT_NUMBER) {
+            const latestBalanceLog = await BankBalanceLog.findOne({ accountNumber: COMPANY_ACCOUNT_NUMBER })
+                .sort({ date: -1, _id: -1 })
+                .lean();
+
+            const oldBalance = latestBalanceLog ? latestBalanceLog.newBalance : 0;
+
+            if (transactionType === 'BALANCE_UPDATE') {
+                calculatedNewBalance = manualNewBalance !== undefined ? manualNewBalance : oldBalance;
+            } else if (transactionType === 'DEPOSIT') {
+                calculatedNewBalance = oldBalance + amount;
+            } else if (transactionType === 'WITHDRAW') {
+                calculatedNewBalance = oldBalance - amount;
+            } else if (transactionType === 'TRANSFER') {
+                const memoLower = memo.toLowerCase();
+                const isExpense = transferredTo || memoLower.includes('transfer to');
+                if (isExpense) {
+                    calculatedNewBalance = oldBalance - amount;
+                } else {
+                    calculatedNewBalance = oldBalance + amount;
+                }
+            }
+
+            if (calculatedNewBalance !== undefined) {
+                await BankBalanceLog.create({
+                    messageId: `bal-man-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`,
+                    accountNumber: COMPANY_ACCOUNT_NUMBER,
+                    oldBalance: oldBalance,
+                    newBalance: calculatedNewBalance,
+                    date: txDate
+                });
+            }
+        }
+
+        await BankTransaction.create({
+            transactionId: txId,
+            accountName,
+            accountNumber,
+            transactionType,
+            amount: transactionType === 'BALANCE_UPDATE' ? 0 : amount,
+            memo,
+            date: txDate,
+            transferredTo,
+            transferredFrom,
+            newBalance: calculatedNewBalance
+        });
+
+        revalidatePath('/dashboard');
+        revalidatePath('/portal/dashboard');
+
+        return { success: true };
+    } catch (error: any) {
+        console.error('Add Manual Transaction Error:', error);
+        return { success: false, error: error.message || 'Failed to add manual transaction' };
     }
 }

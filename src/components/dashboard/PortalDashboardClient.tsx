@@ -412,7 +412,7 @@ export function PortalDashboardClient({
                         </TabsContent>
 
                         <TabsContent value="bank" className="space-y-6 h-auto min-h-[500px] lg:h-[800px]">
-                            <BankLogsExplorer key="portal-bank-view" />
+                            <BankLogsExplorer key="portal-bank-view" userRole={userRole} />
                         </TabsContent>
 
                         <TabsContent value="finances" className="space-y-6">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getBankLogs } from '@/actions/bank';
+import { getBankLogs, addManualTransaction } from '@/actions/bank';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader2, Filter, ArrowUpRight, ArrowDownLeft, RefreshCcw } from 'lucide-react';
+import { Loader2, Filter, ArrowUpRight, ArrowDownLeft, RefreshCcw, Plus, DollarSign } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -17,10 +17,109 @@ import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ClientTime } from '@/components/dashboard/ClientTime';
+import { useToast } from '@/hooks/use-toast';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 
-export function BankLogsExplorer() {
+interface BankLogsExplorerProps {
+    userRole?: string;
+}
+
+export function BankLogsExplorer({ userRole = 'staff' }: BankLogsExplorerProps) {
+    const { toast } = useToast();
+    const canEdit = userRole === 'admin' || userRole === 'staff';
+
     const [transactionType, setTransactionType] = useState<string>('all');
     const [searchTerm, setSearchTerm] = useState('');
+
+    // Manual Transaction Form State
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [formError, setFormError] = useState('');
+    const [formFields, setFormFields] = useState({
+        accountName: 'KOI CAFE',
+        accountNumber: '3571970372',
+        transactionType: 'TRANSFER' as 'TRANSFER' | 'DEPOSIT' | 'WITHDRAW' | 'BALANCE_UPDATE',
+        amount: '',
+        memo: '',
+        date: '',
+        transferredTo: '',
+        transferredFrom: '',
+        newBalance: ''
+    });
+
+    const openAddModal = () => {
+        // Adjust for local timezone offset when getting ISO string
+        const localDate = new Date();
+        const offset = localDate.getTimezoneOffset() * 60000;
+        const localISOTime = (new Date(localDate.getTime() - offset)).toISOString().slice(0, 16);
+
+        setFormFields({
+            accountName: 'KOI CAFE',
+            accountNumber: '3571970372',
+            transactionType: 'TRANSFER',
+            amount: '',
+            memo: '',
+            date: localISOTime,
+            transferredTo: '',
+            transferredFrom: '',
+            newBalance: ''
+    };
+
+    const handleAddTransactionSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setFormError('');
+        setIsSubmitting(true);
+
+        try {
+            // Validation
+            if (!formFields.accountName.trim()) {
+                throw new Error('Account Name is required');
+            }
+            if (!formFields.accountNumber.trim()) {
+                throw new Error('Account Number is required');
+            }
+            if (formFields.transactionType !== 'BALANCE_UPDATE') {
+                const amt = parseFloat(formFields.amount);
+                if (isNaN(amt) || amt <= 0) {
+                    throw new Error('Amount must be a positive number');
+                }
+            } else {
+                const bal = parseFloat(formFields.newBalance);
+                if (isNaN(bal)) {
+                    throw new Error('New Balance must be a number');
+                }
+            }
+
+            const result = await addManualTransaction({
+                accountName: formFields.accountName.trim(),
+                accountNumber: formFields.accountNumber.trim(),
+                transactionType: formFields.transactionType,
+                amount: formFields.transactionType === 'BALANCE_UPDATE' ? 0 : parseFloat(formFields.amount),
+                memo: formFields.memo.trim(),
+                date: formFields.date || undefined,
+                transferredTo: formFields.transactionType === 'TRANSFER' ? formFields.transferredTo.trim() || undefined : undefined,
+                transferredFrom: formFields.transactionType === 'TRANSFER' ? formFields.transferredFrom.trim() || undefined : undefined,
+                newBalance: formFields.transactionType === 'BALANCE_UPDATE' ? parseFloat(formFields.newBalance) : undefined
+            });
+
+            if (result.success) {
+                toast({
+                    title: 'Transaction Added',
+                    description: 'The transaction has been successfully logged.'
+                });
+                setIsAddModalOpen(false);
+                handleSearch(1); // Reload logs
+            } else {
+                setFormError(result.error || 'Failed to save transaction');
+            }
+        } catch (error: any) {
+            setFormError(error.message || 'An error occurred');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     const [dateRange, setDateRange] = useState<DateRange | undefined>({
         from: new Date(new Date().getFullYear(), new Date().getMonth(), 1), // Start of current month
         to: new Date()
@@ -130,9 +229,19 @@ export function BankLogsExplorer() {
             )}
 
             <Card className="glass-card flex-1 flex flex-col min-h-0">
-                <CardHeader>
-                    <CardTitle>Bank Transaction Logs</CardTitle>
-                    <CardDescription>Search and filter global financial records.</CardDescription>
+                <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
+                    <div>
+                        <CardTitle>Bank Transaction Logs</CardTitle>
+                        <CardDescription>Search and filter global financial records.</CardDescription>
+                    </div>
+                    {canEdit && (
+                        <Button
+                            onClick={openAddModal}
+                            className="bg-accent hover:bg-accent/80 text-black flex items-center gap-2 w-full sm:w-auto font-semibold"
+                        >
+                            <Plus className="w-4 h-4" /> Add Transaction
+                        </Button>
+                    )}
                 </CardHeader>
                 <CardContent className="space-y-4 flex-1 flex flex-col min-h-0">
                     {/* Filters */}
@@ -347,6 +456,169 @@ export function BankLogsExplorer() {
                     )}
                 </CardContent>
             </Card>
+
+            {/* Add Transaction Dialog */}
+            <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+                <DialogContent className="glass-card max-w-lg border-white/10 text-white bg-[#121212]/95 backdrop-blur-xl">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-xl font-bold">
+                            <Plus className="w-5 h-5 text-accent" /> Log Bank Transaction
+                        </DialogTitle>
+                        <DialogDescription className="text-muted-foreground">
+                            Manually add a deposit, withdrawal, transfer, or balance update.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <form onSubmit={handleAddTransactionSubmit} className="space-y-4 py-2">
+                        {formError && (
+                            <div className="p-3 rounded bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                                {formError}
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-muted-foreground uppercase">Account Name</label>
+                                <Input
+                                    value={formFields.accountName}
+                                    onChange={(e) => setFormFields(prev => ({ ...prev, accountName: e.target.value }))}
+                                    placeholder="KOI CAFE"
+                                    className="bg-black/40 border-white/10 text-white"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-muted-foreground uppercase">Account Number</label>
+                                <Input
+                                    value={formFields.accountNumber}
+                                    onChange={(e) => setFormFields(prev => ({ ...prev, accountNumber: e.target.value }))}
+                                    placeholder="3571970372"
+                                    className="bg-black/40 border-white/10 text-white"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-muted-foreground uppercase">Transaction Type</label>
+                                <Select
+                                    value={formFields.transactionType}
+                                    onValueChange={(val: any) => setFormFields(prev => ({ ...prev, transactionType: val }))}
+                                >
+                                    <SelectTrigger className="bg-black/40 border-white/10 text-white">
+                                        <SelectValue placeholder="Select type" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-[#1a1a1a] border-white/10 text-white">
+                                        <SelectItem value="TRANSFER">Transfer</SelectItem>
+                                        <SelectItem value="DEPOSIT">Deposit</SelectItem>
+                                        <SelectItem value="WITHDRAW">Withdrawal</SelectItem>
+                                        <SelectItem value="BALANCE_UPDATE">Balance Update</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-muted-foreground uppercase">Date & Time</label>
+                                <Input
+                                    type="datetime-local"
+                                    value={formFields.date}
+                                    onChange={(e) => setFormFields(prev => ({ ...prev, date: e.target.value }))}
+                                    className="bg-black/40 border-white/10 text-white [color-scheme:dark]"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        {formFields.transactionType !== 'BALANCE_UPDATE' ? (
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-muted-foreground uppercase">Amount ($)</label>
+                                <div className="relative">
+                                    <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="0.00"
+                                        value={formFields.amount}
+                                        onChange={(e) => setFormFields(prev => ({ ...prev, amount: e.target.value }))}
+                                        className="pl-9 bg-black/40 border-white/10 text-white"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-muted-foreground uppercase">New Balance ($)</label>
+                                <div className="relative">
+                                    <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="0.00"
+                                        value={formFields.newBalance}
+                                        onChange={(e) => setFormFields(prev => ({ ...prev, newBalance: e.target.value }))}
+                                        className="pl-9 bg-black/40 border-white/10 text-white"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {formFields.transactionType === 'TRANSFER' && (
+                            <div className="grid grid-cols-2 gap-4 p-3 rounded-lg bg-black/20 border border-white/5">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-muted-foreground uppercase">Transferred To</label>
+                                    <Input
+                                        value={formFields.transferredTo}
+                                        onChange={(e) => setFormFields(prev => ({ ...prev, transferredTo: e.target.value }))}
+                                        placeholder="Destination Acct #"
+                                        className="bg-black/40 border-white/10 text-xs text-white"
+                                    />
+                                    <span className="text-[10px] text-muted-foreground">For Outgoing Transfers</span>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-muted-foreground uppercase">Transferred From</label>
+                                    <Input
+                                        value={formFields.transferredFrom}
+                                        onChange={(e) => setFormFields(prev => ({ ...prev, transferredFrom: e.target.value }))}
+                                        placeholder="Source Acct #"
+                                        className="bg-black/40 border-white/10 text-xs text-white"
+                                    />
+                                    <span className="text-[10px] text-muted-foreground">For Incoming Transfers</span>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="space-y-1">
+                            <label className="text-xs font-semibold text-muted-foreground uppercase">Memo / Details</label>
+                            <Textarea
+                                placeholder="Describe the purpose of this transaction..."
+                                value={formFields.memo}
+                                onChange={(e) => setFormFields(prev => ({ ...prev, memo: e.target.value }))}
+                                className="bg-black/40 border-white/10 h-20 text-white"
+                            />
+                        </div>
+
+                        <DialogFooter className="pt-4 border-t border-white/10">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                onClick={() => setIsAddModalOpen(false)}
+                                className="hover:bg-white/5 text-white"
+                                disabled={isSubmitting}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="submit"
+                                className="bg-green-600 hover:bg-green-700 text-white min-w-[100px]"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Log Transaction'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

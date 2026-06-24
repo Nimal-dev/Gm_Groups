@@ -3,6 +3,8 @@
 import connectToDatabase from '@/lib/db';
 import SalaryLog from '@/models/SalaryLog';
 import Employee from '@/models/Employee';
+import BankTransaction from '@/models/BankTransaction';
+import BankBalanceLog from '@/models/BankBalanceLog';
 import { auth } from '@/auth';
 import { revalidatePath } from 'next/cache';
 import { logActivity } from '@/actions/log';
@@ -42,8 +44,49 @@ export async function logPayment(userId: string, amount: number, notes?: string)
             date: new Date()
         });
 
+        // Log to BankTransaction and BankBalanceLog
+        const COMPANY_ACCOUNT_NUMBER = '3571970372';
+        const employeeBankAccount = employee.bankAccountNo || 'Not Set';
+
+        // Retrieve latest company balance to calculate the new balance
+        const latestCompanyBalance = await BankBalanceLog.findOne({ accountNumber: COMPANY_ACCOUNT_NUMBER })
+            .sort({ date: -1, _id: -1 })
+            .lean();
+
+        const oldCompanyBalance = latestCompanyBalance ? latestCompanyBalance.newBalance : 0;
+        const newCompanyBalance = oldCompanyBalance - amount;
+
+        const timeStamp = Date.now();
+        const randSuffix = Math.floor(1000 + Math.random() * 9000);
+        const txId = `SAL-${timeStamp}-${randSuffix}`;
+        const balMsgId = `bal-sal-${timeStamp}-${randSuffix}`;
+
+        // Create BankTransaction
+        await BankTransaction.create({
+            transactionId: txId,
+            accountName: 'KOI CAFE',
+            accountNumber: COMPANY_ACCOUNT_NUMBER,
+            transactionType: 'TRANSFER',
+            amount: amount,
+            memo: `Transfer to: Salary Payment to ${employee.nickname || employee.username}. Note: ${notes || 'Salary'}`,
+            date: new Date(),
+            transferredTo: employeeBankAccount,
+            transferredFrom: COMPANY_ACCOUNT_NUMBER,
+            newBalance: newCompanyBalance
+        });
+
+        // Create BankBalanceLog
+        await BankBalanceLog.create({
+            messageId: balMsgId,
+            accountNumber: COMPANY_ACCOUNT_NUMBER,
+            oldBalance: oldCompanyBalance,
+            newBalance: newCompanyBalance,
+            date: new Date()
+        });
+
         await logActivity('Salary Payment', `Paid $${amount} to ${employee.username} (${userId}). Note: ${notes || 'None'}`);
         revalidatePath('/dashboard');
+        revalidatePath('/portal/dashboard');
 
         // LOG TO DISCORD
         const { sendReportToDiscord } = await import('@/actions/discord');
