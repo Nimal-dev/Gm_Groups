@@ -62,6 +62,7 @@ export function BankLogsExplorer({ userRole = 'staff' }: BankLogsExplorerProps) 
             memo: '',
             date: localISOTime,
             transferredTo: '',
+            transferredFrom: '',
             newBalance: ''
         });
         setFormError('');
