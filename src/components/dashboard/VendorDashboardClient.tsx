@@ -82,6 +82,9 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
     // Orders Details drawer state
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
+    // Global refresh state
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
 
     const fetchInventory = useCallback(async () => {
         setLoadingInventory(true);
@@ -131,13 +134,28 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
         setLoadingBills(false);
     }, [vendorRole]);
 
+    const handleRefreshAll = async () => {
+        setIsRefreshing(true);
+        try {
+            await Promise.all([
+                fetchInventory(),
+                fetchOrders(),
+                fetchStaff(),
+                fetchBills()
+            ]);
+            toast({ title: 'Refreshed', description: 'Dashboard data has been updated.' });
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsRefreshing(false);
+        }
+    };
+
     useEffect(() => {
         fetchInventory();
         fetchOrders();
         fetchStaff();
         fetchBills();
-        const interval = setInterval(() => { if (!document.hidden) { fetchOrders(); fetchStaff(); fetchBills(); } }, 60000);
-        return () => clearInterval(interval);
     }, [fetchInventory, fetchOrders, fetchStaff, fetchBills]);
 
 
@@ -297,6 +315,16 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
                     <p className="text-sm text-muted-foreground mt-1">Welcome back, {vendorName}</p>
                 </div>
                 <div className="flex items-center gap-3">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRefreshAll}
+                        disabled={isRefreshing}
+                        className="text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10"
+                    >
+                        <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                        Refresh
+                    </Button>
                     <Badge variant="outline" className="text-emerald-400 border-emerald-500/50 bg-emerald-500/10 px-3 py-1">
                         {vendorRole}
                     </Badge>
@@ -523,14 +551,17 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
                         <h2 className="text-lg font-semibold flex items-center gap-2">
                             <Package className="w-5 h-5 text-emerald-400" /> Inventory Pricing
                         </h2>
-                        <div className="relative w-full md:w-72">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            <Input 
-                                placeholder="Search raw materials..." 
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-9 bg-black/40 border-white/10 focus:ring-emerald-500/50"
-                            />
+                        <div className="flex items-center gap-2 w-full md:w-auto">
+                            <Button variant="ghost" size="sm" onClick={fetchInventory} className="text-muted-foreground"><RefreshCw className="w-4 h-4 mr-1" /> Refresh</Button>
+                            <div className="relative w-full md:w-72">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <Input 
+                                    placeholder="Search raw materials..." 
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="pl-9 bg-black/40 border-white/10 focus:ring-emerald-500/50"
+                                />
+                            </div>
                         </div>
                     </div>
 
