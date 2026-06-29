@@ -49,10 +49,13 @@ export function BankLogsExplorer({ userRole = 'staff' }: BankLogsExplorerProps) 
     });
 
     const openAddModal = () => {
-        // Adjust for local timezone offset when getting ISO string
-        const localDate = new Date();
-        const offset = localDate.getTimezoneOffset() * 60000;
-        const localISOTime = (new Date(localDate.getTime() - offset)).toISOString().slice(0, 16);
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const localISOTime = `${year}-${month}-${day}T${hours}:${minutes}`;
 
         setFormFields({
             accountName: 'KOI CAFE',
@@ -94,13 +97,16 @@ export function BankLogsExplorer({ userRole = 'staff' }: BankLogsExplorerProps) 
                 }
             }
 
+            // Convert local datetime input to proper Date ISO string
+            const submittedDate = formFields.date ? new Date(formFields.date).toISOString() : new Date().toISOString();
+
             const result = await addManualTransaction({
                 accountName: formFields.accountName.trim(),
                 accountNumber: formFields.accountNumber.trim(),
                 transactionType: formFields.transactionType,
                 amount: formFields.transactionType === 'BALANCE_UPDATE' ? 0 : parseFloat(formFields.amount),
                 memo: formFields.memo.trim(),
-                date: formFields.date || undefined,
+                date: submittedDate,
                 transferredTo: formFields.transactionType === 'TRANSFER' ? formFields.transferredTo.trim() || undefined : undefined,
                 transferredFrom: formFields.transactionType === 'TRANSFER' ? formFields.transferredFrom.trim() || undefined : undefined,
                 newBalance: formFields.transactionType === 'BALANCE_UPDATE' ? parseFloat(formFields.newBalance) : undefined
@@ -117,7 +123,11 @@ export function BankLogsExplorer({ userRole = 'staff' }: BankLogsExplorerProps) 
                 setFormError(result.error || 'Failed to save transaction');
             }
         } catch (error: any) {
-            setFormError(error.message || 'An error occurred');
+            if (error?.message?.includes('Server Action') || error?.message?.includes('was not found')) {
+                setFormError('A deployment update occurred. Please refresh the page (F5) and try again.');
+            } else {
+                setFormError(error.message || 'An error occurred');
+            }
         } finally {
             setIsSubmitting(false);
         }

@@ -51,7 +51,7 @@ export async function getBankLogs(filter: BankLogFilter) {
         // Parallel execution for count and data
         const [logs, totalCount] = await Promise.all([
             BankTransaction.find(query)
-                .sort({ createdAt: -1 })
+                .sort({ date: -1, createdAt: -1 })
                 .skip(skip)
                 .limit(limit)
                 .lean(),
