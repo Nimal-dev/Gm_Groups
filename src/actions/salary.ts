@@ -8,6 +8,7 @@ import BankBalanceLog from '@/models/BankBalanceLog';
 import { auth } from '@/auth';
 import { revalidatePath } from 'next/cache';
 import { logActivity } from '@/actions/log';
+import { getLatestCompanyBalance } from '@/actions/bank';
 
 export async function logPayment(userId: string, amount: number, notes?: string) {
     try {
@@ -49,11 +50,7 @@ export async function logPayment(userId: string, amount: number, notes?: string)
         const employeeBankAccount = employee.bankAccountNo || 'Not Set';
 
         // Retrieve latest company balance to calculate the new balance
-        const latestCompanyBalance = await BankBalanceLog.findOne({ accountNumber: COMPANY_ACCOUNT_NUMBER })
-            .sort({ date: -1, _id: -1 })
-            .lean();
-
-        const oldCompanyBalance = latestCompanyBalance ? latestCompanyBalance.newBalance : 0;
+        const oldCompanyBalance = await getLatestCompanyBalance(COMPANY_ACCOUNT_NUMBER);
         const newCompanyBalance = oldCompanyBalance - amount;
 
         const timeStamp = Date.now();

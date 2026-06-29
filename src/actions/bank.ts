@@ -82,19 +82,7 @@ export async function getBankLogs(filter: BankLogFilter) {
                     totalIncome: {
                         $sum: {
                             $cond: [
-                                {
-                                    $or: [
-                                        { $eq: ["$transactionType", "DEPOSIT"] },
-                                        {
-                                            $and: [
-                                                { $eq: ["$transactionType", "TRANSFER"] },
-                                                // Not an expense -> Income
-                                                { $eq: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] },
-                                                { $or: [{ $eq: ["$transferredTo", null] }, { $eq: ["$transferredTo", ""] }] }
-                                            ]
-                                        }
-                                    ]
-                                },
+                                { $eq: ["$transactionType", "DEPOSIT"] },
                                 "$amount",
                                 0
                             ]
@@ -106,17 +94,7 @@ export async function getBankLogs(filter: BankLogFilter) {
                                 {
                                     $or: [
                                         { $eq: ["$transactionType", "WITHDRAW"] },
-                                        {
-                                            $and: [
-                                                { $eq: ["$transactionType", "TRANSFER"] },
-                                                {
-                                                    $or: [
-                                                        { $ne: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] },
-                                                        { $and: [{ $ne: ["$transferredTo", null] }, { $ne: ["$transferredTo", ""] }] }
-                                                    ]
-                                                }
-                                            ]
-                                        }
+                                        { $eq: ["$transactionType", "TRANSFER"] }
                                     ]
                                 },
                                 "$amount",
@@ -155,6 +133,32 @@ export async function getBankLogs(filter: BankLogFilter) {
             pagination: { page: 1, pageSize: 20, total: 0, totalPages: 0 }
         };
     }
+}
+
+export async function getLatestCompanyBalance(accountNumber: string = '3571970372'): Promise<number> {
+    await connectToDatabase();
+
+    const balanceLog = await BankBalanceLog.findOne({ accountNumber })
+        .sort({ date: -1, _id: -1 })
+        .lean();
+
+    if (balanceLog && typeof balanceLog.newBalance === 'number') {
+        return balanceLog.newBalance;
+    }
+
+    const latestTx = await BankTransaction.findOne({
+        accountNumber,
+        newBalance: { $exists: true, $ne: null }
+    })
+        .sort({ date: -1, _id: -1 })
+        .select('newBalance')
+        .lean();
+
+    if (latestTx && typeof latestTx.newBalance === 'number') {
+        return latestTx.newBalance;
+    }
+
+    return 0;
 }
 
 export async function addManualTransaction(data: {
@@ -199,26 +203,15 @@ export async function addManualTransaction(data: {
         let calculatedNewBalance: number | undefined = undefined;
 
         if (accountNumber === COMPANY_ACCOUNT_NUMBER) {
-            const latestBalanceLog = await BankBalanceLog.findOne({ accountNumber: COMPANY_ACCOUNT_NUMBER })
-                .sort({ date: -1, _id: -1 })
-                .lean();
-
-            const oldBalance = latestBalanceLog ? latestBalanceLog.newBalance : 0;
+            const oldBalance = await getLatestCompanyBalance(COMPANY_ACCOUNT_NUMBER);
 
             if (transactionType === 'BALANCE_UPDATE') {
                 calculatedNewBalance = manualNewBalance !== undefined ? manualNewBalance : oldBalance;
             } else if (transactionType === 'DEPOSIT') {
                 calculatedNewBalance = oldBalance + amount;
-            } else if (transactionType === 'WITHDRAW') {
+            } else if (transactionType === 'WITHDRAW' || transactionType === 'TRANSFER') {
+                // Transfers and withdrawals are ALWAYS a debit from the KOI cafe account
                 calculatedNewBalance = oldBalance - amount;
-            } else if (transactionType === 'TRANSFER') {
-                const memoLower = memo.toLowerCase();
-                const isExpense = transferredTo || memoLower.includes('transfer to');
-                if (isExpense) {
-                    calculatedNewBalance = oldBalance - amount;
-                } else {
-                    calculatedNewBalance = oldBalance + amount;
-                }
             }
 
             if (calculatedNewBalance !== undefined) {

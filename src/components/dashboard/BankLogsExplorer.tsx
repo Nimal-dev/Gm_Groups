@@ -335,10 +335,7 @@ export function BankLogsExplorer({ userRole = 'staff' }: BankLogsExplorerProps) 
                                                         <div className="text-xs text-muted-foreground font-mono">{log.accountNumber}</div>
                                                     </TableCell>
                                                     {(() => {
-                                                        const isExpense = log.transactionType === 'WITHDRAW' ||
-                                                            (log.transactionType === 'TRANSFER' &&
-                                                                (log.memo && log.memo.toLowerCase().includes('transfer to'))
-                                                            );
+                                                        const isExpense = log.transactionType === 'WITHDRAW' || log.transactionType === 'TRANSFER';
                                                         return (
                                                             <TableCell className={cn("font-bold font-mono", isExpense ? 'text-red-400' : 'text-green-400')}>
                                                                 {isExpense ? '-' : '+'}${log.amount.toLocaleString('en-US')}
@@ -382,10 +379,7 @@ export function BankLogsExplorer({ userRole = 'staff' }: BankLogsExplorerProps) 
                         ) : (
                             <div className="space-y-4 pb-4">
                                 {(data?.logs || []).map((log: any) => {
-                                    const isExpense = log.transactionType === 'WITHDRAW' ||
-                                        (log.transactionType === 'TRANSFER' &&
-                                            (log.memo && log.memo.toLowerCase().includes('transfer to'))
-                                        );
+                                    const isExpense = log.transactionType === 'WITHDRAW' || log.transactionType === 'TRANSFER';
                                     return (
                                         <div key={log.transactionId} className="p-4 rounded-xl border border-white/10 bg-white/5 space-y-3">
                                             <div className="flex justify-between items-start">

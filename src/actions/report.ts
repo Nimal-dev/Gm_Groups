@@ -93,10 +93,7 @@ export async function generateReportData(startDate: string | Date, endDate: stri
             const toLower = (t.transferredTo || '').toLowerCase();
             
             // Define expense (Out)
-            const isTransferOut = t.transactionType === 'TRANSFER' && (
-                memoLower.includes('transfer to') ||
-                (t.transferredTo && t.transferredTo.length > 0)
-            );
+            const isTransferOut = t.transactionType === 'TRANSFER';
 
             if (t.transactionType === 'WITHDRAW' || isTransferOut) {
                 // Skip salary transfers because we calculate totalSalaries directly from SalaryLogs
@@ -213,10 +210,7 @@ export async function generateFullShopReportData(startDate: string | Date, endDa
             const memoLower = (t.memo || '').toLowerCase();
             const toLower = (t.transferredTo || '').toLowerCase();
 
-            const isTransferOut = t.transactionType === 'TRANSFER' && (
-                memoLower.includes('transfer to') ||
-                (t.transferredTo && t.transferredTo.length > 0)
-            );
+            const isTransferOut = t.transactionType === 'TRANSFER';
 
             if (t.transactionType === 'WITHDRAW' || isTransferOut) {
                 // Skip salary transfers to avoid double-counting with totalSalaries

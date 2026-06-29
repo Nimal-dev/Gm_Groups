@@ -11,6 +11,7 @@ import RecurringOrder from '@/models/RecurringOrder';
 import DailySalary from '@/models/DailySalary';
 import { unstable_cache } from 'next/cache';
 import { getLocalStartOfMonth } from '@/lib/date-utils';
+import { getLatestCompanyBalance } from '@/actions/bank';
 
 // Internal data fetching function
 const fetchDashboardData = unstable_cache(
@@ -118,18 +119,7 @@ const fetchDashboardData = unstable_cache(
                         totalIncome: {
                             $sum: {
                                 $cond: [
-                                    {
-                                        $or: [
-                                            { $eq: ["$transactionType", "DEPOSIT"] },
-                                            {
-                                                $and: [
-                                                    { $eq: ["$transactionType", "TRANSFER"] },
-                                                    { $eq: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] },
-                                                    { $or: [{ $eq: ["$transferredTo", null] }, { $eq: ["$transferredTo", ""] }] }
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    { $eq: ["$transactionType", "DEPOSIT"] },
                                     "$amount",
                                     0
                                 ]
@@ -141,17 +131,7 @@ const fetchDashboardData = unstable_cache(
                                     {
                                         $or: [
                                             { $eq: ["$transactionType", "WITHDRAW"] },
-                                            {
-                                                $and: [
-                                                    { $eq: ["$transactionType", "TRANSFER"] },
-                                                    {
-                                                        $or: [
-                                                            { $ne: [{ $indexOfCP: [{ $toLower: { $ifNull: ["$memo", ""] } }, "transfer to"] }, -1] },
-                                                            { $and: [{ $ne: ["$transferredTo", null] }, { $ne: ["$transferredTo", ""] }] }
-                                                        ]
-                                                    }
-                                                ]
-                                            }
+                                            { $eq: ["$transactionType", "TRANSFER"] }
                                         ]
                                     },
                                     "$amount",
@@ -163,33 +143,8 @@ const fetchDashboardData = unstable_cache(
                 }
             ]);
 
-            // Fetch Current Balance (Since data model change: Query dedicated BankBalanceLog first)
-            // Hardcoded Company Account Number for GM CAFE
             const COMPANY_ACCOUNT_NUMBER = '3571970372';
-
-            // 1. Try Dedicated Balance Log (New System)
-            const balanceLog = await BankBalanceLog.findOne({ accountNumber: COMPANY_ACCOUNT_NUMBER })
-                .sort({ date: -1, _id: -1 })
-                .lean();
-
-            let currentBalance = 0;
-
-            if (balanceLog) {
-                currentBalance = balanceLog.newBalance;
-            } else {
-                // 2. Fallback to Valid Bank Transactions (Legacy/Backup)
-                const latestTransaction = await BankTransaction.findOne({
-                    accountNumber: COMPANY_ACCOUNT_NUMBER,
-                    newBalance: { $gt: 0 }
-                })
-                    .sort({ date: -1, _id: -1 })
-                    .select('newBalance')
-                    .lean();
-
-                if (latestTransaction) {
-                    currentBalance = latestTransaction.newBalance;
-                }
-            }
+            const currentBalance = await getLatestCompanyBalance(COMPANY_ACCOUNT_NUMBER);
 
             const stats = bankData[0] || { totalIncome: 0, totalExpense: 0 };
             const totalIncome = stats.totalIncome;
