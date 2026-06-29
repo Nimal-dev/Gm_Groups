@@ -69,6 +69,7 @@ export async function logPayment(userId: string, amount: number, notes?: string)
             transactionType: 'TRANSFER',
             amount: amount,
             memo: `Transfer to: Salary Payment to ${employee.nickname || employee.username}. Note: ${notes || 'Salary'}`,
+            rawMessageId: txId,
             date: new Date(),
             transferredTo: employeeBankAccount,
             transferredFrom: COMPANY_ACCOUNT_NUMBER,

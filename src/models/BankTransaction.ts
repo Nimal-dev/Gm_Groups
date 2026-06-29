@@ -7,6 +7,7 @@ export interface IBankTransaction extends Document {
     transactionType: 'TRANSFER' | 'DEPOSIT' | 'WITHDRAW' | 'BALANCE_UPDATE' | 'Unknown';
     amount: number;
     memo?: string;
+    rawMessageId?: string;
     date: Date;
     transferredTo?: string; // For transfers
     transferredFrom?: string; // Added
@@ -22,6 +23,7 @@ const BankTransactionSchema = new Schema<IBankTransaction>({
     transactionType: { type: String, required: true },
     amount: { type: Number, required: true },
     memo: { type: String },
+    rawMessageId: { type: String, unique: true, sparse: true },
     date: { type: Date, required: true },
     transferredTo: { type: String },
     transferredFrom: { type: String },

@@ -239,6 +239,7 @@ export async function addManualTransaction(data: {
             transactionType,
             amount: transactionType === 'BALANCE_UPDATE' ? 0 : amount,
             memo,
+            rawMessageId: txId,
             date: txDate,
             transferredTo,
             transferredFrom,
