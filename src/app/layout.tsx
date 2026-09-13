@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'GM Groups Xlantis',
     description: 'Dominating the Streets of Xlantis with style, power, and unity.',
-    url: 'https://gmgroups.xlantis.com',
+    url: 'https://gmgroups.netlify.app',
     siteName: 'GM Groups',
     locale: 'en_US',
     type: 'website',

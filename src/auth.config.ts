@@ -133,7 +133,10 @@ export const authConfig = {
 
             if (isOnDashboard || isOnPortalDashboard) {
                 if (isLoggedIn && !isApplicant) return true;
-                return false; // Redirect unauthenticated users or applicants to login page
+                const loginPath = isOnPortalDashboard ? '/portal/login' : '/login';
+                const redirectTarget = new URL(loginPath, nextUrl);
+                redirectTarget.searchParams.set('callbackUrl', nextUrl.pathname + nextUrl.search);
+                return Response.redirect(redirectTarget);
             } else if (isLoggedIn && nextUrl.pathname === '/vendor-login') {
                 if (isVendor) return Response.redirect(new URL('/vendor-dashboard', nextUrl));
                 // Non-vendors visiting vendor login — allow (they might need to switch)
@@ -152,23 +155,40 @@ export const authConfig = {
             return true;
         },
         async redirect({ url, baseUrl }) {
+            // Sanitize baseUrl if any stale domain is supplied via NEXTAUTH_URL env
+            const effectiveBaseUrl = baseUrl.includes('gmgroups.site')
+                ? 'https://gmgroups.netlify.app'
+                : baseUrl;
+
             const allowedOrigins = [
-                'https://gmgroups.site',
                 'https://gmgroups.netlify.app',
                 'http://localhost:3000',
                 'http://localhost:3001'
             ];
 
+            // Normalize old domain in target url
+            let targetUrl = url;
+            if (targetUrl.includes('gmgroups.site')) {
+                targetUrl = targetUrl
+                    .replace('https://gmgroups.site', 'https://gmgroups.netlify.app')
+                    .replace('http://gmgroups.site', 'https://gmgroups.netlify.app');
+            }
+
             // Allows relative callback URLs
-            if (url.startsWith("/")) return `${baseUrl}${url}`;
+            if (targetUrl.startsWith("/")) return `${effectiveBaseUrl}${targetUrl}`;
 
-            // Allows callback URLs on the same origin
-            if (new URL(url).origin === baseUrl) return url;
+            try {
+                const parsedUrl = new URL(targetUrl);
+                // Allows callback URLs on the same origin
+                if (parsedUrl.origin === effectiveBaseUrl || parsedUrl.origin === new URL(effectiveBaseUrl).origin) return targetUrl;
 
-            // Allows callback URLs on allowed origins
-            if (allowedOrigins.includes(new URL(url).origin)) return url;
+                // Allows callback URLs on allowed origins
+                if (allowedOrigins.includes(parsedUrl.origin)) return targetUrl;
+            } catch {
+                // Fallback for relative or malformed url
+            }
 
-            return baseUrl;
+            return effectiveBaseUrl;
         },
     },
     providers: [], // Configured in auth.ts
