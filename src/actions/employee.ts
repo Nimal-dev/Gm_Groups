@@ -4,7 +4,7 @@
 import connectToDatabase from '@/lib/db';
 import Employee from '@/models/Employee';
 import { auth } from '@/auth';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 export async function getAllEmployees() {
     try {
@@ -134,3 +134,63 @@ export async function deleteEmployee(userId: string) {
         return { success: false, error: 'Failed to delete employee' };
     }
 }
+
+export async function resetLeaderboard() {
+    try {
+        const session = await auth();
+        if (!session?.user) {
+            return { success: false, error: 'Unauthorized: Please log in.' };
+        }
+
+        await connectToDatabase();
+
+        // Check if user is Manager or above
+        const caller = await Employee.findOne({
+            $or: [
+                { userId: session.user.id },
+                { username: { $regex: new RegExp(`^${session.user.name}$`, 'i') } }
+            ]
+        });
+
+        const rank = (caller?.rank || '').toLowerCase();
+        const role = (session.user.role || '').toLowerCase();
+
+        const isManagerOrAbove = role === 'admin' ||
+            rank.includes('manager') ||
+            rank.includes('management') ||
+            rank.includes('owner') ||
+            rank.includes('boss') ||
+            rank.includes('lawyer');
+
+        if (!isManagerOrAbove) {
+            return { success: false, error: 'Forbidden: Only Manager or above can reset the leaderboard.' };
+        }
+
+        const result = await Employee.updateMany(
+            {},
+            {
+                $set: {
+                    xp: 0,
+                    level: 1
+                }
+            }
+        );
+
+        // Log the activity to Discord analytics
+        const { logActivity } = await import('@/actions/log');
+        await logActivity(
+            'Reset Leaderboard',
+            `Leaderboard reset by ${session.user.name || caller?.username || 'Admin'} (${caller?.rank || 'Manager+'}). Reset ${result.modifiedCount} employees to Level 1 and 0 XP.`
+        ).catch(err => console.error('Failed to log reset leaderboard activity:', err));
+
+        revalidatePath('/dashboard');
+        revalidatePath('/portal/dashboard');
+        revalidateTag('dashboard-data');
+
+        return { success: true, count: result.modifiedCount };
+    } catch (error: any) {
+        console.error('Reset Leaderboard Error:', error);
+        return { success: false, error: error.message || 'Failed to reset leaderboard' };
+    }
+}
+

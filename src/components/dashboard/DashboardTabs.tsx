@@ -524,7 +524,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
             {
                 isAdmin && (
                     <TabsContent value="employees" className="space-y-6 h-auto min-h-[500px] md:h-[800px]">
-                        <AdminEmployeeTable />
+                        <AdminEmployeeTable currentUser={currentUser} userRole={userRole} />
                     </TabsContent>
                 )
             }

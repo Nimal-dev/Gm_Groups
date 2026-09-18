@@ -404,7 +404,7 @@ export function PortalDashboardClient({
                         </TabsContent>
 
                         <TabsContent value="employees" className="space-y-6 h-auto min-h-[500px] lg:h-[800px]">
-                            <AdminEmployeeTable />
+                            <AdminEmployeeTable currentUser={currentUser} userRole={userRole} />
                         </TabsContent>
 
                         <TabsContent value="payroll" className="space-y-6 h-auto min-h-[500px] lg:h-[800px]">
