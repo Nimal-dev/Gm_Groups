@@ -5,12 +5,13 @@ const nextConfig = {
     compress: true,
     images: {
         formats: ['image/avif', 'image/webp'],
+        // Only allow known hosts. A wildcard turns the Netlify image optimizer into an
+        // open proxy anyone can use to burn the free-tier bandwidth quota.
         remotePatterns: [
-            {
-                protocol: 'https',
-                hostname: '**', // Update this based on where images are hosted (e.g., imgur, discord, etc.)
-            },
+            { protocol: 'https', hostname: 'cdn.discordapp.com' },
+            { protocol: 'https', hostname: 'media.discordapp.net' },
         ],
+        minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
     },
     experimental: {
         optimizePackageImports: [

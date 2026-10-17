@@ -11,6 +11,7 @@ import { Lock, Home, UserRound, KeyRound, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useFormStatus } from 'react-dom';
 import { InputOTP } from '@/components/ui/input-otp';
+import { BotWarmup } from '@/components/bot-warmup';
 
 export default function PortalLoginPage() {
     // @ts-ignore
@@ -44,6 +45,7 @@ export default function PortalLoginPage() {
 
     return (
         <div className="flex h-screen w-full items-center justify-center bg-[url('/gm_wallpaper.jpg')] bg-cover bg-center md:bg-black/90 relative overflow-hidden">
+            <BotWarmup />
             {/* Overlay for better text readability */}
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-0"></div>
 

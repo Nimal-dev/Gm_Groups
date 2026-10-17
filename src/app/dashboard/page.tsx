@@ -12,6 +12,7 @@ export const dynamic = 'force-dynamic'; // Ensure real-time data
 import connectToDatabase from '@/lib/db';
 // Fetch Full User Data (XP, Level, Achievements)
 import { auth } from '@/auth';
+import { sanitizeEmployeesForRole, escapeRegex } from '@/lib/employee-utils';
 
 export default async function DashboardPage() {
     const session = await auth();
@@ -35,7 +36,7 @@ export default async function DashboardPage() {
     // Fallback: If no ID match, try username (legacy/safety)
     if (!currentUser) {
         currentUser = await (await import('@/models/Employee')).default.findOne({
-            username: { $regex: new RegExp(`^${session.user.name}$`, 'i') }
+            username: { $regex: new RegExp(`^${escapeRegex(session.user.name || '')}$`, 'i') }
         }).lean();
     }
 
@@ -53,7 +54,9 @@ export default async function DashboardPage() {
     }
 
     const data = await getDashboardData();
-    const { activeStaff, activeOrders, allEmployees, recentSalaries, recurringOrders, dailySalaries, error } = data;
+    const { activeStaff, activeOrders, recentSalaries, recurringOrders, dailySalaries, error } = data;
+    // Only admins may see credentials/bank details of other employees.
+    const allEmployees = sanitizeEmployeesForRole(data.allEmployees, role);
 
     if (error) {
         // ... existing error handling

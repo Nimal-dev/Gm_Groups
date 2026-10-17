@@ -1,6 +1,7 @@
 import { getDashboardData } from '@/actions/dashboard';
 import connectToDatabase from '@/lib/db';
 import { auth } from '@/auth';
+import { sanitizeEmployeesForRole, escapeRegex } from '@/lib/employee-utils';
 import { PortalDashboardClient } from '@/components/dashboard/PortalDashboardClient';
 import { LogoutButton } from '@/components/dashboard/LogoutButton';
 import { Badge } from '@/components/ui/badge';
@@ -28,7 +29,7 @@ export default async function PortalDashboardPage() {
 
     if (!currentUser) {
         currentUser = await (await import('@/models/Employee')).default.findOne({
-            username: { $regex: new RegExp(`^${session.user.name}$`, 'i') }
+            username: { $regex: new RegExp(`^${escapeRegex(session.user.name || '')}$`, 'i') }
         }).lean();
     }
 
@@ -44,7 +45,9 @@ export default async function PortalDashboardPage() {
     }
 
     const data = await getDashboardData();
-    const { activeStaff, activeOrders, recurringOrders, allEmployees, recentSalaries, activeLeaves, dailySalaries, bankStats, error } = data;
+    const { activeStaff, activeOrders, recurringOrders, recentSalaries, activeLeaves, dailySalaries, bankStats, error } = data;
+    // Only admins may see credentials/bank details of other employees.
+    const allEmployees = sanitizeEmployeesForRole(data.allEmployees, role);
 
     if (error) {
         return (

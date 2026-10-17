@@ -31,7 +31,7 @@ const MENU_ITEMS = [
         jpName: "ドラゴンロール",
         description: "Premium sushi roll featuring eel, cucumber, and avocado with unagi sauce.",
         price: "52,800",
-        image: "/Menu/Dragon_roll.png",
+        image: "/Menu/Dragon_Roll.png",
         colorTheme: "green",
         tag: "新鮮" // Shinsen (Fresh)
     },
@@ -51,7 +51,7 @@ const MENU_ITEMS = [
         jpName: "抹茶ミルクティー",
         description: "Premium ceremonial grade matcha blended with creamy milk and tapioca pearls.",
         price: "70,400",
-        image: "/Menu/Matcha_Milk_tea.png",
+        image: "/Menu/Matcha_milk_tea.png",
         colorTheme: "green",
         tag: "極上" // Gokujou (Premium)
     },

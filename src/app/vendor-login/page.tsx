@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader2, Package, AlertCircle, UserRound, Home } from 'lucide-react';
 import { InputOTP } from '@/components/ui/input-otp';
 import { useFormStatus } from 'react-dom';
+import { BotWarmup } from '@/components/bot-warmup';
 
 export default function VendorLoginPage() {
     // @ts-ignore
@@ -25,6 +26,7 @@ export default function VendorLoginPage() {
 
     return (
         <div className="flex flex-col min-h-screen bg-background relative overflow-hidden">
+            <BotWarmup />
             {/* Ambient Background */}
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-[-20%] left-[30%] w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px]" />

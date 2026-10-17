@@ -6,6 +6,7 @@ import { authConfig } from './auth.config';
 import connectToDatabase from '@/lib/db';
 import Employee from '@/models/Employee';
 import VendorUser from '@/models/VendorUser';
+import { escapeRegex } from '@/lib/employee-utils';
 
 /**
  * NextAuth Configuration
@@ -135,7 +136,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                 const loginIdStr = String(credentials.loginId).trim();
 
                 const employee = await Employee.findOne({
-                    loginId: { $regex: new RegExp('^' + loginIdStr + '$', 'i') },
+                    loginId: { $regex: new RegExp('^' + escapeRegex(loginIdStr) + '$', 'i') },
                     status: 'Active'
                 });
 
@@ -182,7 +183,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                 const vendorIdStr = String(credentials.vendorId).trim();
 
                 const vendor = await VendorUser.findOne({
-                    vendorId: { $regex: new RegExp('^' + vendorIdStr + '$', 'i') }
+                    vendorId: { $regex: new RegExp('^' + escapeRegex(vendorIdStr) + '$', 'i') }
                 });
 
                 if (!vendor) {

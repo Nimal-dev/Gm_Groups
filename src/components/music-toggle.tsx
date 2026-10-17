@@ -11,60 +11,57 @@ export function MusicToggle() {
   const [volume, setVolume] = useState(0.3);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // The track is ~5 MB. Create the element lazily on first play, with preload="none",
+  // so visitors who never press play don't download it (saves Netlify bandwidth).
+  const getAudio = () => {
+    if (audioRef.current) return audioRef.current;
+
+    const audio = new Audio();
+    audio.preload = 'none';
+    audio.src = '/audio/lofi.mp3';
+    audio.loop = true;
+    audio.volume = volume;
+    audio.muted = isMuted;
+
+    audio.addEventListener('ended', () => setIsPlaying(false));
+    audio.addEventListener('play', () => setIsPlaying(true));
+    audio.addEventListener('pause', () => setIsPlaying(false));
+
+    audioRef.current = audio;
+    return audio;
+  };
+
   useEffect(() => {
-    // Create audio element with the actual music file
-    audioRef.current = new Audio('/audio/lofi.mp3');
-
-    if (audioRef.current) {
-      audioRef.current.loop = true;
-      audioRef.current.volume = volume;
-
-      // Handle audio events
-      audioRef.current.addEventListener('ended', () => {
-        setIsPlaying(false);
-      });
-
-      audioRef.current.addEventListener('play', () => {
-        setIsPlaying(true);
-      });
-
-      audioRef.current.addEventListener('pause', () => {
-        setIsPlaying(false);
-      });
-    }
-
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
+        audioRef.current.src = '';
         audioRef.current = null;
       }
     };
-  }, [volume]);
+  }, []);
 
   const toggleMusic = () => {
-    if (!audioRef.current) return;
+    const audio = getAudio();
 
     if (isPlaying) {
-      audioRef.current.pause();
+      audio.pause();
     } else {
-      audioRef.current.play().catch(() => {
+      audio.play().catch(() => {
         // Silently fail if playback is blocked
       });
     }
   };
 
   const toggleMute = () => {
-    if (!audioRef.current) return;
-
-    audioRef.current.muted = !isMuted;
-    setIsMuted(!isMuted);
+    const next = !isMuted;
+    if (audioRef.current) audioRef.current.muted = next;
+    setIsMuted(next);
   };
 
   const handleVolumeChange = (newVolume: number) => {
-    if (!audioRef.current) return;
-
     setVolume(newVolume);
-    audioRef.current.volume = newVolume;
+    if (audioRef.current) audioRef.current.volume = newVolume;
   };
 
   return (
