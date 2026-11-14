@@ -21,7 +21,7 @@ export default async function ApplyPage() {
         <div className="flex flex-col min-h-screen relative overflow-hidden">
             {/* Immersive Background */}
             <div
-                className="absolute inset-0 bg-[url('/gm_wallpaper.jpg')] bg-cover bg-center bg-no-repeat fixed"
+                className="absolute inset-0 bg-[url('/gm_wallpaper.webp')] bg-cover bg-center bg-no-repeat fixed"
                 style={{ transform: "translateZ(0)" }}
             />
             {/* Cinematic Gradient Overlays to ensure text remains readable */}

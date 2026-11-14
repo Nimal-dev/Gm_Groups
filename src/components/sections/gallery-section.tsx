@@ -4,12 +4,12 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 
 const GALLERY_IMAGES = [
-    { id: 1, src: "/interior_reception.png", title: "Front Desk & Reception" },
-    { id: 2, src: "/interior_bar.png", title: "Cocktail Bar & Lounge" },
-    { id: 3, src: "/interior_wine_cellar.png", title: "Wine Cellar & VIP Dining" },
-    { id: 4, src: "/interior_promenade.png", title: "Art Gallery Promenade" },
-    { id: 5, src: "/gmcafe_bg.png", title: "GM Cafe Flagship Exterior" },
-    { id: 6, src: "/interior_captains_deck.png", title: "Captain's Deck Lounge" },
+    { id: 1, src: "/interior_reception.webp", title: "Front Desk & Reception" },
+    { id: 2, src: "/interior_bar.webp", title: "Cocktail Bar & Lounge" },
+    { id: 3, src: "/interior_wine_cellar.webp", title: "Wine Cellar & VIP Dining" },
+    { id: 4, src: "/interior_promenade.webp", title: "Art Gallery Promenade" },
+    { id: 5, src: "/gmcafe_bg.webp", title: "GM Cafe Flagship Exterior" },
+    { id: 6, src: "/interior_captains_deck.webp", title: "Captain's Deck Lounge" },
 ];
 
 export function GallerySection() {

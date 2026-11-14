@@ -54,7 +54,7 @@ export function MenuSection({ initialItems }: { initialItems?: GMMenuItem[] } = 
                         station: ((item.station?.toLowerCase().includes('drink') || item.station?.toLowerCase().includes('beverage')) ? 'beverage' : (item.station?.toLowerCase().includes('grill') ? 'grill' : 'finishing')) as StationType,
                         stationLabel: item.station || 'Kitchen',
                         stationColor: (item.station?.toLowerCase().includes('drink') || item.station?.toLowerCase().includes('beverage')) ? '#366a95' : (item.station?.toLowerCase().includes('grill') ? '#c1785b' : '#ad875c'),
-                        image: item.imageUrl || '/Menu/single_chicken_burger.png',
+                        image: item.imageUrl || '/Menu/single_chicken_burger.webp',
                         tag: item.category || 'Mains',
                         set: 'Set A' as const
                     }));

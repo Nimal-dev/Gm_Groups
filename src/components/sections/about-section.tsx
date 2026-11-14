@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
-import gm_logo from "../../../public/gm_logo_dark.png";
+import gm_logo from "../../../public/gm_logo_dark.webp";
 
 export function AboutSection() {
   const sectionRef = useRef<HTMLDivElement>(null);

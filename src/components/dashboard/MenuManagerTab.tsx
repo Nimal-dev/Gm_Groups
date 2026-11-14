@@ -486,7 +486,7 @@ export function MenuManagerTab({ userRole = 'staff' }: MenuManagerTabProps) {
                                                         src={item.imageUrl}
                                                         alt={item.name}
                                                         className="w-12 h-12 rounded-lg object-cover border border-white/10 bg-black/40"
-                                                        onError={(e) => { (e.currentTarget as any).src = '/Menu/single_chicken_burger.png'; }}
+                                                        onError={(e) => { (e.currentTarget as any).src = '/Menu/single_chicken_burger.webp'; }}
                                                     />
                                                 ) : (
                                                     <div className="w-12 h-12 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
@@ -745,7 +745,7 @@ export function MenuManagerTab({ userRole = 'staff' }: MenuManagerTabProps) {
                             <Input
                                 value={dishForm.imageUrl}
                                 onChange={(e) => setDishForm({ ...dishForm, imageUrl: e.target.value })}
-                                placeholder="/Menu/double_cheese_beef_burger.png"
+                                placeholder="/Menu/double_cheese_beef_burger.webp"
                                 className="bg-white/5 border-white/10 text-sm"
                             />
                         </div>

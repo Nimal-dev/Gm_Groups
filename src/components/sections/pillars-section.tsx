@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import gm from "../../../public/GM.png"
-import ambaan from "../../../public/Ambaan.png"
-import arya from "../../../public/Arya.png"
+import gm from "../../../public/GM.webp"
+import ambaan from "../../../public/Ambaan.webp"
+import arya from "../../../public/Arya.webp"
 
 const pillars = [
   {
