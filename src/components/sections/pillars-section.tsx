@@ -4,14 +4,14 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import gm from "../../../public/GM.png"
 import ambaan from "../../../public/Ambaan.png"
-import nimal from "../../../public/Nimal.png"
+import arya from "../../../public/Arya.png"
 
 const pillars = [
   {
-    name: "Nimal Prince",
+    name: "Arya",
     title: "The Manager",
     description: "The engine of our operations. The Manager ensures every deal is sealed, every asset is managed, and the gears of our enterprise turn smoothly.",
-    image: nimal
+    image: arya
   },
   {
     name: "Godwin memana",

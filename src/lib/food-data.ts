@@ -22,171 +22,211 @@ export interface MenuItem {
 }
 
 export const RAW_MATERIALS: Record<string, RawMaterial> = {
-    pork_rib: { id: 'pork_rib', name: 'Raw Pork Rib', ykzRate: 2813, mlbRate: 2800, weight: 0.4 },
-    shrimp: { id: 'shrimp', name: 'Raw Shrimp', ykzRate: 7813, mlbRate: 7800, weight: 0.1 },
-    chashu_pork: { id: 'chashu_pork', name: 'Chashu Pork', ykzRate: 3438, mlbRate: 3430, weight: 0.1 },
-    pork_broth: { id: 'pork_broth', name: 'Pork Broth', ykzRate: 2375, mlbRate: 2370, weight: 0.2 },
-    bbq_sauce: { id: 'bbq_sauce', name: 'BBQ Sauce', ykzRate: 1250, mlbRate: 1250, weight: 0.1 },
-    egg: { id: 'egg', name: 'Egg', ykzRate: 1563, mlbRate: 1560, weight: 0.05 },
-    tomato: { id: 'tomato', name: 'Tomato', ykzRate: 938, mlbRate: 930, weight: 0.1 },
-    lettuce: { id: 'lettuce', name: 'Lettuce', ykzRate: 1250, mlbRate: 1250, weight: 0.1 },
-    cucumber: { id: 'cucumber', name: 'Cucumber', ykzRate: 938, mlbRate: 930, weight: 0.1 },
-    fresh_mint: { id: 'fresh_mint', name: 'Fresh Mint', ykzRate: 625, mlbRate: 620, weight: 0.025 },
-    lime: { id: 'lime', name: 'Lime', ykzRate: 1875, mlbRate: 1870, weight: 0.05 },
-    banana: { id: 'banana', name: 'Banana', ykzRate: 1563, mlbRate: 1560, weight: 0.1 },
-    strawberry: { id: 'strawberry', name: 'Strawberry', ykzRate: 1563, mlbRate: 1560, weight: 0.1 },
-    avocado: { id: 'avocado', name: 'Avocado', ykzRate: 1563, mlbRate: 1560, weight: 0.1 },
+    flour_tortilla: { id: 'flour_tortilla', name: 'Flour Tortilla', ykzRate: 1250, mlbRate: 1250, weight: 0.05 },
+    rice: { id: 'rice', name: 'Rice', ykzRate: 2000, mlbRate: 2000, weight: 0.1 },
+    kidney_beans: { id: 'kidney_beans', name: 'Kidney Beans', ykzRate: 1500, mlbRate: 1500, weight: 0.1 },
+    raw_ground_beef: { id: 'raw_ground_beef', name: 'Raw Ground Beef', ykzRate: 3000, mlbRate: 3000, weight: 0.2 },
+    block_cheese: { id: 'block_cheese', name: 'Block Cheese', ykzRate: 2200, mlbRate: 2200, weight: 0.15 },
+    coffee_beans: { id: 'coffee_beans', name: 'Coffee Beans', ykzRate: 2000, mlbRate: 2000, weight: 0.05 },
+    cream_cheese: { id: 'cream_cheese', name: 'Cream Cheese', ykzRate: 2200, mlbRate: 2200, weight: 0.1 },
+    eggs: { id: 'eggs', name: 'Eggs', ykzRate: 1563, mlbRate: 1560, weight: 0.05 },
+    sugar: { id: 'sugar', name: 'Sugar', ykzRate: 1250, mlbRate: 1250, weight: 0.1 },
+    chocolate: { id: 'chocolate', name: 'Chocolate', ykzRate: 1800, mlbRate: 1800, weight: 0.05 },
+    thai_tea_leaves: { id: 'thai_tea_leaves', name: 'Thai Tea Leaves', ykzRate: 2000, mlbRate: 2000, weight: 0.05 },
+    condensed_milk: { id: 'condensed_milk', name: 'Condensed Milk', ykzRate: 1600, mlbRate: 1600, weight: 0.1 },
+    ice: { id: 'ice', name: 'Ice', ykzRate: 500, mlbRate: 500, weight: 0.05 },
+    paper_cup: { id: 'paper_cup', name: 'Paper Cup', ykzRate: 937.5, mlbRate: 930, weight: 0.0125 },
+    black_tea: { id: 'black_tea', name: 'Black Tea', ykzRate: 1800, mlbRate: 1800, weight: 0.05 },
     milk: { id: 'milk', name: 'Milk', ykzRate: 1563, mlbRate: 1560, weight: 0.2 },
-    ramen_noodles: { id: 'ramen_noodles', name: 'Ramen Noodles', ykzRate: 2188, mlbRate: 2180, weight: 0.1 },
+    cinnamon_stick: { id: 'cinnamon_stick', name: 'Cinnamon Stick', ykzRate: 1000, mlbRate: 1000, weight: 0.02 },
+    fresh_ginger: { id: 'fresh_ginger', name: 'Fresh Ginger', ykzRate: 1000, mlbRate: 1000, weight: 0.05 },
+    pineapple: { id: 'pineapple', name: 'Pineapple', ykzRate: 1500, mlbRate: 1500, weight: 0.2 },
+    coconut_cream: { id: 'coconut_cream', name: 'Coconut Cream', ykzRate: 1800, mlbRate: 1800, weight: 0.15 },
+    glass_cup: { id: 'glass_cup', name: 'Glass Cup', ykzRate: 1563, mlbRate: 1560, weight: 0.1 },
+    lemon: { id: 'lemon', name: 'Lemon', ykzRate: 1200, mlbRate: 1200, weight: 0.05 },
+    fresh_mint: { id: 'fresh_mint', name: 'Fresh Mint', ykzRate: 625, mlbRate: 620, weight: 0.025 },
+    carbonated_water: { id: 'carbonated_water', name: 'Carbonated Water', ykzRate: 1563, mlbRate: 1560, weight: 0.1 },
+    lettuce: { id: 'lettuce', name: 'Lettuce', ykzRate: 1250, mlbRate: 1250, weight: 0.1 },
+    tomato: { id: 'tomato', name: 'Tomato', ykzRate: 938, mlbRate: 930, weight: 0.1 },
     sushi_rice: { id: 'sushi_rice', name: 'Sushi Rice', ykzRate: 2500, mlbRate: 2500, weight: 0.1 },
     nori_sheets: { id: 'nori_sheets', name: 'Nori Sheets', ykzRate: 1875, mlbRate: 1875, weight: 0.033 },
-    eel_sauce: { id: 'eel_sauce', name: 'Eel Sauce', ykzRate: 2500, mlbRate: 2500, weight: 0.1 },
-    tempura_batter: { id: 'tempura_batter', name: 'Tempura Batter', ykzRate: 1563, mlbRate: 1560, weight: 0.1 },
-    sugar: { id: 'sugar', name: 'Sugar', ykzRate: 1250, mlbRate: 1250, weight: 0.1 },
-    water: { id: 'water', name: 'Water', ykzRate: 625, mlbRate: 620, weight: 0.1 },
-    carbonated_water: { id: 'carbonated_water', name: 'Carbonated Water', ykzRate: 1563, mlbRate: 1560, weight: 0.1 },
-    tapioca_pearls: { id: 'tapioca_pearls', name: 'Tapioca Pearls', ykzRate: 2500, mlbRate: 2500, weight: 0.1 },
-    matcha_powder: { id: 'matcha_powder', name: 'Matcha Powder', ykzRate: 2188, mlbRate: 2180, weight: 0.05 },
-    fry_carton: { id: 'fry_carton', name: 'Fry Carton', ykzRate: 750, mlbRate: 750, weight: 0.005 }, // Estimated weight if not provided
-    paper_cup: { id: 'paper_cup', name: 'Paper Cup', ykzRate: 937.5, mlbRate: 930, weight: 0.0125 },
-    glass_cup: { id: 'glass_cup', name: 'Glass Cup', ykzRate: 1563, mlbRate: 1560, weight: 0.1 },
-    bubble_tea_cup: { id: 'bubble_tea_cup', name: 'Bubble Tea Cup', ykzRate: 625, mlbRate: 620, weight: 0.025 },
-    bowl: { id: 'bowl', name: 'Bowl', ykzRate: 1125, mlbRate: 1120, weight: 0.05 }, // Estimated
-    bug_spray: { id: 'bug_spray', name: 'Bug Spray', ykzRate: 15625, mlbRate: 15620, weight: 0.2 },
-    rat_poison: { id: 'rat_poison', name: 'Rat Poison', ykzRate: 15625, mlbRate: 15620, weight: 0.15 },
+    raw_salmon_fillet: { id: 'raw_salmon_fillet', name: 'Raw Salmon Fillet', ykzRate: 4000, mlbRate: 4000, weight: 0.2 },
+    raw_tuna_steak: { id: 'raw_tuna_steak', name: 'Raw Tuna Steak', ykzRate: 4500, mlbRate: 4500, weight: 0.2 },
+    avocado: { id: 'avocado', name: 'Avocado', ykzRate: 1563, mlbRate: 1560, weight: 0.1 },
 };
 
 export const MENU_ITEMS: MenuItem[] = [
     {
-        id: 'bbq_ribs',
-        name: 'BBQ Ribs',
+        id: 'missio_style_burrito',
+        name: 'Missio Style burrito',
         category: 'Food',
-        batchSize: 5,
-        prepTime: '10s',
-        finishedWeight: 1.1,
+        batchSize: 19,
+        prepTime: '41s',
+        finishedWeight: 4.5,
         ingredients: [
-            { materialId: 'pork_rib', quantity: 15 },
-            { materialId: 'bbq_sauce', quantity: 15 },
+            { materialId: 'flour_tortilla', quantity: 19 },
+            { materialId: 'rice', quantity: 19 },
+            { materialId: 'kidney_beans', quantity: 19 },
+            { materialId: 'raw_ground_beef', quantity: 19 },
+            { materialId: 'block_cheese', quantity: 19 },
         ]
     },
     {
-        id: 'ramen',
-        name: 'Ramen',
+        id: 'italian_tiramisu',
+        name: 'Italian tiramisu',
         category: 'Food',
-        batchSize: 15,
+        batchSize: 6,
+        prepTime: '36s',
+        finishedWeight: 1.5,
+        ingredients: [
+            { materialId: 'coffee_beans', quantity: 6 },
+            { materialId: 'cream_cheese', quantity: 6 },
+            { materialId: 'eggs', quantity: 6 },
+            { materialId: 'sugar', quantity: 6 },
+            { materialId: 'chocolate', quantity: 6 },
+        ]
+    },
+    {
+        id: 'beef_taco',
+        name: 'Beef Taco',
+        category: 'Food',
+        batchSize: 11,
+        prepTime: '32s',
+        finishedWeight: 2.2,
+        ingredients: [
+            { materialId: 'flour_tortilla', quantity: 11 },
+            { materialId: 'raw_ground_beef', quantity: 11 },
+            { materialId: 'lettuce', quantity: 11 },
+            { materialId: 'tomato', quantity: 11 },
+        ]
+    },
+    {
+        id: 'sushi_tray',
+        name: 'Sushi Tray',
+        category: 'Food',
+        batchSize: 11,
+        prepTime: '45s',
+        finishedWeight: 2.8,
+        ingredients: [
+            { materialId: 'sushi_rice', quantity: 11 },
+            { materialId: 'nori_sheets', quantity: 11 },
+            { materialId: 'raw_salmon_fillet', quantity: 11 },
+            { materialId: 'raw_tuna_steak', quantity: 11 },
+            { materialId: 'avocado', quantity: 11 },
+        ]
+    },
+    {
+        id: 'lemon_mint_cooler_glass',
+        name: 'Lemon mint cooler glass',
+        category: 'Beverage',
+        batchSize: 13,
         prepTime: '30s',
-        finishedWeight: 6.0,
+        finishedWeight: 2.6,
         ingredients: [
-            { materialId: 'pork_broth', quantity: 60 },
-            { materialId: 'ramen_noodles', quantity: 60 },
-            { materialId: 'egg', quantity: 60 },
-            { materialId: 'chashu_pork', quantity: 60 },
+            { materialId: 'lemon', quantity: 13 },
+            { materialId: 'fresh_mint', quantity: 13 },
+            { materialId: 'sugar', quantity: 13 },
+            { materialId: 'carbonated_water', quantity: 13 },
+            { materialId: 'glass_cup', quantity: 13 },
         ]
     },
     {
-        id: 'dragon_roll',
-        name: 'Dragon Roll',
-        category: 'Food',
-        batchSize: 15,
+        id: 'pina_colada',
+        name: 'Pina Colada',
+        category: 'Beverage',
+        batchSize: 20,
+        prepTime: '33s',
+        finishedWeight: 4.0,
+        ingredients: [
+            { materialId: 'pineapple', quantity: 20 },
+            { materialId: 'coconut_cream', quantity: 20 },
+            { materialId: 'ice', quantity: 20 },
+            { materialId: 'glass_cup', quantity: 20 },
+        ]
+    },
+    {
+        id: 'thai_ice_tea',
+        name: 'Thai Ice Tea',
+        category: 'Beverage',
+        batchSize: 12,
+        prepTime: '32s',
+        finishedWeight: 2.4,
+        ingredients: [
+            { materialId: 'thai_tea_leaves', quantity: 12 },
+            { materialId: 'condensed_milk', quantity: 12 },
+            { materialId: 'ice', quantity: 12 },
+            { materialId: 'paper_cup', quantity: 12 },
+        ]
+    },
+    {
+        id: 'masala_chai',
+        name: 'Masala Chai',
+        category: 'Beverage',
+        batchSize: 10,
+        prepTime: '38s',
+        finishedWeight: 2.0,
+        ingredients: [
+            { materialId: 'black_tea', quantity: 10 },
+            { materialId: 'milk', quantity: 10 },
+            { materialId: 'cinnamon_stick', quantity: 10 },
+            { materialId: 'fresh_ginger', quantity: 10 },
+            { materialId: 'paper_cup', quantity: 10 },
+        ]
+    },
+    {
+        id: 'icedlatte_capped',
+        name: 'Icedlatte Capped',
+        category: 'Beverage',
+        batchSize: 10,
         prepTime: '30s',
-        finishedWeight: 3.8,
+        finishedWeight: 2.0,
         ingredients: [
-            { materialId: 'sushi_rice', quantity: 30 },
-            { materialId: 'nori_sheets', quantity: 60 },
-            { materialId: 'shrimp', quantity: 15 }, // Based on recipe: 15 Shrimp Tempura = 15 Shrimp + 15 Batter
-            { materialId: 'tempura_batter', quantity: 15 },
-            { materialId: 'avocado', quantity: 45 },
-            { materialId: 'eel_sauce', quantity: 15 },
+            { materialId: 'coffee_beans', quantity: 10 },
+            { materialId: 'milk', quantity: 10 },
+            { materialId: 'ice', quantity: 10 },
+            { materialId: 'paper_cup', quantity: 10 },
         ]
     },
     {
-        id: 'garden_salad',
-        name: 'Garden Salad',
-        category: 'Food',
+        id: 'frappe_coffee',
+        name: 'Frappe Coffee',
+        category: 'Beverage',
         batchSize: 9,
-        prepTime: '15s',
+        prepTime: '35s',
         finishedWeight: 1.8,
         ingredients: [
-            { materialId: 'lettuce', quantity: 18 },
-            { materialId: 'tomato', quantity: 18 },
-            { materialId: 'cucumber', quantity: 18 },
-        ]
-    },
-    {
-        id: 'matcha_milk_tea',
-        name: 'Matcha Milk Tea',
-        category: 'Beverage',
-        batchSize: 15,
-        prepTime: '50s',
-        finishedWeight: 3.0,
-        ingredients: [
-            { materialId: 'matcha_powder', quantity: 60 },
-            { materialId: 'milk', quantity: 60 },
-            { materialId: 'tapioca_pearls', quantity: 60 },
-            { materialId: 'bubble_tea_cup', quantity: 15 },
-        ]
-    },
-    {
-        id: 'virgin_mojito',
-        name: 'Virgin Mojito',
-        category: 'Beverage',
-        batchSize: 15,
-        prepTime: '10s',
-        finishedWeight: 0.5,
-        ingredients: [
-            { materialId: 'lime', quantity: 45 },
-            { materialId: 'fresh_mint', quantity: 45 },
-            { materialId: 'sugar', quantity: 45 },
-            { materialId: 'carbonated_water', quantity: 45 },
-            { materialId: 'glass_cup', quantity: 15 },
-        ]
-    },
-    {
-        id: 'smoothie',
-        name: 'Smoothie',
-        category: 'Beverage',
-        batchSize: 15,
-        prepTime: '50s',
-        finishedWeight: 3.0,
-        ingredients: [
-            { materialId: 'banana', quantity: 60 },
-            { materialId: 'strawberry', quantity: 60 },
-            { materialId: 'milk', quantity: 45 },
-            { materialId: 'glass_cup', quantity: 15 },
-        ]
-    },
-    {
-        id: 'shrimp_tempura',
-        name: 'Shrimp Tempura',
-        category: 'Component',
-        batchSize: 15,
-        prepTime: '165s',
-        finishedWeight: 2.7,
-        ingredients: [
-            { materialId: 'shrimp', quantity: 15 },
-            { materialId: 'tempura_batter', quantity: 15 },
+            { materialId: 'coffee_beans', quantity: 9 },
+            { materialId: 'milk', quantity: 9 },
+            { materialId: 'sugar', quantity: 9 },
+            { materialId: 'ice', quantity: 9 },
+            { materialId: 'paper_cup', quantity: 9 },
         ]
     }
 ];
 
 export function calculateRequirements(
     selectedItems: { id: string; targetQuantity: number }[],
-    livePrices?: { ykz: Record<string, number>, mlb: Record<string, number> }
+    livePrices?: { ykz: Record<string, number>, mlb: Record<string, number> },
+    customMenuItems?: MenuItem[],
+    customRawMaterials?: Record<string, RawMaterial>
 ) {
+    const activeMenuItems = customMenuItems && customMenuItems.length > 0 ? customMenuItems : MENU_ITEMS;
+    const activeMaterials = customRawMaterials && Object.keys(customRawMaterials).length > 0 ? customRawMaterials : RAW_MATERIALS;
     const rawRequirements: Record<string, { materialId: string; quantity: number; weight: number; ykzCost: number; mlbCost: number }> = {};
 
     selectedItems.forEach(item => {
-        const menuItem = MENU_ITEMS.find(m => m.id === item.id);
+        const menuItem = activeMenuItems.find(m => m.id === item.id);
         if (!menuItem) return;
 
-        const batches = Math.ceil(item.targetQuantity / menuItem.batchSize);
+        const batchSize = Math.max(1, menuItem.batchSize || 1);
+        const batches = Math.ceil(item.targetQuantity / batchSize);
 
         menuItem.ingredients.forEach(ing => {
-            const material = RAW_MATERIALS[ing.materialId];
+            const material = activeMaterials[ing.materialId] || Object.values(activeMaterials).find(m => m.id === ing.materialId || m.name.toLowerCase() === ing.materialId.toLowerCase());
             if (!material) return;
 
             const neededQty = ing.quantity * batches;
-            const weight = material.weight * neededQty;
+            const weight = (material.weight || 0.1) * neededQty;
             
             const ykzRate = livePrices?.ykz?.[material.name] ?? material.ykzRate;
             const mlbRate = livePrices?.mlb?.[material.name] ?? material.mlbRate;
@@ -194,14 +234,15 @@ export function calculateRequirements(
             const ykzCost = ykzRate * neededQty;
             const mlbCost = mlbRate * neededQty;
 
-            if (rawRequirements[ing.materialId]) {
-                rawRequirements[ing.materialId].quantity += neededQty;
-                rawRequirements[ing.materialId].weight += weight;
-                rawRequirements[ing.materialId].ykzCost += ykzCost;
-                rawRequirements[ing.materialId].mlbCost += mlbCost;
+            const key = material.id || ing.materialId;
+            if (rawRequirements[key]) {
+                rawRequirements[key].quantity += neededQty;
+                rawRequirements[key].weight += weight;
+                rawRequirements[key].ykzCost += ykzCost;
+                rawRequirements[key].mlbCost += mlbCost;
             } else {
-                rawRequirements[ing.materialId] = {
-                    materialId: ing.materialId,
+                rawRequirements[key] = {
+                    materialId: key,
                     quantity: neededQty,
                     weight,
                     ykzCost,

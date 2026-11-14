@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { SALES_ITEMS } from '@/constants/salesItems';
 import { submitSalesLog } from '@/actions/sales';
+import { getMenuAndIngredients } from '@/actions/menu-management';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,12 +18,37 @@ export function SalesLogForm() {
     const [customPrices, setCustomPrices] = useState<Record<string, number>>({});
     const [discount, setDiscount] = useState<string>('0');
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Dynamic Sales Items state
+    const [salesCategories, setSalesCategories] = useState<Record<string, { label: string; items: Array<{ id: string; name: string; price: number }> }>>(SALES_ITEMS);
     const [activeTab, setActiveTab] = useState(Object.keys(SALES_ITEMS)[0]);
+
+    useEffect(() => {
+        getMenuAndIngredients().then((res) => {
+            if (res.success && res.menuItems?.length > 0) {
+                const grouped: Record<string, { label: string; items: Array<{ id: string; name: string; price: number }> }> = {};
+                res.menuItems.forEach((item: any) => {
+                    const catKey = (item.category || 'Mains').toLowerCase().replace(/[^a-z0-9]+/g, '_');
+                    const catLabel = item.category || 'Mains';
+                    if (!grouped[catKey]) {
+                        grouped[catKey] = { label: catLabel, items: [] };
+                    }
+                    grouped[catKey].items.push({
+                        id: item.id,
+                        name: item.name,
+                        price: item.price || 150
+                    });
+                });
+                setSalesCategories(grouped);
+                setActiveTab(prev => grouped[prev] ? prev : Object.keys(grouped)[0]);
+            }
+        }).catch(err => console.error("Failed to load dynamic sales items:", err));
+    }, []);
 
     // Flatten items for easy lookup
     const allItems = useMemo(() => {
-        return Object.values(SALES_ITEMS).flatMap(cat => cat.items);
-    }, []);
+        return Object.values(salesCategories).flatMap(cat => cat.items);
+    }, [salesCategories]);
 
     const handleQuantityChange = (itemId: string, value: number) => {
         const newVal = Math.max(0, value);
@@ -104,19 +130,20 @@ export function SalesLogForm() {
                 setCustomPrices({});
                 setDiscount('0');
             } else {
-                toast({ title: 'Error', description: res.error, variant: 'destructive' });
+                toast({ title: 'Submission Failed', description: res.error, variant: 'destructive' });
             }
         } catch (error) {
-            toast({ title: 'Error', description: 'Unexpected error occurred.', variant: 'destructive' });
+            toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
         } finally {
             setIsSubmitting(false);
         }
     };
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full">
-            <div className="lg:col-span-2">
-                <Card className="glass-card shadow-2xl border-white/10 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-7xl mx-auto w-full items-start">
+            {/* Left Column: Interactive Menu */}
+            <div className="lg:col-span-8 flex flex-col gap-6">
+                <Card className="glass-card w-full overflow-hidden border-white/10">
                     <CardHeader className="bg-gradient-to-r from-accent/10 to-transparent">
                         <CardTitle className="flex items-center gap-2 text-2xl">
                             <ShoppingCart className="w-7 h-7 text-accent" />
@@ -130,7 +157,7 @@ export function SalesLogForm() {
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                             <div className="overflow-x-auto pb-4 hide-scrollbar">
                                 <TabsList className="bg-black/20 p-1 h-auto flex gap-1 w-max rounded-xl border border-white/5">
-                                    {Object.entries(SALES_ITEMS).map(([key, cat]) => (
+                                    {Object.entries(salesCategories).map(([key, cat]) => (
                                         <TabsTrigger
                                             key={key}
                                             value={key}
@@ -142,7 +169,7 @@ export function SalesLogForm() {
                                 </TabsList>
                             </div>
 
-                            {Object.entries(SALES_ITEMS).map(([key, cat]) => (
+                            {Object.entries(salesCategories).map(([key, cat]) => (
                                 <TabsContent key={key} value={key} className="mt-0 focus-visible:outline-none">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {cat.items.map(item => (
@@ -178,23 +205,19 @@ export function SalesLogForm() {
                                                         </Button>
                                                     </div>
                                                 </div>
-                                                
-                                                <div className="flex items-center gap-3 mt-auto">
-                                                    <div className="relative flex-1">
-                                                        <DollarSign className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+
+                                                {/* Price Override Field */}
+                                                <div className="flex items-center justify-between pt-3 border-t border-white/5 text-xs text-muted-foreground">
+                                                    <span>Custom Unit Price:</span>
+                                                    <div className="flex items-center gap-1.5 w-32">
+                                                        <DollarSign className="w-3 h-3 text-muted-foreground/60" />
                                                         <Input
                                                             type="number"
-                                                            value={customPrices[item.id] !== undefined ? customPrices[item.id] : item.price}
-                                                            onChange={(e) => handlePriceChange(item.id, e.target.value)}
-                                                            className="h-9 pl-8 bg-black/40 border-white/10 text-sm focus:border-accent/50 focus:ring-accent/20"
                                                             placeholder={item.price.toString()}
+                                                            value={customPrices[item.id] !== undefined ? customPrices[item.id] : ''}
+                                                            onChange={(e) => handlePriceChange(item.id, e.target.value)}
+                                                            className="h-7 text-right font-mono bg-black/40 border-white/10 text-xs text-accent focus-visible:border-accent"
                                                         />
-                                                    </div>
-                                                    <div className="text-right flex flex-col justify-end">
-                                                        <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Item Total</span>
-                                                        <span className="font-mono text-sm font-bold text-accent">
-                                                            ${((customPrices[item.id] !== undefined ? customPrices[item.id] : item.price) * (quantities[item.id] || 0)).toLocaleString()}
-                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -207,46 +230,56 @@ export function SalesLogForm() {
                 </Card>
             </div>
 
-            <div className="lg:col-span-1 space-y-6">
-                <Card className="glass-card sticky top-6 overflow-hidden border-accent/20 shadow-xl">
-                    <CardHeader className="bg-accent/5 border-b border-white/5">
-                        <CardTitle className="text-lg text-white">Order Summary</CardTitle>
+            {/* Right Column: Checkout Summary Receipt */}
+            <div className="lg:col-span-4 flex flex-col gap-6 sticky top-6">
+                <Card className="glass-card border-white/10 overflow-hidden shadow-2xl">
+                    <CardHeader className="border-b border-white/5 bg-white/5">
+                        <CardTitle className="flex justify-between items-center text-lg">
+                            <span>Receipt Summary</span>
+                            <span className="text-xs font-mono font-normal text-muted-foreground">{totals.itemsToSubmit.reduce((a, b) => a + b.quantity, 0)} Items</span>
+                        </CardTitle>
                     </CardHeader>
                     <CardContent className="p-6 space-y-6">
-                        <div className="space-y-4">
-                           {totals.itemsToSubmit.length > 0 ? (
-                                <div className="space-y-2">
-                                    {totals.itemsToSubmit.map(item => (
-                                        <div key={item.name} className="flex justify-between text-sm animate-in fade-in slide-in-from-right-2">
-                                            <span className="text-muted-foreground truncate max-w-[150px]">{item.quantity}x {item.name}</span>
-                                            <span className="font-mono text-white">${(item.price * item.quantity).toLocaleString()}</span>
-                                        </div>
-                                    ))}
+                        {/* Order Items List */}
+                        <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                            {totals.itemsToSubmit.length === 0 ? (
+                                <div className="text-center py-10 text-muted-foreground flex flex-col items-center gap-2">
+                                    <ShoppingCart className="w-8 h-8 opacity-20" />
+                                    <p className="text-sm">No items added to current sale</p>
                                 </div>
                             ) : (
-                                <div className="text-center py-6 text-muted-foreground italic text-sm">
-                                    No items added yet.
-                                </div>
+                                totals.itemsToSubmit.map((item, idx) => (
+                                    <div key={idx} className="flex justify-between items-center text-sm py-1 border-b border-white/5">
+                                        <div className="flex flex-col flex-1 min-w-0 pr-2">
+                                            <span className="font-semibold text-white truncate">{item.name}</span>
+                                            <span className="text-xs text-muted-foreground font-mono">{item.quantity} × ${item.price.toLocaleString()}</span>
+                                        </div>
+                                        <span className="font-bold text-accent font-mono shrink-0">${(item.quantity * item.price).toLocaleString()}</span>
+                                    </div>
+                                ))
                             )}
                         </div>
 
-                        <div className="pt-4 border-t border-white/10 space-y-3">
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-muted-foreground">Subtotal</span>
+                        {/* Financial calculations */}
+                        <div className="space-y-3 pt-4 border-t border-white/5 text-sm">
+                            <div className="flex justify-between items-center text-muted-foreground">
+                                <span>Subtotal</span>
                                 <span className="font-mono text-white">${totals.subtotal.toLocaleString()}</span>
                             </div>
-                            
-                            <div className="space-y-2">
-                                <div className="flex justify-between items-center text-sm">
-                                    <Label className="text-muted-foreground">Discount (%)</Label>
-                                    <div className="relative w-24">
-                                        <Percent className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                                        <Input 
-                                            type="number" 
-                                            value={discount} 
-                                            onChange={e => setDiscount(e.target.value)}
-                                            className="h-8 pr-7 bg-black/40 border-white/10 text-right font-mono"
-                                            placeholder="0"
+
+                            <div className="flex flex-col gap-2 p-3 rounded-lg bg-black/30 border border-white/5">
+                                <div className="flex justify-between items-center">
+                                    <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                                        <Percent className="w-3 h-3 text-accent" /> Discount
+                                    </Label>
+                                    <div className="flex items-center gap-1 w-20">
+                                        <Input
+                                            type="number"
+                                            min="0"
+                                            max="100"
+                                            value={discount}
+                                            onChange={(e) => setDiscount(e.target.value)}
+                                            className="h-7 text-right font-mono bg-black/60 border-white/10 text-xs text-accent"
                                         />
                                     </div>
                                 </div>

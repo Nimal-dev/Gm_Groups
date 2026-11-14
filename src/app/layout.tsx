@@ -47,8 +47,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${outfit.variable} ${inter.variable} font-body antialiased`}>
+        <Preloader />
         <SmoothScrolling>
-          <Preloader />
           {children}
           <Toaster />
         </SmoothScrolling>

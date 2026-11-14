@@ -39,11 +39,6 @@ const SalesLogSchema: Schema = new Schema({
 // Indexes
 SalesLogSchema.index({ userId: 1, date: 1 });
 
-// Force delete model if it exists to prevent caching issues during dev
-if (mongoose.models && mongoose.models.SalesLog) {
-    delete mongoose.models.SalesLog;
-}
-
 const SalesLog = mongoose.models.SalesLog || mongoose.model<ISalesLog>('SalesLog', SalesLogSchema);
 
 export default SalesLog;

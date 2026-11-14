@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GamificationCard } from '@/components/dashboard/GamificationCard';
 import { DutyControl } from '@/components/dashboard/DutyControl';
+import { getEmployeeEarnings, getLiveActiveStaff } from '@/actions/dashboard';
 
 // Lazy Load heavy tab components
 const FoodLogForm = dynamic(() => import('@/components/dashboard/FoodLogForm').then(mod => mod.FoodLogForm), {
@@ -121,8 +122,7 @@ export function PortalDashboardClient({
 
         setIsRefreshingEarnings(true);
         try {
-            const mod = await import('@/actions/dashboard');
-            const res = await mod.getEmployeeEarnings(currentUser?.userId);
+            const res = await getEmployeeEarnings(currentUser?.userId);
             if (res.success) {
                 setTodaySalary(res.todaySalary);
                 setTotalUnpaid(res.unpaidSalary || 0);
@@ -479,8 +479,7 @@ function ActiveStaffList({ initialStaff }: { initialStaff: any[] }) {
     const fetchStaff = async () => {
         setIsRefreshing(true);
         try {
-            const mod = await import('@/actions/dashboard');
-            const res = await mod.getLiveActiveStaff();
+            const res = await getLiveActiveStaff();
             if (res.success && res.activeStaff) {
                 setStaffList(res.activeStaff);
             }

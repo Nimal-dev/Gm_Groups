@@ -16,6 +16,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { MENU_ITEMS, RAW_MATERIALS, calculateRequirements } from '@/lib/food-data';
 import { useRouter } from 'next/navigation';
+import { getMenuAndIngredients } from '@/actions/menu-management';
+import { getVendorInventory } from '@/actions/vendor';
 
 export function FoodPrepCalculator() {
     const router = useRouter();
@@ -23,18 +25,33 @@ export function FoodPrepCalculator() {
     const [searchTerm, setSearchTerm] = useState('');
     const [partnerPreference, setPartnerPreference] = useState<'YKZ' | 'MLB' | 'BOTH'>('BOTH');
     
+    // Dynamic Menu Items & Raw Materials state
+    const [dynamicMenuItems, setDynamicMenuItems] = useState<any[]>(MENU_ITEMS);
+    const [dynamicRawMaterials, setDynamicRawMaterials] = useState<Record<string, any>>(RAW_MATERIALS);
+
     // Live Pricing State
     const [loadingPrices, setLoadingPrices] = useState(true);
     const [livePrices, setLivePrices] = useState<{ ykz: Record<string, number>, mlb: Record<string, number> }>({ ykz: {}, mlb: {} });
 
     useEffect(() => {
+        // Load live dynamic recipes and raw materials from MongoDB
+        getMenuAndIngredients().then((res) => {
+            if (res.success && res.menuItems?.length > 0) {
+                setDynamicMenuItems(res.menuItems);
+            }
+            if (res.success && res.rawMaterials?.length > 0) {
+                const map: Record<string, any> = {};
+                res.rawMaterials.forEach((rm: any) => { map[rm.id] = rm; });
+                setDynamicRawMaterials(map);
+            }
+        }).catch(err => console.error("Failed to fetch dynamic menu config", err));
+
         const fetchInventories = async () => {
             setLoadingPrices(true);
             try {
-                const mod = await import('@/actions/vendor');
                 const [ykzRes, mlbRes] = await Promise.all([
-                    mod.getVendorInventory('YKZ'),
-                    mod.getVendorInventory('MLB')
+                    getVendorInventory('YKZ'),
+                    getVendorInventory('MLB')
                 ]);
                 
                 const newLivePrices = { ykz: {} as Record<string, number>, mlb: {} as Record<string, number> };
@@ -61,11 +78,11 @@ export function FoodPrepCalculator() {
     }, []);
 
     const filteredMenuItems = useMemo(() => {
-        return MENU_ITEMS.filter(item =>
+        return dynamicMenuItems.filter(item =>
             item.category !== 'Component' &&
             item.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
-    }, [searchTerm]);
+    }, [dynamicMenuItems, searchTerm]);
 
     const addItem = (itemId: string) => {
         if (selections.find(s => s.id === itemId)) return;
@@ -80,7 +97,9 @@ export function FoodPrepCalculator() {
         setSelections(selections.filter(s => s.id !== itemId));
     };
 
-    const results = useMemo(() => calculateRequirements(selections, livePrices), [selections, livePrices]);
+    const results = useMemo(() => {
+        return calculateRequirements(selections, livePrices, dynamicMenuItems, dynamicRawMaterials);
+    }, [selections, livePrices, dynamicMenuItems, dynamicRawMaterials]);
 
     const totals = useMemo(() => {
         return results.reduce((acc, curr) => ({
@@ -92,8 +111,11 @@ export function FoodPrepCalculator() {
     }, [results]);
 
     const generateRequestUrl = (partner: 'YKZ' | 'MLB') => {
-        const itemsStr = results.map(r => `${r.quantity}x ${RAW_MATERIALS[r.materialId].name}`).join('\n');
-        const notes = `Need these items delivered to 8228 KOI CAFE, \nThis is an automated message from inside the city and the person requesting will not be able to see the Discord messages. \nDo use ingame methods to contact us!`;
+        const itemsStr = results.map(r => {
+            const matName = dynamicRawMaterials[r.materialId]?.name || r.materialId;
+            return `${r.quantity}x ${matName}`;
+        }).join('\n');
+        const notes = `Need these items delivered to 8228 GM CAFE, \nThis is an automated message from inside the city and the person requesting will not be able to see the Discord messages. \nDo use ingame methods to contact us!`;
         return `/rawrequest?partner=${partner}&items=${encodeURIComponent(itemsStr)}&notes=${encodeURIComponent(notes)}`;
     };
 

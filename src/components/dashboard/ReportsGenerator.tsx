@@ -215,7 +215,7 @@ export function ReportsGenerator({ userRole = 'staff' }: { userRole?: string }) 
                 setFullReportData(result.data);
                 
                 // Text representation for Discord/Clipboard
-                reportText = `KOI CAFE - FULL SHOP REPORT\n` +
+                reportText = `GM CAFE - FULL SHOP REPORT\n` +
                              `Period: ${formatLocalDate(result.data.startDate)} - ${formatLocalDate(result.data.endDate)}\n` +
                              `---------------------------\n` +
                              `Opening: $${result.data.financials.openingBalance.toLocaleString()}\n` +

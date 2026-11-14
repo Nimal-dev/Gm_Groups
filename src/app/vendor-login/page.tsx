@@ -105,7 +105,7 @@ export default function VendorLoginPage() {
 
                             <div className="mt-6 text-center">
                                 <p className="text-xs text-white/30 tracking-wider uppercase font-mono">
-                                    KOI Cafe Vendor System
+                                    GM Cafe Vendor System
                                 </p>
                             </div>
                         </CardContent>

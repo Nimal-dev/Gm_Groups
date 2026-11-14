@@ -1,30 +1,69 @@
 export const ITEM_CATEGORIES = {
     'food_items': {
-        label: '🍔 Main Menu',
-        items: ['BBQ Ribs', 'Dragon Roll', 'Ramen', 'Garden Salad']
+        label: '🍔 Food Items',
+        items: [
+            'Missio Style burrito',
+            'Beef Taco',
+            'Sushi Tray',
+            'Italian tiramisu'
+        ]
     },
-    'drinks_and_sides': {
-        label: '🍹 Drinks & Sides',
-        items: ['Matcha Milk Tea', 'Virgin Mojito', 'Smoothie', 'Shrimp Tempura']
+    'drinks': {
+        label: '🍹 Drinks & Beverages',
+        items: [
+            'Lemon mint cooler glass',
+            'Pina Colada',
+            'Thai Ice Tea',
+            'Masala Chai',
+            'Icedlatte Capped',
+            'Frappe Coffee'
+        ]
     }
 };
 
 export const BATCH_SIZES: Record<string, number> = {
-    'BBQ Ribs': 5,
-    'Ramen': 15,
-    'Dragon Roll': 15,
-    'Garden Salad': 9,
-    'Matcha Milk Tea': 15,
-    'Virgin Mojito': 15,
-    'Smoothie': 15,
-    'Shrimp Tempura': 15
+    'Missio Style burrito': 19,
+    'Italian tiramisu': 6,
+    'Beef Taco': 11,
+    'Sushi Tray': 11,
+    'Thai Ice Tea': 12,
+    'Masala Chai': 10,
+    'Icedlatte Capped': 10,
+    'Frappe Coffee': 9,
+    'Pina Colada': 20,
+    'Lemon mint cooler glass': 13
 };
 
 export const RAW_MATERIALS = [
-    'Raw Pork Rib', 'Raw Shrimp', 'Chashu Pork', 'Pork Broth', 'BBQ Sauce', 'Egg', 
-    'Tomato', 'Lettuce', 'Cucumber', 'Fresh Mint', 'Lime', 'Banana', 'Strawberry', 
-    'Avacado', 'Milk', 'Ramen Noodles', 'Sushi Rice', 'Nori Sheets', 'Eel Sauce', 
-    'Tempura Batter', 'Sugar', 'Water', 'Carbonated Water', 'Tapioca Pearls', 
-    'Matcha Powder', 'Fry Carton', 'Paper Cup', 'Glass Cup', 'Bubble Tea Cup', 
-    'Bowl', 'Bug Spray', 'Rat Poison', 'Shrimp Tempura'
+    'Flour Tortilla',
+    'Rice',
+    'Kidney Beans',
+    'Raw Ground Beef',
+    'Block Cheese',
+    'Coffee Beans',
+    'Cream Cheese',
+    'Eggs',
+    'Sugar',
+    'Chocolate',
+    'Thai Tea Leaves',
+    'Condensed Milk',
+    'Ice',
+    'Paper Cup',
+    'Black Tea',
+    'Milk',
+    'Cinnamon Stick',
+    'Fresh Ginger',
+    'Pineapple',
+    'Coconut Cream',
+    'Glass Cup',
+    'Lemon',
+    'Fresh Mint',
+    'Carbonated Water',
+    'Lettuce',
+    'Tomato',
+    'Sushi Rice',
+    'Nori Sheets',
+    'Raw Salmon Fillet',
+    'Raw Tuna Steak',
+    'Avocado'
 ];

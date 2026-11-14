@@ -1,4 +1,3 @@
-// ... (imports)
 import NextAuth from 'next-auth';
 import Discord from 'next-auth/providers/discord';
 import Credentials from 'next-auth/providers/credentials';
@@ -11,10 +10,10 @@ import { escapeRegex } from '@/lib/employee-utils';
 /**
  * NextAuth Configuration
  * 
- * Handles authentication via Discord OAuth.
+ * Handles authentication via Discord OAuth and MPIN Credentials.
  * - Verifies user existence in the internal `Employee` database.
  * - Assigns roles (Admin, Bulkhead, Staff) based on Employee Rank.
- * - Logs login activity to the central bot logging system.
+ * - Asynchronously logs login activity to the central bot logging system without blocking user redirect.
  * - Persists Employee Name and Role in the session.
  */
 export const { auth, signIn, signOut, handlers } = NextAuth({
@@ -27,26 +26,26 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}authjs.session-token`,
             options: {
                 httpOnly: true,
-                sameSite: 'none',
+                sameSite: 'lax',
                 path: '/',
-                secure: true
+                secure: process.env.NODE_ENV === 'production'
             }
         },
         callbackUrl: {
             name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}authjs.callback-url`,
             options: {
-                sameSite: 'none',
+                sameSite: 'lax',
                 path: '/',
-                secure: true
+                secure: process.env.NODE_ENV === 'production'
             }
         },
         csrfToken: {
             name: `${process.env.NODE_ENV === 'production' ? '__Host-' : ''}authjs.csrf-token`,
             options: {
                 httpOnly: true,
-                sameSite: 'none',
+                sameSite: 'lax',
                 path: '/',
-                secure: true
+                secure: process.env.NODE_ENV === 'production'
             }
         }
     },
@@ -64,18 +63,18 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             if (account?.provider === 'discord' && profile) {
                 try {
                     await connectToDatabase();
-                    // Check if the Discord User ID exists in the Employee collection
-                    const employee = await Employee.findOne({ userId: profile.id, status: 'Active' });
+                    // Fast indexed lookup for Discord User ID in Employee collection
+                    const employee = await Employee.findOne({ userId: profile.id, status: 'Active' }).lean();
 
                     if (!employee) {
                         console.info(`New applicant login: ${profile.username} (${profile.id}). They are not an active employee.`);
                         user.role = 'applicant';
-                        user.name = profile.username as string; // Use Discord username for applicants
+                        user.name = (profile.username as string) || (profile.name as string) || 'Applicant';
                         return true; // Allow them in but uniquely identified as applicant
                     }
 
                     // Map Rank to Website Role
-                    const rank = employee.rank.toLowerCase();
+                    const rank = (employee.rank || '').toLowerCase();
                     let role = 'staff'; // Default role (Covering Staff, Recruit, Novice, etc.)
 
                     if (rank.includes('owner') || rank.includes('boss') || rank.includes('management') || rank.includes('manager') || rank.includes('lawyer')) {
@@ -88,17 +87,18 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     user.role = role;
                     user.name = employee.username; // Use DB Employee Name instead of Discord Username
 
-                    // Log the login activity
-                    const { fetchBot } = await import('@/lib/bot-api');
-                    await fetchBot('/api/website-log', {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            action: 'Login',
-                            user: employee.username,
-                            details: `User ${employee.username} logged in via Discord.`,
-                            role: role
-                        })
-                    }).catch(err => console.error('Failed to log Discord login:', err));
+                    // Fire-and-forget: Log the login activity in the background without blocking the user response
+                    import('@/lib/bot-api').then(({ fetchBot }) => {
+                        fetchBot('/api/website-log', {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                action: 'Login',
+                                user: employee.username,
+                                details: `User ${employee.username} logged in via Discord.`,
+                                role: role
+                            })
+                        }).catch(err => console.error('Failed to log Discord login:', err));
+                    }).catch(err => console.error('Failed to load bot-api for website-log:', err));
 
                     return true;
                 } catch (error) {
@@ -106,20 +106,17 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     return false;
                 }
             }
-            if (account?.provider === 'credentials') {
+            if (account?.provider === 'credentials' || account?.provider === 'vendor-mpin') {
                 return true;
             }
-            if (account?.provider === 'vendor-mpin') {
-                return true;
-            }
-            return false; // Deny other non-Discord login attempts
+            return false; // Deny other unsupported login attempts
         },
     },
     providers: [
         Discord({
             clientId: process.env.AUTH_DISCORD_ID,
             clientSecret: process.env.AUTH_DISCORD_SECRET,
-            authorization: { params: { scope: 'identify email guilds guilds.join' } }, // Use standard scopes + guilds.join if needed
+            authorization: { params: { scope: 'identify email guilds guilds.join' } },
         }),
         Credentials({
             name: 'MPIN Login',
@@ -135,10 +132,15 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                 await connectToDatabase();
                 const loginIdStr = String(credentials.loginId).trim();
 
-                const employee = await Employee.findOne({
-                    loginId: { $regex: new RegExp('^' + escapeRegex(loginIdStr) + '$', 'i') },
-                    status: 'Active'
-                });
+                // Fast indexed exact lookup first
+                let employee = await Employee.findOne({ loginId: loginIdStr, status: 'Active' });
+                if (!employee) {
+                    // Fallback to case-insensitive regex only if exact match is not found
+                    employee = await Employee.findOne({
+                        loginId: { $regex: new RegExp('^' + escapeRegex(loginIdStr) + '$', 'i') },
+                        status: 'Active'
+                    });
+                }
 
                 if (!employee) {
                     console.warn(`[Auth] No active employee found for Login ID: ${loginIdStr}`);
@@ -151,7 +153,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                 }
 
                 // Map Rank to Website Role
-                const rank = employee.rank.toLowerCase();
+                const rank = (employee.rank || '').toLowerCase();
                 let role = 'staff';
 
                 if (rank.includes('owner') || rank.includes('boss') || rank.includes('management') || rank.includes('manager') || rank.includes('lawyer')) {
@@ -182,9 +184,14 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                 await connectToDatabase();
                 const vendorIdStr = String(credentials.vendorId).trim();
 
-                const vendor = await VendorUser.findOne({
-                    vendorId: { $regex: new RegExp('^' + escapeRegex(vendorIdStr) + '$', 'i') }
-                });
+                // Fast indexed exact lookup first
+                let vendor = await VendorUser.findOne({ vendorId: vendorIdStr });
+                if (!vendor) {
+                    // Fallback to case-insensitive regex only if exact match is not found
+                    vendor = await VendorUser.findOne({
+                        vendorId: { $regex: new RegExp('^' + escapeRegex(vendorIdStr) + '$', 'i') }
+                    });
+                }
 
                 if (!vendor) {
                     console.warn(`[Auth] No vendor found for Vendor ID: ${vendorIdStr}`);

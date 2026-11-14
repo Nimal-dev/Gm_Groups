@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
-export function KOICafeCTA() {
+export function GMCafeCTA() {
   return (
-    <section id="koi-cafe-cta" className="py-20 bg-background/50 sm:py-28">
+    <section id="gm-cafe-cta" className="py-20 bg-background/50 sm:py-28">
       <div className="container px-4 mx-auto text-center">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -26,7 +26,7 @@ export function KOICafeCTA() {
           viewport={{ once: true }}
           className="max-w-2xl mx-auto mt-4 text-lg text-muted-foreground"
         >
-          Explore our flagship **GM Cafe & Restaurant**, see what's on the menu, and understand why **KOI Cafe** is the true heart of Xlantis.
+          Explore our flagship **GM Cafe & Restaurant**, see what's on the menu, and understand why **GM Cafe** is the true heart of Xlantis.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -36,8 +36,8 @@ export function KOICafeCTA() {
           className="mt-8"
         >
           <Button asChild size="lg" className="px-10 py-6 text-lg font-bold bg-[#27cb63] text-primary-foreground hover:bg-[#27cb63]/90">
-            <Link href="/koi-cafe">
-              Explore KOI Cafe <ArrowRight className="w-5 h-5 ml-2" />
+            <Link href="/gm-cafe">
+              Explore GM Cafe <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
           </Button>
         </motion.div>

@@ -16,10 +16,6 @@ const VendorUserSchema: Schema = new Schema({
 
 VendorUserSchema.index({ role: 1 });
 
-if (mongoose.models?.VendorUser) {
-    delete mongoose.models.VendorUser;
-}
-
-const VendorUser = mongoose.model<IVendorUser>('VendorUser', VendorUserSchema);
+const VendorUser = mongoose.models.VendorUser || mongoose.model<IVendorUser>('VendorUser', VendorUserSchema);
 
 export default VendorUser;

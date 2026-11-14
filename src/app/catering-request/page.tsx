@@ -397,14 +397,14 @@ export default function CateringRequestPage() {
 
                                                             <div>
                                                                 <h5 className="font-semibold text-white/90">5. LIABILITY & WAIVER</h5>
-                                                                <p>Liability transfers to X-Club upon handover. X-Club assumes responsibility for cold chain storage (&lt;5°C) and safe reheating (&gt;75°C). X-Club indemnifies GM KOI Cafe against health claims for food consumed &gt;32 hours after handover or improperly stored. The foods can be consumed till 1% durability. Any foods consumed &lt;1% is strictly forbidden and will not come under KOI Cafe’s responsibility.</p>
+                                                                <p>Liability transfers to X-Club upon handover. X-Club assumes responsibility for cold chain storage (&lt;5°C) and safe reheating (&gt;75°C). X-Club indemnifies GM Cafe against health claims for food consumed &gt;32 hours after handover or improperly stored. The foods can be consumed till 1% durability. Any foods consumed &lt;1% is strictly forbidden and will not come under GM Cafe’s responsibility.</p>
                                                             </div>
                                                             <div>
                                                                 <h5 className="font-semibold text-white/90">6.POLICY GOVERNANCE & AMENDMENTS</h5>
                                                                 <ul className="list-disc pl-4 space-y-1">
-                                                                    <li><strong>Right to Modify:</strong> GM KOI Cafe reserves the right to review, amend, or update this policy at any time, specifically in the event that operational flaws, loopholes, or financial discrepancies are identified.
+                                                                    <li><strong>Right to Modify:</strong> GM Cafe reserves the right to review, amend, or update this policy at any time, specifically in the event that operational flaws, loopholes, or financial discrepancies are identified.
                                                                     </li>
-                                                                    <li><strong>Notification:</strong> Any such amendments will be effective immediately upon written notification to the Client. Continued use of GM KOI Cafe’s catering services constitutes acceptance of the revised terms.
+                                                                    <li><strong>Notification:</strong> Any such amendments will be effective immediately upon written notification to the Client. Continued use of GM Cafe’s catering services constitutes acceptance of the revised terms.
                                                                     </li>
                                                                 </ul>
                                                             </div>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
-import bs from "../../../public/koicafe_bg.png"
+import gmcafe_bg from "../../../public/gmcafe_bg.png"
 
 export function BusinessSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -24,12 +24,12 @@ export function BusinessSection() {
     >
       {/* Heavy Parallax Background */}
       <motion.div
-        style={{ y: bgY, backgroundImage: `url(${bs.src})` }}
-        className="absolute inset-0 bg-center bg-cover grayscale opacity-30"
+        style={{ y: bgY, backgroundImage: `url(${gmcafe_bg.src})` }}
+        className="absolute inset-0 bg-center bg-cover opacity-35"
       />
       <div
         className="absolute inset-0 bg-center bg-cover bg-fixed opacity-10 pointer-events-none"
-        style={{ backgroundImage: `url(${bs.src})` }}
+        style={{ backgroundImage: `url(${gmcafe_bg.src})` }}
       />
 
       <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black z-[1]" />
@@ -49,13 +49,13 @@ export function BusinessSection() {
                 The Flagship Front
               </span>
               <h2 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter uppercase leading-[0.8]">
-                <span className="text-white">KOI</span><br />
+                <span className="text-white">GM</span><br />
                 <span className="text-[#27cb63]">CAFE</span>
               </h2>
             </div>
 
             <p className="text-lg md:text-xl text-zinc-400 font-light leading-relaxed max-w-xl">
-              More than just a fast-food joint, KOI Cafe is a hub of information, a neutral ground for meetings, and a symbol of our public-facing dominance. It's the jewel in our commercial crown that keeps the city fed and our secrets safe.
+              More than just a fast-food joint, GM Cafe is a hub of information, a neutral ground for meetings, and a symbol of our public-facing dominance. It's the jewel in our commercial crown that keeps the city fed and our secrets safe.
             </p>
 
             <Button
@@ -63,7 +63,7 @@ export function BusinessSection() {
               size="lg"
               className="h-14 md:h-16 px-8 md:px-10 text-base md:text-lg font-black bg-[#27cb63] hover:bg-white text-black rounded-none skew-x-[-12deg] transition-all duration-300 group"
             >
-              <Link href="/koi-cafe" className="flex items-center gap-3">
+              <Link href="/gm-cafe" className="flex items-center gap-3">
                 <span className="skew-x-[12deg]">DOMINATE CUISINE</span>
                 <ArrowRight className="w-5 h-5 skew-x-[12deg] group-hover:translate-x-2 transition-transform" />
               </Link>

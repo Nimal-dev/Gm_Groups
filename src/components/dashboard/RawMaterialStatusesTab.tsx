@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { getEmployeeOrders, cancelOrder } from '@/actions/vendor';
 import { Loader2, Package, Clock, X, RefreshCw, ChevronRight, User, AlertCircle, Calendar, Info } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 
@@ -42,9 +43,8 @@ export default function RawMaterialStatusesTab({ userId, userName, userRole }: R
     const fetchOrders = async () => {
         setLoading(true);
         try {
-            const mod = await import('@/actions/vendor');
             // Irrespective of roles, fetch all requests made to YKZ/MLB or both by omitting userRole parameter
-            const res = await mod.getEmployeeOrders(userId, userName);
+            const res = await getEmployeeOrders(userId, userName);
             if (res.success) {
                 setOrders(res.orders);
                 // Keep the selected order details in sync if it's currently open
@@ -72,8 +72,7 @@ export default function RawMaterialStatusesTab({ userId, userName, userRole }: R
         }
         setCancelling(true);
         try {
-            const mod = await import('@/actions/vendor');
-            const res = await mod.cancelOrder(cancelModal._id, cancelReason, userName);
+            const res = await cancelOrder(cancelModal._id, cancelReason, userName);
             if (res.success) {
                 toast({ title: 'Order Cancelled', className: 'bg-red-600 border-none' });
                 fetchOrders();

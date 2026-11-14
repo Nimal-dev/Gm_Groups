@@ -82,15 +82,15 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
-          className="flex flex-col sm:flex-row gap-6"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full max-w-[280px] sm:max-w-none"
         >
-          <form action={discordApplyLogin}>
+          <form action={discordApplyLogin} className="w-full sm:w-auto flex justify-center">
             <Button
               type="submit"
               size="lg"
-              className="h-16 px-10 text-lg font-black bg-primary hover:bg-white text-black rounded-none skew-x-[-12deg] transition-all duration-300 group"
+              className="w-full sm:w-auto min-w-[220px] h-14 sm:h-16 px-8 sm:px-10 text-base sm:text-lg font-black bg-primary hover:bg-white text-black rounded-none skew-x-[-12deg] transition-all duration-300 group justify-center shadow-lg cursor-pointer"
             >
-              <span className="skew-x-[12deg] flex items-center gap-2">JOIN GM</span>
+              <span className="skew-x-[12deg] flex items-center justify-center gap-2">JOIN GM</span>
             </Button>
           </form>
 
@@ -98,10 +98,10 @@ export function HeroSection() {
             asChild
             variant="outline"
             size="lg"
-            className="h-16 px-10 text-lg font-bold border-white/10 hover:border-primary bg-white/5 backdrop-blur-md text-white hover:text-black rounded-none skew-x-[-12deg] transition-all duration-300"
+            className="w-full sm:w-auto min-w-[220px] h-14 sm:h-16 px-8 sm:px-10 text-base sm:text-lg font-bold border-white/10 hover:border-primary bg-white/5 backdrop-blur-md text-white hover:text-black rounded-none skew-x-[-12deg] transition-all duration-300 justify-center shadow-lg cursor-pointer"
           >
-            <Link href="#about">
-              <span className="skew-x-[12deg]">EXPLORE LEGACY</span>
+            <Link href="#about" className="flex items-center justify-center w-full">
+              <span className="skew-x-[12deg] text-center">EXPLORE LEGACY</span>
             </Link>
           </Button>
         </motion.div>

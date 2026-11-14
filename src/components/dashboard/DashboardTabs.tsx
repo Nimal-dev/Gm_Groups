@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { endRecurringOrder, updateRecurringOrder } from '@/actions/bulk-orders';
+import { getCateringRequests } from '@/actions/catering';
+import { getEmployeeEarnings, getLiveActiveStaff } from '@/actions/dashboard';
 
 import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -77,6 +79,10 @@ const MaterialsBillsTab = dynamic(() => import('@/components/dashboard/Materials
     loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Bills...</div>,
     ssr: false
 });
+const MenuManagerTab = dynamic(() => import('@/components/dashboard/MenuManagerTab'), {
+    loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading Menu & Recipes...</div>,
+    ssr: false
+});
 
 import { LeaveManagementCard } from '@/components/dashboard/LeaveManagementCard';
 
@@ -110,8 +116,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
 
     useEffect(() => {
         // Fetch pending catering requests count for notification badge
-        import('@/actions/catering').then(async (mod) => {
-            const res = await mod.getCateringRequests();
+        getCateringRequests().then((res) => {
             if (res.success) {
                 setPendingCateringCount(res.requests.length);
             }
@@ -153,8 +158,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
 
         setIsRefreshingEarnings(true);
         try {
-            const mod = await import('@/actions/dashboard');
-            const res = await mod.getEmployeeEarnings(currentUser?.userId);
+            const res = await getEmployeeEarnings(currentUser?.userId);
             if (res.success) {
                 setTodaySalary(res.todaySalary);
                 setTotalUnpaid(res.unpaidSalary || 0);
@@ -236,6 +240,7 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                     <TabsTrigger value="calculator" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent text-primary/80 font-bold">Calculator</TabsTrigger>
                     <TabsTrigger value="orderstatus" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Raw Material Status</TabsTrigger>
                     <TabsTrigger value="reports" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">Reports</TabsTrigger>
+                    <TabsTrigger value="menu-manager" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent font-semibold text-amber-400">Menu & Recipes</TabsTrigger>
                 </TabsList>
             </div>
 
@@ -631,6 +636,11 @@ export function DashboardTabs({ activeStaff, activeOrders, recurringOrders, allE
                     userRole={currentUser?.role || 'staff'}
                 />
             </TabsContent>
+
+            {/* MENU & RECIPES TAB */}
+            <TabsContent value="menu-manager" className="space-y-6">
+                <MenuManagerTab userRole={userRole} />
+            </TabsContent>
         </Tabs >
     );
 }
@@ -647,8 +657,7 @@ function ActiveStaffList({ initialStaff }: { initialStaff: any[] }) {
         setIsRefreshing(true);
         try {
             // Dynamically import to avoid server-client boundary issues if any, though regular import works too
-            const mod = await import('@/actions/dashboard');
-            const res = await mod.getLiveActiveStaff();
+            const res = await getLiveActiveStaff();
             if (res.success && res.activeStaff) {
                 setStaffList(res.activeStaff);
             }

@@ -27,7 +27,7 @@ export async function generateShopPDF(data: FullReportData, reportTo: string, re
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
-    doc.text('KOI CAFE', 14, 25);
+    doc.text('GM CAFE', 14, 25);
     
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');

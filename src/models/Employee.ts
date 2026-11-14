@@ -4,7 +4,7 @@ export interface IEmployee extends Document {
     userId: string;
     username: string;
     nickname?: string;
-    loginId?: string; // New custom login identifier
+    loginId?: string; // Custom login identifier
     mpin?: string;
     rank: string;
     joinedAt: Date;
@@ -42,15 +42,10 @@ const EmployeeSchema: Schema = new Schema({
     unpaidSalary: { type: Number, default: 0 }
 });
 
-// Index for optimization
+// Indexes for optimization
 EmployeeSchema.index({ status: 1 });
 EmployeeSchema.index({ level: -1, xp: -1 }); // Sorting Leaderboard
 
-// Force delete model if it exists to prevent caching issues during dev
-if (mongoose.models && mongoose.models.Employee) {
-    delete mongoose.models.Employee;
-}
-
-const Employee = mongoose.model<IEmployee>('Employee', EmployeeSchema);
+const Employee = mongoose.models.Employee || mongoose.model<IEmployee>('Employee', EmployeeSchema);
 
 export default Employee;

@@ -45,11 +45,6 @@ const DailySalarySchema: Schema = new Schema({
 // Index for getting a specific user's daily record efficiently
 DailySalarySchema.index({ userId: 1, date: 1 }, { unique: true });
 
-// Force delete model if it exists to prevent caching issues during dev
-if (mongoose.models && mongoose.models.DailySalary) {
-    delete mongoose.models.DailySalary;
-}
-
 const DailySalary = mongoose.models.DailySalary || mongoose.model<IDailySalary>('DailySalary', DailySalarySchema);
 
 export default DailySalary;

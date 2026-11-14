@@ -629,7 +629,7 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
                 {/* STAFF TAB */}
                 <TabsContent value="staff" className="space-y-6">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-semibold flex items-center gap-2"><Users className="w-5 h-5 text-emerald-400" /> KOI Cafe Staff Online</h2>
+                        <h2 className="text-lg font-semibold flex items-center gap-2"><Users className="w-5 h-5 text-emerald-400" /> GM Cafe Staff Online</h2>
                         <Button variant="ghost" size="sm" onClick={fetchStaff} className="text-muted-foreground"><RefreshCw className="w-4 h-4 mr-1" /> Refresh</Button>
                     </div>
 

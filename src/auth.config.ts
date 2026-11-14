@@ -1,7 +1,11 @@
-
 import type { NextAuthConfig } from 'next-auth';
 
 async function refreshAccessToken(token: any) {
+    // If there is no refresh token (e.g. MPIN or credentials), never attempt refresh
+    if (!token?.refreshToken) {
+        return token;
+    }
+
     try {
         const url = 'https://discord.com/api/oauth2/token';
         const body = new URLSearchParams({
@@ -17,6 +21,7 @@ async function refreshAccessToken(token: any) {
             },
             method: 'POST',
             body,
+            signal: AbortSignal.timeout(5000), // Hard timeout to prevent middleware hanging
         });
 
         const refreshedTokens = await response.json();
@@ -25,10 +30,14 @@ async function refreshAccessToken(token: any) {
             throw refreshedTokens;
         }
 
+        const expiresInSec = typeof refreshedTokens.expires_in === 'number'
+            ? refreshedTokens.expires_in
+            : 7 * 24 * 60 * 60;
+
         return {
             ...token,
             accessToken: refreshedTokens.access_token,
-            expiresAt: Date.now() + refreshedTokens.expires_in * 1000,
+            expiresAt: Date.now() + expiresInSec * 1000,
             refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
         };
     } catch (error) {
@@ -63,10 +72,14 @@ export const authConfig = {
                     };
                 }
 
+                const expiresInSec = typeof account.expires_in === 'number'
+                    ? account.expires_in
+                    : 7 * 24 * 60 * 60;
+
                 return {
                     accessToken: account.access_token,
                     refreshToken: account.refresh_token,
-                    expiresAt: Date.now() + (account.expires_in as number * 1000),
+                    expiresAt: Date.now() + (expiresInSec * 1000),
                     user: {
                         ...user,
                         id: (profile?.id as string) || user.id, // CRITICAL FIX: Force use of Discord ID
@@ -76,17 +89,17 @@ export const authConfig = {
                 };
             }
 
+            // Fast-path: MPIN sessions or tokens without a refreshToken never query Discord
+            if (token.accessToken === 'mpin-auth' || !token.refreshToken) {
+                return token;
+            }
+
             // Return previous token if the access token has not expired yet
-            if (Date.now() < (token.expiresAt as number)) {
+            if (token.expiresAt && Date.now() < (token.expiresAt as number)) {
                 return token;
             }
 
-            if (token.accessToken === 'mpin-auth') {
-                // MPIN sessions inherently don't use Discord OAuth refresh tokens
-                return token;
-            }
-
-            // Access token has expired, try to update it
+            // Access token has expired and has a valid refreshToken, try to update it
             return await refreshAccessToken(token);
         },
         async session({ session, token }) {
