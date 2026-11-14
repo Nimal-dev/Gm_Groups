@@ -44,6 +44,16 @@ export function Preloader() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleSkip]);
 
+    // Immediate browser in-memory pre-decoding for instant display
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const pre1 = new window.Image();
+            pre1.src = '/nimal_intro.webp';
+            const pre2 = new window.Image();
+            pre2.src = '/arya_intro.webp';
+        }
+    }, []);
+
     useEffect(() => {
         // --- Master Animation Timeline (Plays on every reload) ---
         const timers: NodeJS.Timeout[] = [];
@@ -244,7 +254,7 @@ export function Preloader() {
                             >
                                 {/* Old Manager Photo */}
                                 <Image
-                                    src="/Nimal.png"
+                                    src="/nimal_intro.webp"
                                     alt="Nimal Prince - Old Manager"
                                     fill
                                     priority
@@ -362,7 +372,7 @@ export function Preloader() {
                                 className="relative w-[240px] h-[320px] sm:w-[280px] sm:h-[380px] rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(245,158,11,0.5)] border-4 border-amber-400/60 bg-gradient-to-b from-amber-400/20 to-black group"
                             >
                                 <Image
-                                    src="/Arya.png"
+                                    src="/arya_intro.webp"
                                     alt="Arya - The New Manager"
                                     fill
                                     priority
