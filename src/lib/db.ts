@@ -22,13 +22,19 @@ if (!cached) {
 }
 
 async function connectToDatabase() {
-    // Return existing connection immediately if healthy and ready (readyState === 1: Connected)
+    // 1. Return existing connection immediately if healthy and ready (readyState === 1: Connected)
     if (cached.conn && mongoose.connection.readyState === 1) {
         return cached.conn;
     }
 
-    // If connection dropped or socket closed, clear cache to force a fresh connection
-    if (mongoose.connection.readyState !== 1) {
+    // 2. If a connection is already in-flight (readyState === 2: Connecting), wait for it instead of wiping or reconnecting
+    if (cached.promise && mongoose.connection.readyState === 2) {
+        cached.conn = await cached.promise;
+        return cached.conn;
+    }
+
+    // 3. Only if connection dropped or disconnected (readyState === 0 or 3), reset cache
+    if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
         cached.conn = null;
         cached.promise = null;
     }
@@ -37,7 +43,9 @@ async function connectToDatabase() {
         const opts = {
             bufferCommands: false,
             dbName: 'gmbot', // Explicitly connecting to the bot's DB
-            maxPoolSize: 10, // Optimization for Free Tier
+            maxPoolSize: 10,
+            minPoolSize: 2, // Maintain warm sockets in pool for instant response
+            maxIdleTimeMS: 60000,
             serverSelectionTimeoutMS: 5000,
             socketTimeoutMS: 45000,
         };

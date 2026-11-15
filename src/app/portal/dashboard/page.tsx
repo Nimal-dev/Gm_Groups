@@ -1,5 +1,6 @@
 import { getDashboardData } from '@/actions/dashboard';
 import connectToDatabase from '@/lib/db';
+import Employee from '@/models/Employee';
 import { auth } from '@/auth';
 import { sanitizeEmployeesForRole, escapeRegex } from '@/lib/employee-utils';
 import { PortalDashboardClient } from '@/components/dashboard/PortalDashboardClient';
@@ -23,14 +24,14 @@ export default async function PortalDashboardPage() {
 
     await connectToDatabase();
 
-    let currentUser = await (await import('@/models/Employee')).default.findOne({
+    let currentUser = await Employee.findOne({
         userId: session.user.id
-    }).lean();
+    }).select('userId username xp level achievements rank').lean();
 
     if (!currentUser) {
-        currentUser = await (await import('@/models/Employee')).default.findOne({
+        currentUser = await Employee.findOne({
             username: { $regex: new RegExp(`^${escapeRegex(session.user.name || '')}$`, 'i') }
-        }).lean();
+        }).select('userId username xp level achievements rank').lean();
     }
 
     if (!currentUser) {

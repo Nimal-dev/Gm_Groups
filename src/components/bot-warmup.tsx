@@ -11,6 +11,12 @@ import { useEffect } from 'react';
  */
 export function BotWarmup() {
     useEffect(() => {
+        // 1. Immediately pre-warm database connection so authentication on submit is instant
+        fetch('/api/warmup', { cache: 'no-store' }).catch(() => {
+            // Silently ignore warmup errors
+        });
+
+        // 2. Ping external Discord bot if configured
         const botUrl = process.env.NEXT_PUBLIC_BOT_URL;
         if (!botUrl) return;
 

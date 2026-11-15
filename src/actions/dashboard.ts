@@ -9,6 +9,7 @@ import BankTransaction from '@/models/BankTransaction';
 import BankBalanceLog from '@/models/BankBalanceLog';
 import RecurringOrder from '@/models/RecurringOrder';
 import DailySalary from '@/models/DailySalary';
+import Leave from '@/models/Leave';
 import { unstable_cache } from 'next/cache';
 import { getLocalStartOfMonth } from '@/lib/date-utils';
 import { getLatestCompanyBalance } from '@/actions/bank';
@@ -42,9 +43,9 @@ const fetchDashboardData = unstable_cache(
                     .limit(10)
                     .lean(),
 
-                import('@/models/Leave').then(m => m.default.find({
+                Leave.find({
                     endDate: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) }
-                }).sort({ endDate: 1 }).lean()),
+                }).sort({ endDate: 1 }).lean(),
 
                 RecurringOrder.find({})
                     .sort({ createdAt: -1 })

@@ -130,25 +130,49 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                 }
 
                 await connectToDatabase();
-                const loginIdStr = String(credentials.loginId).trim();
+                const loginInput = String(credentials.loginId).trim();
+                const mpinInput = String(credentials.mpin).trim();
 
-                // Fast indexed exact lookup first
-                let employee = await Employee.findOne({ loginId: loginIdStr, status: 'Active' });
+                // 1. Fast indexed exact lookup (matches Login ID, Username, or Nickname)
+                let employee = await Employee.findOne({
+                    $or: [
+                        { loginId: loginInput },
+                        { loginId: loginInput.toLowerCase() },
+                        { username: loginInput },
+                        { nickname: loginInput }
+                    ],
+                    status: 'Active'
+                }).select('userId username rank status loginId mpin nickname').lean();
+
+                // 2. Case-insensitive exact match
                 if (!employee) {
-                    // Fallback to case-insensitive regex only if exact match is not found
+                    const safeRegex = new RegExp('^' + escapeRegex(loginInput) + '$', 'i');
                     employee = await Employee.findOne({
-                        loginId: { $regex: new RegExp('^' + escapeRegex(loginIdStr) + '$', 'i') },
+                        $or: [
+                            { loginId: safeRegex },
+                            { username: safeRegex },
+                            { nickname: safeRegex }
+                        ],
                         status: 'Active'
-                    });
+                    }).select('userId username rank status loginId mpin nickname').lean();
+                }
+
+                // 3. Match without or with "GM | " prefix if user entered just their name (e.g., "Arya Krishnan" or "Nimal Prince")
+                if (!employee && !loginInput.toUpperCase().startsWith('GM | ')) {
+                    const prefixedRegex = new RegExp('^GM\\s*\\|\\s*' + escapeRegex(loginInput) + '$', 'i');
+                    employee = await Employee.findOne({
+                        username: prefixedRegex,
+                        status: 'Active'
+                    }).select('userId username rank status loginId mpin nickname').lean();
                 }
 
                 if (!employee) {
-                    console.warn(`[Auth] No active employee found for Login ID: ${loginIdStr}`);
+                    console.warn(`[Auth] No active employee found for: ${loginInput}`);
                     throw new Error('Invalid Login ID or MPIN');
                 }
 
-                if (employee.mpin !== credentials.mpin) {
-                    console.warn(`[Auth] MPIN mismatch for Login ID: ${loginIdStr}`);
+                if (employee.mpin !== mpinInput) {
+                    console.warn(`[Auth] MPIN mismatch for: ${loginInput}`);
                     throw new Error('Invalid Login ID or MPIN');
                 }
 
@@ -183,14 +207,26 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
                 await connectToDatabase();
                 const vendorIdStr = String(credentials.vendorId).trim();
+                const mpinInput = String(credentials.mpin).trim();
 
                 // Fast indexed exact lookup first
-                let vendor = await VendorUser.findOne({ vendorId: vendorIdStr });
+                let vendor = await VendorUser.findOne({
+                    $or: [
+                        { vendorId: vendorIdStr },
+                        { vendorId: vendorIdStr.toLowerCase() },
+                        { name: vendorIdStr }
+                    ]
+                }).select('_id name role vendorId mpin').lean();
+
                 if (!vendor) {
-                    // Fallback to case-insensitive regex only if exact match is not found
+                    // Fallback to case-insensitive regex
+                    const safeRegex = new RegExp('^' + escapeRegex(vendorIdStr) + '$', 'i');
                     vendor = await VendorUser.findOne({
-                        vendorId: { $regex: new RegExp('^' + escapeRegex(vendorIdStr) + '$', 'i') }
-                    });
+                        $or: [
+                            { vendorId: safeRegex },
+                            { name: safeRegex }
+                        ]
+                    }).select('_id name role vendorId mpin').lean();
                 }
 
                 if (!vendor) {
@@ -198,7 +234,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     throw new Error('Invalid Vendor ID or MPIN');
                 }
 
-                if (vendor.mpin !== credentials.mpin) {
+                if (vendor.mpin !== mpinInput) {
                     console.warn(`[Auth] MPIN mismatch for Vendor ID: ${vendorIdStr}`);
                     throw new Error('Invalid Vendor ID or MPIN');
                 }

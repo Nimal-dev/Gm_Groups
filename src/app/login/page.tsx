@@ -123,7 +123,7 @@ export default function LoginPage() {
                                         <form ref={formRef} action={dispatch} className="space-y-4">
                                             <div className="space-y-4">
                                                 <div className="space-y-1.5 relative group">
-                                                    <Label htmlFor="loginId" className="text-xs text-white/70 uppercase tracking-wider pl-1">Login ID</Label>
+                                                    <Label htmlFor="loginId" className="text-xs text-white/70 uppercase tracking-wider pl-1">Login ID or Username</Label>
                                                     <div className="relative">
                                                         <UserRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-accent transition-colors" />
                                                         <input 
@@ -131,7 +131,7 @@ export default function LoginPage() {
                                                             name="loginId"
                                                             type="text" 
                                                             required
-                                                            placeholder="Enter your Login ID" 
+                                                            placeholder="Enter Login ID or Username" 
                                                             className="flex h-11 w-full rounded-md border border-white/10 bg-black/30 px-10 text-sm focus-visible:outline-none focus:border-accent text-white transition-all group-hover:border-white/20"
                                                         />
                                                     </div>

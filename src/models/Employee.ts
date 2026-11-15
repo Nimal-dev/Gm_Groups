@@ -44,6 +44,9 @@ const EmployeeSchema: Schema = new Schema({
 
 // Indexes for optimization
 EmployeeSchema.index({ status: 1 });
+EmployeeSchema.index({ loginId: 1, status: 1 });
+EmployeeSchema.index({ username: 1, status: 1 });
+EmployeeSchema.index({ nickname: 1, status: 1 });
 EmployeeSchema.index({ level: -1, xp: -1 }); // Sorting Leaderboard
 
 const Employee = mongoose.models.Employee || mongoose.model<IEmployee>('Employee', EmployeeSchema);

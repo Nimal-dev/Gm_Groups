@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic'; // Ensure real-time data
 
 // ... imports
 import connectToDatabase from '@/lib/db';
+import Employee from '@/models/Employee';
 // Fetch Full User Data (XP, Level, Achievements)
 import { auth } from '@/auth';
 import { sanitizeEmployeesForRole, escapeRegex } from '@/lib/employee-utils';
@@ -27,17 +28,16 @@ export default async function DashboardPage() {
 
     await connectToDatabase();
 
-    // We use the Employee model now, as it handles staff accounts
-    // session.user.id SHOULD correspond to Employee.userId (Discord ID)
-    let currentUser = await (await import('@/models/Employee')).default.findOne({
+    // Fast indexed employee lookup
+    let currentUser = await Employee.findOne({
         userId: session.user.id
-    }).lean();
+    }).select('userId username xp level achievements rank').lean();
 
     // Fallback: If no ID match, try username (legacy/safety)
     if (!currentUser) {
-        currentUser = await (await import('@/models/Employee')).default.findOne({
+        currentUser = await Employee.findOne({
             username: { $regex: new RegExp(`^${escapeRegex(session.user.name || '')}$`, 'i') }
-        }).lean();
+        }).select('userId username xp level achievements rank').lean();
     }
 
     // Fallback for debugging/if user still not found in DB
