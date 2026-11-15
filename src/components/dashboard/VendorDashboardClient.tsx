@@ -27,7 +27,8 @@ import {
     Package, Users, ShoppingCart, RefreshCw,
     Loader2, LogOut, Clock, X, CheckCircle2, Search,
     BarChart3, Receipt, Calendar, DollarSign, FileText, Hash, User,
-    Copy, Check, ArrowUpRight, TrendingUp, AlertCircle, Eye
+    Copy, Check, ArrowUpRight, TrendingUp, AlertCircle, Eye,
+    Plus, Pencil, Trash2
 } from 'lucide-react';
 
 import VendorReportsGenerator from './VendorReportsGenerator';
@@ -60,6 +61,18 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
     const [localPrices, setLocalPrices] = useState<Record<string, string>>({});
     const [savingPriceId, setSavingPriceId] = useState<string | null>(null);
     const [loadingInventory, setLoadingInventory] = useState(true);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [newItemName, setNewItemName] = useState('');
+    const [newItemPrice, setNewItemPrice] = useState('');
+    const [newItemUnit, setNewItemUnit] = useState('per unit');
+    const [isAddingItem, setIsAddingItem] = useState(false);
+    const [editingItem, setEditingItem] = useState<any | null>(null);
+    const [editItemName, setEditItemName] = useState('');
+    const [editItemPrice, setEditItemPrice] = useState('');
+    const [editItemUnit, setEditItemUnit] = useState('per unit');
+    const [isEditingItem, setIsEditingItem] = useState(false);
+    const [deletingItem, setDeletingItem] = useState<any | null>(null);
+    const [isDeletingItem, setIsDeletingItem] = useState(false);
 
     // Orders state
     const [orders, setOrders] = useState<any[]>([]);
@@ -160,6 +173,105 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
 
 
     // Inventory handlers
+    const handleAddItem = async () => {
+        if (!newItemName.trim()) {
+            toast({ title: 'Error', description: 'Item name is required', variant: 'destructive' });
+            return;
+        }
+        const numPrice = parseFloat(newItemPrice);
+        if (isNaN(numPrice) || numPrice < 0) {
+            toast({ title: 'Error', description: 'Please enter a valid price', variant: 'destructive' });
+            return;
+        }
+        setIsAddingItem(true);
+        try {
+            const mod = await import('@/actions/vendor');
+            const res = await mod.addVendorInventoryItem({
+                itemName: newItemName.trim(),
+                price: numPrice,
+                unit: newItemUnit.trim() || 'per unit',
+                vendorRole,
+            });
+            if (res.success && res.item) {
+                toast({ title: 'Ingredient Added', description: `${newItemName} added to inventory.`, className: 'bg-green-600 border-none' });
+                setInventory(prev => [...prev, res.item].sort((a, b) => a.itemName.localeCompare(b.itemName)));
+                setLocalPrices(prev => ({ ...prev, [res.item._id]: String(res.item.price) }));
+                setNewItemName('');
+                setNewItemPrice('');
+                setNewItemUnit('per unit');
+                setShowAddModal(false);
+            } else {
+                throw new Error(res.error || 'Failed to add ingredient');
+            }
+        } catch (err: any) {
+            toast({ title: 'Error', description: err.message, variant: 'destructive' });
+        }
+        setIsAddingItem(false);
+    };
+
+    const handleEditItemSubmit = async () => {
+        if (!editingItem) return;
+        if (!editItemName.trim()) {
+            toast({ title: 'Error', description: 'Item name cannot be empty', variant: 'destructive' });
+            return;
+        }
+        const numPrice = parseFloat(editItemPrice);
+        if (isNaN(numPrice) || numPrice < 0) {
+            toast({ title: 'Error', description: 'Please enter a valid price', variant: 'destructive' });
+            return;
+        }
+        setIsEditingItem(true);
+        try {
+            const mod = await import('@/actions/vendor');
+            const res = await mod.updateVendorInventoryItem({
+                id: editingItem._id,
+                itemName: editItemName.trim(),
+                price: numPrice,
+                unit: editItemUnit.trim() || 'per unit',
+                vendorRole,
+            });
+            if (res.success) {
+                toast({ title: 'Ingredient Updated', className: 'bg-green-600 border-none' });
+                setInventory(prev => prev.map(item =>
+                    item._id === editingItem._id
+                        ? { ...item, itemName: editItemName.trim(), price: numPrice, unit: editItemUnit.trim() || 'per unit' }
+                        : item
+                ));
+                setLocalPrices(prev => ({ ...prev, [editingItem._id]: String(numPrice) }));
+                setEditingItem(null);
+            } else {
+                throw new Error(res.error || 'Failed to update item');
+            }
+        } catch (err: any) {
+            toast({ title: 'Error', description: err.message, variant: 'destructive' });
+        }
+        setIsEditingItem(false);
+    };
+
+    const handleDeleteItemConfirm = async () => {
+        if (!deletingItem) return;
+        setIsDeletingItem(true);
+        try {
+            const mod = await import('@/actions/vendor');
+            const res = await mod.deleteVendorInventoryItem(deletingItem._id);
+            if (res.success) {
+                toast({ title: 'Ingredient Deleted', description: `${deletingItem.itemName} removed from inventory.`, className: 'bg-red-600 border-none' });
+                setInventory(prev => prev.filter(item => item._id !== deletingItem._id));
+                setLocalPrices(prev => {
+                    const next = { ...prev };
+                    delete next[deletingItem._id];
+                    return next;
+                });
+                setDeletingItem(null);
+            } else {
+                throw new Error(res.error || 'Failed to delete item');
+            }
+        } catch (err: any) {
+            toast({ title: 'Error', description: err.message, variant: 'destructive' });
+        }
+        setIsDeletingItem(false);
+    };
+
     const handleUpdatePrice = async (id: string, price: string) => {
         if (!price || isNaN(parseFloat(price))) {
             toast({ title: 'Error', description: 'Invalid price', variant: 'destructive' });
@@ -545,21 +657,32 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
                     )}
                 </TabsContent>
 
-                {/* INVENTORY TAB */}
+                                {/* INVENTORY TAB */}
                 <TabsContent value="inventory" className="space-y-4">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <h2 className="text-lg font-semibold flex items-center gap-2">
-                            <Package className="w-5 h-5 text-emerald-400" /> Inventory Pricing
-                        </h2>
-                        <div className="flex items-center gap-2 w-full md:w-auto">
-                            <Button variant="ghost" size="sm" onClick={fetchInventory} className="text-muted-foreground"><RefreshCw className="w-4 h-4 mr-1" /> Refresh</Button>
-                            <div className="relative w-full md:w-72">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h2 className="text-lg font-semibold flex items-center gap-2">
+                                <Package className="w-5 h-5 text-emerald-400" /> Inventory Pricing & Catalog
+                            </h2>
+                            <p className="text-xs text-muted-foreground mt-0.5">Manage raw material prices and synchronize items with GM Cafe recipes in real-time.</p>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                            <Button 
+                                onClick={() => setShowAddModal(true)} 
+                                className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-lg shadow-emerald-900/30 gap-1.5 h-9"
+                            >
+                                <Plus className="w-4 h-4" /> Add Ingredient
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={fetchInventory} className="text-muted-foreground h-9">
+                                <RefreshCw className="w-4 h-4 mr-1" /> Refresh
+                            </Button>
+                            <div className="relative w-full sm:w-64">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                 <Input 
                                     placeholder="Search raw materials..." 
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-9 bg-black/40 border-white/10 focus:ring-emerald-500/50"
+                                    value={searchTerm} 
+                                    onChange={(e) => setSearchTerm(e.target.value)} 
+                                    className="pl-9 h-9 bg-black/40 border-white/10 focus:ring-emerald-500/50" 
                                 />
                             </div>
                         </div>
@@ -576,7 +699,8 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
                                     <TableRow className="border-white/10 hover:bg-transparent">
                                         <TableHead className="text-muted-foreground font-semibold py-4 px-4 md:px-6">Raw Material</TableHead>
                                         <TableHead className="text-muted-foreground font-semibold py-4 hidden sm:table-cell">Unit</TableHead>
-                                        <TableHead className="text-right text-muted-foreground font-semibold py-4 px-4 md:px-6">Price ($)</TableHead>
+                                        <TableHead className="text-right text-muted-foreground font-semibold py-4 px-4 md:px-6">Quick Price ($)</TableHead>
+                                        <TableHead className="text-right text-muted-foreground font-semibold py-4 px-4 md:px-6">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -590,22 +714,23 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
                                             </TableCell>
                                             <TableCell className="text-muted-foreground py-4 italic text-sm hidden sm:table-cell">{item.unit}</TableCell>
                                             <TableCell className="text-right py-4 px-4 md:px-6">
-                                                <div className="flex items-center justify-end gap-2 md:gap-3">
+                                                <div className="flex items-center justify-end gap-1.5 sm:gap-2">
                                                     <div className="relative">
                                                         <Input 
                                                             type="number" 
                                                             value={localPrices[item._id] || ''} 
-                                                            onChange={(e) => setLocalPrices(prev => ({...prev, [item._id]: e.target.value}))}
-                                                            className="w-20 md:w-28 h-9 bg-black/40 border-white/10 text-emerald-400 font-mono text-right focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all pr-2"
+                                                            onChange={(e) => setLocalPrices(prev => ({...prev, [item._id]: e.target.value}))} 
+                                                            className="w-20 sm:w-24 h-9 bg-black/40 border-white/10 text-emerald-400 font-mono text-right focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all pr-2" 
                                                         />
                                                     </div>
                                                     <Button 
                                                         size="icon" 
                                                         variant="ghost" 
+                                                        title="Quick Save Price"
                                                         className={`h-9 w-9 transition-all duration-300 rounded-lg shrink-0 ${
                                                             localPrices[item._id] === String(item.price) 
                                                             ? 'text-muted-foreground/20' 
-                                                            : 'text-emerald-400 hover:bg-white hover:text-emerald-600 hover:scale-110 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
+                                                            : 'text-emerald-400 hover:bg-emerald-500/20 hover:scale-105'
                                                         }`}
                                                         disabled={savingPriceId === item._id || localPrices[item._id] === String(item.price)}
                                                         onClick={() => handleUpdatePrice(item._id, localPrices[item._id])}
@@ -613,8 +738,35 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
                                                         {savingPriceId === item._id ? (
                                                             <Loader2 className="w-4 h-4 animate-spin" />
                                                         ) : (
-                                                            <CheckCircle2 className={`w-4 h-4 ${localPrices[item._id] !== String(item.price) ? 'animate-pulse' : ''}`} />
+                                                            <CheckCircle2 className={`w-4 h-4 ${localPrices[item._id] !== String(item.price) ? 'animate-pulse text-emerald-400' : ''}`} />
                                                         )}
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-right py-4 px-4 md:px-6">
+                                                <div className="flex items-center justify-end gap-1">
+                                                    <Button 
+                                                        size="icon" 
+                                                        variant="ghost" 
+                                                        title="Edit Ingredient Details"
+                                                        className="h-8 w-8 text-zinc-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg shrink-0 transition-colors"
+                                                        onClick={() => {
+                                                            setEditingItem(item);
+                                                            setEditItemName(item.itemName);
+                                                            setEditItemPrice(String(item.price));
+                                                            setEditItemUnit(item.unit || 'per unit');
+                                                        }}
+                                                    >
+                                                        <Pencil className="w-4 h-4" />
+                                                    </Button>
+                                                    <Button 
+                                                        size="icon" 
+                                                        variant="ghost" 
+                                                        title="Delete Ingredient"
+                                                        className="h-8 w-8 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg shrink-0 transition-colors"
+                                                        onClick={() => setDeletingItem(item)}
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
                                                     </Button>
                                                 </div>
                                             </TableCell>
@@ -1177,6 +1329,165 @@ export default function VendorDashboardClient({ vendorRole, vendorName }: Vendor
                     </SheetFooter>
                 </SheetContent>
             </Sheet>
+            {/* ADD INGREDIENT DIALOG */}
+            <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+                <DialogContent className="sm:max-w-md bg-zinc-950 border-white/10 text-white">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-emerald-400">
+                            <Plus className="w-5 h-5" /> Add New Ingredient ({vendorRole})
+                        </DialogTitle>
+                        <CardDescription className="text-zinc-400">
+                            Add a new raw material to your vendor inventory and live cafe catalog.
+                        </CardDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-2">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="itemName" className="text-xs font-semibold text-zinc-300">Ingredient Name</Label>
+                            <Input
+                                id="itemName"
+                                placeholder="e.g. Alfredo Sauce, Burger Bun"
+                                value={newItemName}
+                                onChange={(e) => setNewItemName(e.target.value)}
+                                className="bg-black/50 border-white/10 text-white placeholder:text-zinc-600 focus:ring-emerald-500/50"
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                                <Label htmlFor="itemPrice" className="text-xs font-semibold text-zinc-300">Price ($)</Label>
+                                <Input
+                                    id="itemPrice"
+                                    type="number"
+                                    placeholder="e.g. 100"
+                                    value={newItemPrice}
+                                    onChange={(e) => setNewItemPrice(e.target.value)}
+                                    className="bg-black/50 border-white/10 text-emerald-400 font-mono focus:ring-emerald-500/50"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="itemUnit" className="text-xs font-semibold text-zinc-300">Unit</Label>
+                                <Input
+                                    id="itemUnit"
+                                    placeholder="e.g. per unit, per kg"
+                                    value={newItemUnit}
+                                    onChange={(e) => setNewItemUnit(e.target.value)}
+                                    className="bg-black/50 border-white/10 text-white placeholder:text-zinc-600 focus:ring-emerald-500/50"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setShowAddModal(false)}
+                            className="text-zinc-400 hover:text-white hover:bg-white/5"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleAddItem}
+                            disabled={isAddingItem || !newItemName.trim() || !newItemPrice.trim()}
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white"
+                        >
+                            {isAddingItem ? <Loader2 className="w-4 h-4 animate-spin mr-1.5" /> : <Plus className="w-4 h-4 mr-1.5" />}
+                            Add Ingredient
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* EDIT INGREDIENT DIALOG */}
+            <Dialog open={!!editingItem} onOpenChange={(open) => !open && setEditingItem(null)}>
+                <DialogContent className="sm:max-w-md bg-zinc-950 border-white/10 text-white">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-blue-400">
+                            <Pencil className="w-5 h-5" /> Edit Ingredient
+                        </DialogTitle>
+                        <CardDescription className="text-zinc-400">
+                            Update details and pricing for this ingredient.
+                        </CardDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-2">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="editItemName" className="text-xs font-semibold text-zinc-300">Ingredient Name</Label>
+                            <Input
+                                id="editItemName"
+                                value={editItemName}
+                                onChange={(e) => setEditItemName(e.target.value)}
+                                className="bg-black/50 border-white/10 text-white focus:ring-blue-500/50"
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                                <Label htmlFor="editItemPrice" className="text-xs font-semibold text-zinc-300">Price ($)</Label>
+                                <Input
+                                    id="editItemPrice"
+                                    type="number"
+                                    value={editItemPrice}
+                                    onChange={(e) => setEditItemPrice(e.target.value)}
+                                    className="bg-black/50 border-white/10 text-emerald-400 font-mono focus:ring-blue-500/50"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="editItemUnit" className="text-xs font-semibold text-zinc-300">Unit</Label>
+                                <Input
+                                    id="editItemUnit"
+                                    value={editItemUnit}
+                                    onChange={(e) => setEditItemUnit(e.target.value)}
+                                    className="bg-black/50 border-white/10 text-white focus:ring-blue-500/50"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setEditingItem(null)}
+                            className="text-zinc-400 hover:text-white hover:bg-white/5"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleEditItemSubmit}
+                            disabled={isEditingItem || !editItemName.trim() || !editItemPrice.trim()}
+                            className="bg-blue-600 hover:bg-blue-500 text-white"
+                        >
+                            {isEditingItem ? <Loader2 className="w-4 h-4 animate-spin mr-1.5" /> : <Check className="w-4 h-4 mr-1.5" />}
+                            Save Changes
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* DELETE INGREDIENT DIALOG */}
+            <Dialog open={!!deletingItem} onOpenChange={(open) => !open && setDeletingItem(null)}>
+                <DialogContent className="sm:max-w-md bg-zinc-950 border-red-500/20 text-white">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-red-400">
+                            <Trash2 className="w-5 h-5" /> Delete Ingredient
+                        </DialogTitle>
+                        <CardDescription className="text-zinc-400">
+                            Are you sure you want to delete <span className="text-white font-semibold">{deletingItem?.itemName}</span>? This will remove it from your vendor catalog and set your price to $0.
+                        </CardDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2 sm:gap-0 mt-2">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setDeletingItem(null)}
+                            className="text-zinc-400 hover:text-white hover:bg-white/5"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleDeleteItemConfirm}
+                            disabled={isDeletingItem}
+                            className="bg-red-600 hover:bg-red-500 text-white"
+                        >
+                            {isDeletingItem ? <Loader2 className="w-4 h-4 animate-spin mr-1.5" /> : <Trash2 className="w-4 h-4 mr-1.5" />}
+                            Delete Ingredient
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

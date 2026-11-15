@@ -1,6 +1,10 @@
 'use server';
 
 import { fetchBot } from '@/lib/bot-api';
+import connectToDatabase from '@/lib/db';
+import RawMaterial from '@/models/RawMaterial';
+import VendorInventory from '@/models/VendorInventory';
+import { revalidatePath } from 'next/cache';
 
 // ==================== Admin Vendor Management ====================
 
@@ -51,10 +55,26 @@ export async function deleteVendorUser(id: string) {
 export async function getVendorInventory(role?: string) {
     try {
         const url = role ? `/api/vendor/inventory?role=${role}` : '/api/vendor/inventory';
-        const response = await fetchBot(url, { method: 'GET', cache: 'no-store' });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
-        return { success: true, items: data.items };
+        let items: any[] = [];
+        try {
+            const response = await fetchBot(url, { method: 'GET', cache: 'no-store' });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.items) items = data.items;
+            }
+        } catch (botErr) {
+            console.warn('[VendorAction] fetchBot failed for getVendorInventory, falling back to direct DB:', botErr);
+        }
+
+        // Direct DB fallback if empty or bot offline
+        if (items.length === 0) {
+            await connectToDatabase();
+            const query = role ? { vendorRole: role } : {};
+            const dbItems = await VendorInventory.find(query).sort({ itemName: 1 }).lean();
+            items = JSON.parse(JSON.stringify(dbItems));
+        }
+
+        return { success: true, items };
     } catch (error: any) {
         console.error('Get Inventory Error:', error);
         return { success: false, error: error.message, items: [] };
@@ -63,28 +83,120 @@ export async function getVendorInventory(role?: string) {
 
 export async function addVendorInventoryItem(payload: { itemName: string; price: number; unit: string; vendorRole: string }) {
     try {
-        const response = await fetchBot('/api/vendor/inventory', {
-            method: 'POST',
-            body: JSON.stringify(payload),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
-        return { success: true, item: data.item };
+        const cleanName = payload.itemName.trim();
+        const numPrice = Number(payload.price);
+        const itemUnit = payload.unit ? payload.unit.trim() : 'per unit';
+        const role = payload.vendorRole;
+
+        let botItem = null;
+        try {
+            const response = await fetchBot('/api/vendor/inventory', {
+                method: 'POST',
+                body: JSON.stringify({ itemName: cleanName, price: numPrice, unit: itemUnit, vendorRole: role }),
+            });
+            const data = await response.json();
+            if (response.ok && data.item) botItem = data.item;
+        } catch (botErr) {
+            console.warn('[VendorAction] fetchBot failed for addVendorInventoryItem, using direct DB sync:', botErr);
+        }
+
+        // Direct DB Sync
+        await connectToDatabase();
+        let item = botItem;
+        if (!item) {
+            const created = await VendorInventory.create({
+                itemName: cleanName,
+                price: numPrice,
+                unit: itemUnit,
+                vendorRole: role
+            });
+            item = JSON.parse(JSON.stringify(created));
+        }
+
+        // Synchronize with RawMaterial model
+        const slugId = cleanName.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+        const rateUpdate = role === 'YKZ' ? { ykzRate: numPrice } : { mlbRate: numPrice };
+
+        await RawMaterial.findOneAndUpdate(
+            { $or: [{ id: slugId }, { name: { $regex: new RegExp(`^${cleanName}$`, 'i') } }] },
+            {
+                $set: {
+                    name: cleanName,
+                    unit: itemUnit,
+                    ...rateUpdate
+                },
+                $setOnInsert: {
+                    id: slugId,
+                    category: 'General',
+                    weight: 0.1,
+                    station: 'Kitchen',
+                    ...(role === 'YKZ' ? { mlbRate: 0 } : { ykzRate: 0 })
+                }
+            },
+            { upsert: true, new: true }
+        );
+
+        revalidatePath('/vendor-dashboard');
+        revalidatePath('/rawrequest');
+        revalidatePath('/portal/dashboard');
+        revalidatePath('/dashboard');
+
+        return { success: true, item };
     } catch (error: any) {
         console.error('Add Inventory Error:', error);
         return { success: false, error: error.message };
     }
 }
 
-export async function updateVendorInventoryItem(payload: { id: string; itemName?: string; price?: number; unit?: string }) {
+export async function updateVendorInventoryItem(payload: { id: string; itemName?: string; price?: number; unit?: string; vendorRole?: string }) {
     try {
-        const response = await fetchBot('/api/vendor/inventory', {
-            method: 'PUT',
-            body: JSON.stringify(payload),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
-        return { success: true, item: data.item };
+        let botItem = null;
+        try {
+            const response = await fetchBot('/api/vendor/inventory', {
+                method: 'PUT',
+                body: JSON.stringify(payload),
+            });
+            const data = await response.json();
+            if (response.ok && data.item) botItem = data.item;
+        } catch (botErr) {
+            console.warn('[VendorAction] fetchBot failed for updateVendorInventoryItem, using direct DB sync:', botErr);
+        }
+
+        // Direct DB Sync
+        await connectToDatabase();
+        const updateData: any = {};
+        if (payload.itemName) updateData.itemName = payload.itemName.trim();
+        if (payload.price != null) updateData.price = Number(payload.price);
+        if (payload.unit) updateData.unit = payload.unit.trim();
+
+        const item = await VendorInventory.findByIdAndUpdate(payload.id, updateData, { new: true });
+        const targetItem = botItem || (item ? JSON.parse(JSON.stringify(item)) : null);
+
+        if (targetItem) {
+            const role = payload.vendorRole || targetItem.vendorRole;
+            const updateFields: any = {};
+            if (payload.price != null) {
+                if (role === 'YKZ') updateFields.ykzRate = Number(payload.price);
+                else updateFields.mlbRate = Number(payload.price);
+            }
+            if (payload.itemName) updateFields.name = payload.itemName.trim();
+            if (payload.unit) updateFields.unit = payload.unit.trim();
+
+            if (Object.keys(updateFields).length > 0) {
+                const searchName = targetItem.itemName;
+                await RawMaterial.updateOne(
+                    { name: { $regex: new RegExp(`^${searchName}$`, 'i') } },
+                    { $set: updateFields }
+                );
+            }
+        }
+
+        revalidatePath('/vendor-dashboard');
+        revalidatePath('/rawrequest');
+        revalidatePath('/portal/dashboard');
+        revalidatePath('/dashboard');
+
+        return { success: true, item: targetItem };
     } catch (error: any) {
         console.error('Update Inventory Error:', error);
         return { success: false, error: error.message };
@@ -93,12 +205,33 @@ export async function updateVendorInventoryItem(payload: { id: string; itemName?
 
 export async function deleteVendorInventoryItem(id: string) {
     try {
-        const response = await fetchBot('/api/vendor/inventory', {
-            method: 'DELETE',
-            body: JSON.stringify({ id }),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
+        try {
+            await fetchBot('/api/vendor/inventory', {
+                method: 'DELETE',
+                body: JSON.stringify({ id }),
+            });
+        } catch (botErr) {
+            console.warn('[VendorAction] fetchBot failed for deleteVendorInventoryItem, using direct DB sync:', botErr);
+        }
+
+        // Direct DB Sync
+        await connectToDatabase();
+        const item = await VendorInventory.findByIdAndDelete(id);
+
+        if (item) {
+            const role = item.vendorRole;
+            const updateField = role === 'YKZ' ? { ykzRate: 0 } : { mlbRate: 0 };
+            await RawMaterial.updateOne(
+                { name: { $regex: new RegExp(`^${item.itemName.trim()}$`, 'i') } },
+                { $set: updateField }
+            );
+        }
+
+        revalidatePath('/vendor-dashboard');
+        revalidatePath('/rawrequest');
+        revalidatePath('/portal/dashboard');
+        revalidatePath('/dashboard');
+
         return { success: true };
     } catch (error: any) {
         console.error('Delete Inventory Error:', error);
